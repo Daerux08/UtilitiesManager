@@ -64,11 +64,36 @@ namespace UtilitiesManager
         public int OriginalValueSound { get; private set; }
         public BatteryInfo BatteryStatus { get; private set; } = new BatteryInfo();
 
+        public bool IsBrightnessCtlAvailable { get; private set; }
+        public bool IsPactlAvailable { get; private set; }
+        public bool IsUpowerAvailable { get; private set; }
+
         public async Task LoadOriginalValuesAsync()
         {
-            OriginalValueLight = await GetBrightnessPercentAsync();
-            OriginalValueSound = await GetVolumeAsync();
-            BatteryStatus = await GetBatteryAsync();
+            await CheckDependenciesAsync();
+            OriginalValueLight = IsBrightnessCtlAvailable ? await GetBrightnessPercentAsync() : 50;
+            OriginalValueSound = IsPactlAvailable ? await GetVolumeAsync() : 50;
+            BatteryStatus = IsUpowerAvailable ? await GetBatteryAsync() : new BatteryInfo();
+        }
+
+        public async Task CheckDependenciesAsync()
+        {
+            IsBrightnessCtlAvailable = await CheckCommandAvailable("brightnessctl");
+            IsPactlAvailable = await CheckCommandAvailable("pactl");
+            IsUpowerAvailable = await CheckCommandAvailable("upower");
+        }
+
+        private async Task<bool> CheckCommandAvailable(string command)
+        {
+            try
+            {
+                string output = await TerminalCommands.RunCommandAsync($"which {command}");
+                return !string.IsNullOrWhiteSpace(output);
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         // BRIGHTNESS 

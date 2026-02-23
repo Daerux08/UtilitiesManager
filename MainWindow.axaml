@@ -11,6 +11,10 @@
         Icon="avares://UtilitiesManager/UtilManagerV3.png"
 >
 
+    <Window.Resources>
+        <local:BoolToStringConverter x:Key="BoolToStringConverter" />
+    </Window.Resources>
+
     <Window.Styles>
         <Style Selector="TextBlock">
             <Setter Property="Margin" Value="0,5,0,1"/>
@@ -36,7 +40,12 @@
         <TextBlock Text="Slider 1 – Sound Level"/>
         <Slider Minimum="0" Maximum="100"
                 Value="{Binding SoundLevel}"
-                TickFrequency="1" IsSnapToTickEnabled="True"/>
+                TickFrequency="1" IsSnapToTickEnabled="True"
+                IsEnabled="{Binding SoundAvailable}">
+            <ToolTip.Tip>
+                <TextBlock Text="{Binding SoundAvailable, Converter={StaticResource BoolToStringConverter}, ConverterParameter='pactl is not found|Volume control'}" />
+            </ToolTip.Tip>
+        </Slider>
         <TextBlock Text="{Binding SoundLevel, StringFormat='Volume {0:F0}%'}"
                    HorizontalAlignment="Center"
                    FontWeight="SemiBold"
@@ -45,7 +54,12 @@
         <TextBlock Text="Slider 2 – Screen Brightness"/>
         <Slider Minimum="0" Maximum="100"
                 Value="{Binding Brightness}"
-                TickFrequency="1" IsSnapToTickEnabled="True"/>
+                TickFrequency="1" IsSnapToTickEnabled="True"
+                IsEnabled="{Binding BrightnessAvailable}">
+            <ToolTip.Tip>
+                <TextBlock Text="{Binding BrightnessAvailable, Converter={StaticResource BoolToStringConverter}, ConverterParameter='brightnessctl is not found|Brightness control'}" />
+            </ToolTip.Tip>
+        </Slider>
         <TextBlock Text="{Binding Brightness, StringFormat='Brightness: {0:F0}% – '}"
                    HorizontalAlignment="Center"
                    FontWeight="SemiBold"
@@ -53,6 +67,11 @@
 
         <!-- The new button that saves your soul -->
         <Button Content="Open Battery Menu"
-                Click="OpenBattery_Click" />
+                Click="OpenBattery_Click"
+                IsEnabled="{Binding BatteryAvailable}">
+            <ToolTip.Tip>
+                <TextBlock Text="{Binding BatteryAvailable, Converter={StaticResource BoolToStringConverter}, ConverterParameter='upower is not found|Battery status'}" />
+            </ToolTip.Tip>
+        </Button>
     </StackPanel>
 </Window>

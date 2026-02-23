@@ -28,7 +28,8 @@ public partial class BatteryWindow : Window  // ← assuming you renamed the cla
     private async Task RefreshBatteryDataAsync()
     {
         var checker = new CheckDependencyCommand();
-        var status = await checker.GetBatteryAsync();
+        await checker.CheckDependenciesAsync(); // Need to call this first
+        var status = checker.IsUpowerAvailable ? await checker.GetBatteryAsync() : new BatteryInfo { State = "upower not found" };
 
         if (this.FindControl<TextBlock>("PercentageText") is TextBlock pct)
         {
