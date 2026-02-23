@@ -9,5 +9,4 @@ Current functionalities include:
 
 Future updates include:
 1. Better edge-case handling
-2. Error windows with fixes
-3. More attractive UI
+2. More attractive UI
