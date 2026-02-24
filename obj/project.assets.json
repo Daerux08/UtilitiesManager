@@ -1369,24 +1369,31 @@
     ]
   },
   "packageFolders": {
-    "/home/mr-owl/.nuget/packages/": {}
+    "C:\\Users\\test441\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/mr-owl/UtilitiesManager/UtilitiesManager.csproj",
+      "projectUniqueName": "C:\\Users\\test441\\OneDrive\\Documents\\GitHub\\UtilitiesManager\\UtilitiesManager.csproj",
       "projectName": "UtilitiesManager",
-      "projectPath": "/home/mr-owl/UtilitiesManager/UtilitiesManager.csproj",
-      "packagesPath": "/home/mr-owl/.nuget/packages/",
-      "outputPath": "/home/mr-owl/UtilitiesManager/obj/",
+      "projectPath": "C:\\Users\\test441\\OneDrive\\Documents\\GitHub\\UtilitiesManager\\UtilitiesManager.csproj",
+      "packagesPath": "C:\\Users\\test441\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\test441\\OneDrive\\Documents\\GitHub\\UtilitiesManager\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "/home/mr-owl/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\test441\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "net10.0"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -1448,7 +1455,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/home/mr-owl/.dotnet/sdk/10.0.103/PortableRuntimeIdentifierGraph.json",
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json",
         "packagesToPrune": {
           "Microsoft.CSharp": "(,4.7.32767]",
           "Microsoft.VisualBasic": "(,10.4.32767]",

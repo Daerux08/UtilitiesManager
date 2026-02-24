@@ -36,6 +36,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private bool _brightnessAvailable;
     private bool _soundAvailable;
     private bool _batteryAvailable;
+    private bool _wifiAvailable;
 
     public int SoundLevel
     {
@@ -87,6 +88,16 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         }
     }
 
+    public bool WiFiAvailable
+    {
+        get => _wifiAvailable;
+        set
+        {
+            _wifiAvailable = value;
+            OnPropertyChanged();
+        }
+    }
+
     public bool BatteryAvailable
     {
         get => _batteryAvailable;
@@ -115,6 +126,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         BrightnessAvailable = _checker.IsBrightnessCtlAvailable;
         SoundAvailable = _checker.IsPactlAvailable;
         BatteryAvailable = _checker.IsUpowerAvailable;
+        WiFiAvailable = _checker.IsNmcliAvailable;
     }
 
     public new event PropertyChangedEventHandler? PropertyChanged;
@@ -132,5 +144,15 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         var batteryWindow = new BatteryWindow();
         batteryWindow.Show(this);                   // 5
         // batteryWindow.ShowDialog(this);          // ← uncomment if you want modal (blocks main window)
+    }
+
+    // ← Wi-Fi button click opens Wi-Fi window
+    private void OpenWiFi_Click(object? sender, RoutedEventArgs e)
+    {
+        if (!WiFiAvailable)
+            return; // Or show a message, but since button will be disabled, maybe not needed
+        var wifiWindow = new WiFiWindow();
+        wifiWindow.Show(this);
+        // wifiWindow.ShowDialog(this);            // ← uncomment if you want modal (blocks main window)
     }
 }

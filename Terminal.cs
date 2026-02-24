@@ -16,6 +16,17 @@ namespace UtilitiesManager
         public bool IsPresent { get; set; } = false;
     }
 
+    public class WiFiInfo
+    {
+        public string SSID { get; set; } = "";
+        public string Mode { get; set; } = "";
+        public string Chan { get; set; } = "";
+        public string Rate { get; set; } = "";
+        public string Signal { get; set; } = "";
+        public string Security { get; set; } = "";
+        public bool IsActive { get; set; } = false;
+    }
+
     public static class TerminalCommands
     {
         public static async Task<string> RunCommandAsync(string command, int timeoutMs = Timeout.Infinite)
@@ -67,6 +78,7 @@ namespace UtilitiesManager
         public bool IsBrightnessCtlAvailable { get; private set; }
         public bool IsPactlAvailable { get; private set; }
         public bool IsUpowerAvailable { get; private set; }
+        public bool IsNmcliAvailable { get; private set; }
 
         public async Task LoadOriginalValuesAsync()
         {
@@ -81,6 +93,7 @@ namespace UtilitiesManager
             IsBrightnessCtlAvailable = await CheckCommandAvailable("brightnessctl");
             IsPactlAvailable = await CheckCommandAvailable("pactl");
             IsUpowerAvailable = await CheckCommandAvailable("upower");
+            IsNmcliAvailable = await CheckCommandAvailable("nmcli");
         }
 
         private async Task<bool> CheckCommandAvailable(string command)
@@ -179,6 +192,88 @@ namespace UtilitiesManager
             }
 
             return info;
+        }
+
+        // WIFI
+        public async Task<List<WiFiInfo>> GetWiFiNetworksAsync()
+        {
+            var networks = new List<WiFiInfo>();
+
+            try
+            {
+                string output = await TerminalCommands.RunCommandAsync("nmcli device wifi list");
+
+                if (string.IsNullOrWhiteSpace(output))
+                    return networks;
+
+                var lines = output.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+
+                // Skip the header line and process each network
+                for (int i = 1; i < lines.Length; i++)
+                {
+                    var line = lines[i].Trim();
+                    if (string.IsNullOrWhiteSpace(line))
+                        continue;
+
+                    // Parse the nmcli output format
+                    // The columns are: IN-USE, SSID, MODE, CHAN, RATE, SIGNAL, BARS, SECURITY
+                    var parts = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    
+                    if (parts.Length >= 7)
+                    {
+                        var network = new WiFiInfo();
+                        
+                        // Check if this network is currently connected (marked with '*')
+                        network.IsActive = parts[0] == "*";
+                        
+                        // SSID might contain spaces, so we need to be more careful
+                        // Find where the mode column starts (usually after SSID)
+                        int modeIndex = 1;
+                        if (network.IsActive)
+                            modeIndex = 2; // Skip the '*' and potential space
+                        
+                        // Try to identify the mode column position
+                        for (int j = modeIndex; j < parts.Length; j++)
+                        {
+                            if (parts[j] == "Infra" || parts[j] == "Ad-Hoc" || parts[j] == "AP")
+                            {
+                                // Extract SSID (everything from position 1 to before mode)
+                                network.SSID = string.Join(" ", parts[modeIndex..j]);
+                                network.Mode = parts[j];
+                                network.Chan = j + 1 < parts.Length ? parts[j + 1] : "";
+                                network.Rate = j + 2 < parts.Length ? parts[j + 2] : "";
+                                network.Signal = j + 3 < parts.Length ? parts[j + 3] : "";
+                                
+                                // Security is usually the last part
+                                if (j + 4 < parts.Length)
+                                {
+                                    network.Security = string.Join(" ", parts[(j + 4)..]);
+                                }
+                                break;
+                            }
+                        }
+                        
+                        // Fallback parsing if the above fails
+                        if (string.IsNullOrEmpty(network.Mode) && parts.Length >= 7)
+                        {
+                            network.SSID = parts[1];
+                            network.Mode = parts[2];
+                            network.Chan = parts[3];
+                            network.Rate = parts[4];
+                            network.Signal = parts[5];
+                            network.Security = parts.Length > 7 ? string.Join(" ", parts[7..]) : parts[6];
+                        }
+
+                        networks.Add(network);
+                    }
+                }
+            }
+            catch
+            {
+                // Return empty list if parsing fails
+            }
+
+            return networks;
         }
     }
 }

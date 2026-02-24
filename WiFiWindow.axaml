@@ -1,0 +1,87 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="400"
+        x:Class="UtilitiesManager.WiFiWindow"
+        Title="Wi-Fi Networks"
+        WindowStartupLocation="CenterScreen"
+        Icon="avares://UtilitiesManager/UtilManagerV3.png">
+
+    <Window.Styles>
+        <Style Selector="Button">
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Padding" Value="10,5"/>
+        </Style>
+        <Style Selector="DataGrid">
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="AutoGenerateColumns" Value="False"/>
+            <Setter Property="CanUserReorderColumns" Value="True"/>
+            <Setter Property="CanUserResizeColumns" Value="True"/>
+            <Setter Property="CanUserSortColumns" Value="True"/>
+            <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+            <Setter Property="IsReadOnly" Value="True"/>
+            <Setter Property="SelectionMode" Value="Single"/>
+        </Style>
+        <Style Selector="DataGridRow:selected /template/ Rectangle#BackgroundRectangle">
+            <Setter Property="Fill" Value="#FF007ACC"/>
+        </Style>
+    </Window.Styles>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <TextBlock Grid.Row="0" 
+                   Text="Available Wi-Fi Networks" 
+                   FontSize="18" 
+                   FontWeight="Bold" 
+                   HorizontalAlignment="Center" 
+                   Margin="0,10,0,10"/>
+
+        <!-- Data Grid -->
+        <DataGrid Grid.Row="1" 
+                  Name="WiFiDataGrid"
+                  ItemsSource="{Binding WiFiNetworks}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Status" 
+                                    Binding="{Binding IsActive, Converter={StaticResource BoolToStatusConverter}}" 
+                                    Width="80"/>
+                <DataGridTextColumn Header="SSID" 
+                                    Binding="{Binding SSID}" 
+                                    Width="*"/>
+                <DataGridTextColumn Header="Mode" 
+                                    Binding="{Binding Mode}" 
+                                    Width="80"/>
+                <DataGridTextColumn Header="Channel" 
+                                    Binding="{Binding Chan}" 
+                                    Width="70"/>
+                <DataGridTextColumn Header="Rate" 
+                                    Binding="{Binding Rate}" 
+                                    Width="80"/>
+                <DataGridTextColumn Header="Signal" 
+                                    Binding="{Binding Signal}" 
+                                    Width="70"/>
+                <DataGridTextColumn Header="Security" 
+                                    Binding="{Binding Security}" 
+                                    Width="*"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="2" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Center" 
+                    Margin="0,10,0,10">
+            <Button Content="Refresh" 
+                    Click="Refresh_Click"/>
+            <Button Content="Close" 
+                    Click="OnCloseClick"/>
+        </StackPanel>
+    </Grid>
+</Window>
