@@ -17,20 +17,20 @@ build_property.PlatformNeutralAssembly =
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = UtilitiesManager
-build_property.ProjectDir = C:\Users\test441\OneDrive\Documents\GitHub\UtilitiesManager\
+build_property.ProjectDir = /home/mr-owl/UtilitiesManager/
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.EffectiveAnalysisLevelStyle = 10.0
 build_property.EnableCodeStyleSeverity = 
 
-[C:/Users/test441/OneDrive/Documents/GitHub/UtilitiesManager/App.axaml]
+[/home/mr-owl/UtilitiesManager/App.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
-[C:/Users/test441/OneDrive/Documents/GitHub/UtilitiesManager/BatteryWindow.axaml]
+[/home/mr-owl/UtilitiesManager/BatteryWindow.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
-[C:/Users/test441/OneDrive/Documents/GitHub/UtilitiesManager/MainWindow.axaml]
+[/home/mr-owl/UtilitiesManager/MainWindow.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
-[C:/Users/test441/OneDrive/Documents/GitHub/UtilitiesManager/WiFiWindow.axaml]
+[/home/mr-owl/UtilitiesManager/WiFiWindow.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml

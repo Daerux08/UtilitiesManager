@@ -5,6 +5,7 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Threading.Tasks;
 
@@ -27,9 +28,31 @@ public class BoolToStatusConverter : IValueConverter
     }
 }
 
-public partial class WiFiWindow : Window
+public partial class WiFiWindow : Window, INotifyPropertyChanged
 {
-    public List<WiFiInfo> WiFiNetworks { get; private set; } = new List<WiFiInfo>();
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    private List<WiFiInfo> _wiFiNetworks = new List<WiFiInfo>();
+    public List<WiFiInfo> WiFiNetworks
+    {
+        get => _wiFiNetworks;
+        private set
+        {
+            _wiFiNetworks = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(WiFiNetworks)));
+        }
+    }
+
+    private string _statusText = "Loading WiFi networks...";
+    public string StatusText
+    {
+        get => _statusText;
+        set
+        {
+            _statusText = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(StatusText)));
+        }
+    }
 
     public WiFiWindow()
     {
@@ -50,22 +73,31 @@ public partial class WiFiWindow : Window
 
     private async Task RefreshWiFiDataAsync()
     {
-        var checker = new CheckDependencyCommand();
-        await checker.CheckDependenciesAsync();
-        
-        if (checker.IsNmcliAvailable)
+        try
         {
-            WiFiNetworks = await checker.GetWiFiNetworksAsync();
+            var checker = new CheckDependencyCommand();
+            await checker.CheckDependenciesAsync();
+            
+            if (checker.IsNmcliAvailable)
+            {
+                WiFiNetworks = await checker.GetWiFiNetworksAsync();
+                StatusText = $"Loaded {WiFiNetworks.Count} WiFi networks.";
+            }
+            else
+            {
+                WiFiNetworks = new List<WiFiInfo>();
+                StatusText = "nmcli is not available.";
+            }
         }
-        else
+        catch (Exception ex)
         {
             WiFiNetworks = new List<WiFiInfo>();
+            StatusText = $"Error loading WiFi networks: {ex.Message}";
         }
 
-        // Update the DataGrid
+        // Update the DataGrid manually to ensure it updates
         if (this.FindControl<DataGrid>("WiFiDataGrid") is DataGrid dataGrid)
         {
-            dataGrid.ItemsSource = null;
             dataGrid.ItemsSource = WiFiNetworks;
         }
     }

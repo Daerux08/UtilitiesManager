@@ -1,31 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\test441\\OneDrive\\Documents\\GitHub\\UtilitiesManager\\UtilitiesManager.csproj": {}
+    "/home/mr-owl/UtilitiesManager/UtilitiesManager.csproj": {}
   },
   "projects": {
-    "C:\\Users\\test441\\OneDrive\\Documents\\GitHub\\UtilitiesManager\\UtilitiesManager.csproj": {
+    "/home/mr-owl/UtilitiesManager/UtilitiesManager.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\test441\\OneDrive\\Documents\\GitHub\\UtilitiesManager\\UtilitiesManager.csproj",
+        "projectUniqueName": "/home/mr-owl/UtilitiesManager/UtilitiesManager.csproj",
         "projectName": "UtilitiesManager",
-        "projectPath": "C:\\Users\\test441\\OneDrive\\Documents\\GitHub\\UtilitiesManager\\UtilitiesManager.csproj",
-        "packagesPath": "C:\\Users\\test441\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\test441\\OneDrive\\Documents\\GitHub\\UtilitiesManager\\obj\\",
+        "projectPath": "/home/mr-owl/UtilitiesManager/UtilitiesManager.csproj",
+        "packagesPath": "/home/mr-owl/.nuget/packages/",
+        "outputPath": "/home/mr-owl/UtilitiesManager/obj/",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
-        ],
         "configFilePaths": [
-          "C:\\Users\\test441\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/home/mr-owl/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net10.0"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -51,6 +45,10 @@
           "targetAlias": "net10.0",
           "dependencies": {
             "Avalonia": {
+              "target": "Package",
+              "version": "[11.3.12, )"
+            },
+            "Avalonia.Controls.DataGrid": {
               "target": "Package",
               "version": "[11.3.12, )"
             },
@@ -87,7 +85,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.103/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "/home/mr-owl/.dotnet/sdk/10.0.103/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.CSharp": "(,4.7.32767]",
             "Microsoft.VisualBasic": "(,10.4.32767]",

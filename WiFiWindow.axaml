@@ -2,11 +2,17 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:UtilitiesManager"
         mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="400"
         x:Class="UtilitiesManager.WiFiWindow"
+        x:DataType="local:WiFiWindow"
         Title="Wi-Fi Networks"
         WindowStartupLocation="CenterScreen"
         Icon="avares://UtilitiesManager/UtilManagerV3.png">
+
+    <Window.Resources>
+        <local:BoolToStatusConverter x:Key="BoolToStatusConverter" />
+    </Window.Resources>
 
     <Window.Styles>
         <Style Selector="Button">
@@ -50,24 +56,31 @@
                   ItemsSource="{Binding WiFiNetworks}">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Status" 
+                                    x:DataType="local:WiFiInfo"
                                     Binding="{Binding IsActive, Converter={StaticResource BoolToStatusConverter}}" 
                                     Width="80"/>
                 <DataGridTextColumn Header="SSID" 
+                                    x:DataType="local:WiFiInfo"
                                     Binding="{Binding SSID}" 
                                     Width="*"/>
                 <DataGridTextColumn Header="Mode" 
+                                    x:DataType="local:WiFiInfo"
                                     Binding="{Binding Mode}" 
                                     Width="80"/>
                 <DataGridTextColumn Header="Channel" 
+                                    x:DataType="local:WiFiInfo"
                                     Binding="{Binding Chan}" 
                                     Width="70"/>
                 <DataGridTextColumn Header="Rate" 
+                                    x:DataType="local:WiFiInfo"
                                     Binding="{Binding Rate}" 
                                     Width="80"/>
                 <DataGridTextColumn Header="Signal" 
+                                    x:DataType="local:WiFiInfo"
                                     Binding="{Binding Signal}" 
                                     Width="70"/>
                 <DataGridTextColumn Header="Security" 
+                                    x:DataType="local:WiFiInfo"
                                     Binding="{Binding Security}" 
                                     Width="*"/>
             </DataGrid.Columns>
