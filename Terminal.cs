@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Threading;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace UtilitiesManager
 {
@@ -196,9 +197,9 @@ namespace UtilitiesManager
         }
 
         // WIFI
-        public async Task<List<WiFiInfo>> GetWiFiNetworksAsync()
+        public async Task<ObservableCollection<WiFiInfo>> GetWiFiNetworksAsync()
         {
-            var networks = new List<WiFiInfo>();
+            var networks = new ObservableCollection<WiFiInfo>();
 
             try
             {
@@ -216,61 +217,44 @@ namespace UtilitiesManager
                     if (string.IsNullOrWhiteSpace(line))
                         continue;
 
-                    // Parse the nmcli output format
-                    // The columns are: IN-USE, SSID, MODE, CHAN, RATE, SIGNAL, BARS, SECURITY
-                    var parts = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                    
-                    if (parts.Length >= 7)
+                    // Split by 2 or more spaces to separate columns
+                    var parts = Regex.Split(line, @"\s{2,}");
+
+                    if (parts.Length >= 8)
                     {
                         var network = new WiFiInfo();
                         
-                        // Check if this network is currently connected (marked with '*')
-                        network.IsActive = parts[0] == "*";
+                        // IN-USE is the first part, check for '*'
+                        network.IsActive = parts[0].Contains("*");
                         
-                        // SSID might contain spaces, so we need to be more careful
-                        // Find where the mode column starts (usually after SSID)
-                        int modeIndex = 1;
-                        if (network.IsActive)
-                            modeIndex = 2; // Skip the '*' and potential space
+                        // BSSID is second
+                        // SSID is third
+                        network.SSID = parts[2];
                         
-                        // Try to identify the mode column position
-                        for (int j = modeIndex; j < parts.Length; j++)
-                        {
-                            if (parts[j] == "Infra" || parts[j] == "Ad-Hoc" || parts[j] == "AP")
-                            {
-                                // Extract SSID (everything from position 1 to before mode)
-                                network.SSID = string.Join(" ", parts[modeIndex..j]);
-                                network.Mode = parts[j];
-                                network.Chan = j + 1 < parts.Length ? parts[j + 1] : "";
-                                network.Rate = j + 2 < parts.Length ? parts[j + 2] : "";
-                                network.Signal = j + 3 < parts.Length ? parts[j + 3] : "";
-                                
-                                // Security is usually the last part
-                                if (j + 4 < parts.Length)
-                                {
-                                    network.Security = string.Join(" ", parts[(j + 4)..]);
-                                }
-                                break;
-                            }
-                        }
+                        // MODE is fourth
+                        network.Mode = parts[3];
                         
-                        // Fallback parsing if the above fails
-                        if (string.IsNullOrEmpty(network.Mode) && parts.Length >= 7)
-                        {
-                            network.SSID = parts[1];
-                            network.Mode = parts[2];
-                            network.Chan = parts[3];
-                            network.Rate = parts[4];
-                            network.Signal = parts[5];
-                            network.Security = parts.Length > 7 ? string.Join(" ", parts[7..]) : parts[6];
-                        }
+                        // CHAN is fifth
+                        network.Chan = parts[4];
+                        
+                        // RATE is sixth
+                        network.Rate = parts[5];
+                        
+                        // SIGNAL is seventh
+                        network.Signal = parts[6];
+                        
+                        // SECURITY is eighth and beyond
+                        network.Security = parts.Length > 7 ? string.Join(" ", parts[7..]) : "";
 
                         networks.Add(network);
+                        Console.WriteLine($"Parsed network: {network.SSID}, Active: {network.IsActive}");
                     }
                 }
+                Console.WriteLine($"Total networks parsed: {networks.Count}");
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine($"Error parsing WiFi: {ex.Message}");
                 // Return empty list if parsing fails
             }
 

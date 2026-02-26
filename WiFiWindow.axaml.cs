@@ -3,8 +3,10 @@ using Avalonia.Controls;
 using Avalonia.Data.Converters;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using System.Threading.Tasks;
@@ -30,10 +32,10 @@ public class BoolToStatusConverter : IValueConverter
 
 public partial class WiFiWindow : Window, INotifyPropertyChanged
 {
-    public event PropertyChangedEventHandler? PropertyChanged;
+    public new event PropertyChangedEventHandler? PropertyChanged;
 
-    private List<WiFiInfo> _wiFiNetworks = new List<WiFiInfo>();
-    public List<WiFiInfo> WiFiNetworks
+    private ObservableCollection<WiFiInfo> _wiFiNetworks = new ObservableCollection<WiFiInfo>();
+    public ObservableCollection<WiFiInfo> WiFiNetworks
     {
         get => _wiFiNetworks;
         private set
@@ -56,8 +58,8 @@ public partial class WiFiWindow : Window, INotifyPropertyChanged
 
     public WiFiWindow()
     {
-        InitializeComponent();
         DataContext = this;
+        InitializeComponent();
         Opened += WiFiWindow_Opened;
     }
 
@@ -80,30 +82,41 @@ public partial class WiFiWindow : Window, INotifyPropertyChanged
             
             if (checker.IsNmcliAvailable)
             {
-                WiFiNetworks = await checker.GetWiFiNetworksAsync();
-                StatusText = $"Loaded {WiFiNetworks.Count} WiFi networks.";
+                // Perform rescan before listing
+                await TerminalCommands.RunCommandAsync("nmcli device wifi rescan");
+                
+                // Wait for rescan to complete
+                await Task.Delay(3000);
+                
+                var newNetworks = await checker.GetWiFiNetworksAsync();
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    WiFiNetworks.Clear();
+                    foreach (var network in newNetworks)
+                    {
+                        WiFiNetworks.Add(network);
+                    }
+                });
+                StatusText = $"Found {newNetworks.Count} available networks.";
             }
             else
             {
-                WiFiNetworks = new List<WiFiInfo>();
+                WiFiNetworks.Clear();
                 StatusText = "nmcli is not available.";
             }
         }
         catch (Exception ex)
         {
-            WiFiNetworks = new List<WiFiInfo>();
+            WiFiNetworks.Clear();
             StatusText = $"Error loading WiFi networks: {ex.Message}";
         }
 
-        // Update the DataGrid manually to ensure it updates
-        if (this.FindControl<DataGrid>("WiFiDataGrid") is DataGrid dataGrid)
-        {
-            dataGrid.ItemsSource = WiFiNetworks;
-        }
+        // No need to manually set ItemsSource since it's bound
     }
 
     private void Refresh_Click(object? sender, RoutedEventArgs e)
     {
+        StatusText = "Refreshing...";
         _ = RefreshWiFiDataAsync();
     }
 
