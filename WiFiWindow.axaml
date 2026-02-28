@@ -54,7 +54,8 @@
         <!-- Data Grid -->
         <DataGrid Grid.Row="1" 
                   Name="WiFiDataGrid"
-                  ItemsSource="{Binding WiFiNetworks}">
+                  ItemsSource="{Binding WiFiNetworks}"
+                  DoubleTapped="WiFiDataGrid_DoubleTapped">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Status" 
                                     x:DataType="local:WiFiInfo"

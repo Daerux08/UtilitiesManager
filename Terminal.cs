@@ -30,6 +30,16 @@ namespace UtilitiesManager
         public bool IsActive { get; set; } = false;
     }
 
+    public class CommandResult
+    {
+        public int ExitCode { get; set; }
+        public string Output { get; set; } = "";
+        public string Error { get; set; } = "";
+        
+        public bool IsSuccess => ExitCode == 0;
+        public string CombinedOutput => Output + (string.IsNullOrEmpty(Error) ? "" : "\n" + Error);
+    }
+
     public static class TerminalCommands
     {
         public static async Task<string> RunCommandAsync(string command, int timeoutMs = Timeout.Infinite)
@@ -53,6 +63,34 @@ namespace UtilitiesManager
             await process.WaitForExitAsync();
 
             return output.Trim();
+        }
+
+        public static async Task<CommandResult> RunCommandWithResultAsync(string command, int timeoutMs = Timeout.Infinite)
+        {
+            var psi = new ProcessStartInfo
+            {
+                FileName = "/bin/bash",
+                Arguments = $"-c \"{command.Replace("\"", "\\\"")}\"",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using var process = new Process { StartInfo = psi };
+            process.Start();
+
+            string output = await process.StandardOutput.ReadToEndAsync();
+            string error = await process.StandardError.ReadToEndAsync();
+
+            await process.WaitForExitAsync();
+
+            return new CommandResult
+            {
+                ExitCode = process.ExitCode,
+                Output = output.Trim(),
+                Error = error.Trim()
+            };
         }
     }
 
