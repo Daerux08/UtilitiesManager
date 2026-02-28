@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace UtilitiesManager
 {
@@ -198,67 +199,81 @@ namespace UtilitiesManager
 
         // WIFI
         public async Task<ObservableCollection<WiFiInfo>> GetWiFiNetworksAsync()
-        {
-            var networks = new ObservableCollection<WiFiInfo>();
-
-            try
-            {
-                string output = await TerminalCommands.RunCommandAsync("nmcli device wifi list");
-
-                if (string.IsNullOrWhiteSpace(output))
-                    return networks;
-
-                var lines = output.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
-
-                // Skip the header line and process each network
-                for (int i = 1; i < lines.Length; i++)
-                {
-                    var line = lines[i].Trim();
-                    if (string.IsNullOrWhiteSpace(line))
-                        continue;
-
-                    // Split by 2 or more spaces to separate columns
-                    var parts = Regex.Split(line, @"\s{2,}");
-
-                    if (parts.Length >= 8)
-                    {
-                        var network = new WiFiInfo();
-                        
-                        // IN-USE is the first part, check for '*'
-                        network.IsActive = parts[0].Contains("*");
-                        
-                        // BSSID is second
-                        // SSID is third
-                        network.SSID = parts[2];
-                        
-                        // MODE is fourth
-                        network.Mode = parts[3];
-                        
-                        // CHAN is fifth
-                        network.Chan = parts[4];
-                        
-                        // RATE is sixth
-                        network.Rate = parts[5];
-                        
-                        // SIGNAL is seventh
-                        network.Signal = parts[6];
-                        
-                        // SECURITY is eighth and beyond
-                        network.Security = parts.Length > 7 ? string.Join(" ", parts[7..]) : "";
-
-                        networks.Add(network);
-                        Console.WriteLine($"Parsed network: {network.SSID}, Active: {network.IsActive}");
-                    }
-                }
-                Console.WriteLine($"Total networks parsed: {networks.Count}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error parsing WiFi: {ex.Message}");
-                // Return empty list if parsing fails
-            }
-
+{
+    var networks = new ObservableCollection<WiFiInfo>();
+    try
+    {
+        // Keep the pretty output with bars
+        string output = await TerminalCommands.RunCommandAsync("nmcli device wifi list");
+        if (string.IsNullOrWhiteSpace(output))
             return networks;
+
+        var lines = output.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+
+        // Skip the header line (usually index 0)
+        for (int i = 1; i < lines.Length; i++)
+        {
+            var line = lines[i].TrimStart();  // sometimes leading space on active line
+            if (string.IsNullOrWhiteSpace(line))
+                continue;
+
+            // Split on 2+ whitespace → should give us 8 or 9 parts
+            var parts = Regex.Split(line, @"\s{2,}");
+
+            // In 2025–2026 reality: expect at least 8 parts
+            if (parts.Length < 8) 
+            {
+                Console.WriteLine($"Skipping weird line: {line}");
+                continue;
+            }
+
+            var network = new WiFiInfo();
+
+            int idx = 0;
+
+            // [0] IN-USE: "" or "*"
+            network.IsActive = parts[idx++].Contains("*");
+
+            // [1] BSSID (you might want to store this)
+            // network.BSSID = parts[idx++].Trim();   // ← uncomment if you add the prop
+
+            // [2] SSID
+            network.SSID = parts[idx++].Trim();
+
+            // [3] MODE
+            network.Mode = parts[idx++].Trim();
+
+            // [4] CHAN
+            network.Chan = parts[idx++].Trim();
+
+            // [5] RATE
+            network.Rate = parts[idx++].Trim();
+
+            // [6] SIGNAL (e.g. "92")
+            network.Signal = parts[idx++].Trim();
+
+            // [7] BARS (▂▄▆█ or ▂___ etc.) — you could store this too if you want to display it
+            // network.Bars = parts[idx++].Trim();
+
+            // [8..] SECURITY (can be multiple words, or "--", or empty)
+            network.Security = string.Join(" ", parts.Skip(idx)).Trim();
+            if (network.Security == "--" || string.IsNullOrEmpty(network.Security))
+                network.Security = "Open";
+
+            networks.Add(network);
+
+            Console.WriteLine($"Parsed: {network.SSID,-30} | Sig: {network.Signal,-3} | Bars: {parts[7]} | Sec: {network.Security}");
+        }
+
+        Console.WriteLine($"Total networks parsed: {networks.Count}");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Parsing went tits-up: {ex.Message}");
+    }
+
+    return networks;
+            }
         }
     }
-}
+
