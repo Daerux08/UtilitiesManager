@@ -6,6 +6,7 @@ Current functionalities include:
 1. a screen brightness slider
 2. a brightness slider
 3. a battery status window
+4. a Wi-Fi management window
 
 Future updates include:
 1. Better edge-case handling
