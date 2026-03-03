@@ -5,7 +5,7 @@ APP_NAME="utilitiesmanager"
 APP_VERSION="0.3.0~alpha$(date +%Y%m%d%H%M)"
 ARCH="amd64"
 
-# Your actual project file
+# project file
 PROJECT_PATH="./UtilitiesManager.csproj"
 
 # Output directories
