@@ -11,3 +11,7 @@ Current functionalities include:
 Future updates include:
 1. Better edge-case handling
 2. More attractive UI
+3. A user manager window
+4. A bluetooth management window
+5. Battery profile selector
+6. APT package GUI manager
