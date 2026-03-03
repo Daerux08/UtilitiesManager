@@ -47,7 +47,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             {
                 _soundLevel = value;
                 if (_soundAvailable)
-                    _ = _changer.SetVolumeAsync(value); // ← now actually sets volume
+                    _ = _changer.SetVolumeAsync(value); // Sets the system volume
                 OnPropertyChanged();
             }
         }
@@ -62,7 +62,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             {
                 _brightness = value;
                 if (_brightnessAvailable)
-                    _ = _changer.SetBrightnessAsync(value); // ← now actually sets brightness
+                    _ = _changer.SetBrightnessAsync(value); // Sets the screen brightness
                 OnPropertyChanged();
             }
         }
@@ -136,23 +136,21 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    // ← New shit: button click opens Battery window
+    // Button click handler to open Battery window
     private void OpenBattery_Click(object? sender, RoutedEventArgs e)
     {
         if (!BatteryAvailable)
-            return; // Or show a message, but since button will be disabled, maybe not needed
+            return; // Button is disabled when unavailable
         var batteryWindow = new BatteryWindow();
-        batteryWindow.Show(this);                   // 5
-        // batteryWindow.ShowDialog(this);          // ← uncomment if you want modal (blocks main window)
+        batteryWindow.Show(this);
     }
 
-    // ← Wi-Fi button click opens Wi-Fi window
+    // Button click handler to open Wi-Fi window
     private void OpenWiFi_Click(object? sender, RoutedEventArgs e)
     {
         if (!WiFiAvailable)
-            return; // Or show a message, but since button will be disabled, maybe not needed
+            return; // Button is disabled when unavailable
         var wifiWindow = new WiFiWindow();
         wifiWindow.Show(this);
-        // wifiWindow.ShowDialog(this);            // ← uncomment if you want modal (blocks main window)
     }
 }

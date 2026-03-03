@@ -7,8 +7,11 @@ using System.Threading.Tasks;
 
 namespace UtilitiesManager;
 
-public partial class BatteryWindow : Window  // ← assuming you renamed the class too
+public partial class BatteryWindow : Window
 {
+    private readonly ChangeValueCommand _changer = new();
+    private readonly CheckDependencyCommand _checker = new();
+
     public BatteryWindow()
     {
         InitializeComponent();
@@ -27,9 +30,23 @@ public partial class BatteryWindow : Window  // ← assuming you renamed the cla
 
     private async Task RefreshBatteryDataAsync()
     {
-        var checker = new CheckDependencyCommand();
-        await checker.CheckDependenciesAsync(); // Need to call this first
-        var status = checker.IsUpowerAvailable ? await checker.GetBatteryAsync() : new BatteryInfo { State = "upower not found" };
+        await _checker.CheckDependenciesAsync(); // Check system dependencies first
+        var status = _checker.IsUpowerAvailable ? await _checker.GetBatteryAsync() : new BatteryInfo { State = "upower not found" };
+        var profile = _checker.IsPowerProfilesCtlAvailable ? await _checker.GetCurrentPowerProfileAsync() : "powerprofilesctl not found";
+
+        // Enable/disable power profile buttons based on availability
+        if (this.FindControl<Button>("PowerSaverButton") is Button powerSaverBtn)
+        {
+            powerSaverBtn.IsEnabled = _checker.IsPowerProfilesCtlAvailable;
+        }
+        if (this.FindControl<Button>("BalancedButton") is Button balancedBtn)
+        {
+            balancedBtn.IsEnabled = _checker.IsPowerProfilesCtlAvailable;
+        }
+        if (this.FindControl<Button>("PerformanceButton") is Button performanceBtn)
+        {
+            performanceBtn.IsEnabled = _checker.IsPowerProfilesCtlAvailable;
+        }
 
         if (this.FindControl<TextBlock>("PercentageText") is TextBlock pct)
         {
@@ -54,15 +71,47 @@ public partial class BatteryWindow : Window  // ← assuming you renamed the cla
         {
             power.Text = status.EnergyRate >= 0 ? $"{status.EnergyRate:F1} W" : "N/A";
         }
+
+        if (this.FindControl<TextBlock>("ProfileText") is TextBlock profileText)
+        {
+            profileText.Text = profile;
+        }
     }
 
     private void Refresh_Click(object? sender, RoutedEventArgs e)
     {
-        _ = RefreshBatteryDataAsync();  // async void is fine here since it's fire-and-forget UI
+        _ = RefreshBatteryDataAsync();  // Async call to refresh battery data
     }
 
     private void OnCloseClick(object? sender, RoutedEventArgs e)
     {
         this.Close();
+    }
+
+    private async void SetPowerSaver_Click(object? sender, RoutedEventArgs e)
+    {
+        if (_checker.IsPowerProfilesCtlAvailable)
+        {
+            await _changer.SetPowerProfileAsync("power-saver");
+            await RefreshBatteryDataAsync(); // Refresh to show updated profile
+        }
+    }
+
+    private async void SetBalanced_Click(object? sender, RoutedEventArgs e)
+    {
+        if (_checker.IsPowerProfilesCtlAvailable)
+        {
+            await _changer.SetPowerProfileAsync("balanced");
+            await RefreshBatteryDataAsync(); // Refresh to show updated profile
+        }
+    }
+
+    private async void SetPerformance_Click(object? sender, RoutedEventArgs e)
+    {
+        if (_checker.IsPowerProfilesCtlAvailable)
+        {
+            await _changer.SetPowerProfileAsync("performance");
+            await RefreshBatteryDataAsync(); // Refresh to show updated profile
+        }
     }
 }

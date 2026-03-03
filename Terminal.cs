@@ -108,6 +108,11 @@ namespace UtilitiesManager
                 $"pactl set-sink-volume @DEFAULT_SINK@ {percentage}%"
             );
         }
+
+        public async Task SetPowerProfileAsync(string profile)
+        {
+            await TerminalCommands.RunCommandAsync($"powerprofilesctl set {profile}");
+        }
     }
 
     public class CheckDependencyCommand
@@ -120,6 +125,7 @@ namespace UtilitiesManager
         public bool IsPactlAvailable { get; private set; }
         public bool IsUpowerAvailable { get; private set; }
         public bool IsNmcliAvailable { get; private set; }
+        public bool IsPowerProfilesCtlAvailable { get; private set; }
 
         public async Task LoadOriginalValuesAsync()
         {
@@ -135,6 +141,7 @@ namespace UtilitiesManager
             IsPactlAvailable = await CheckCommandAvailable("pactl");
             IsUpowerAvailable = await CheckCommandAvailable("upower");
             IsNmcliAvailable = await CheckCommandAvailable("nmcli");
+            IsPowerProfilesCtlAvailable = await CheckCommandAvailable("powerprofilesctl");
         }
 
         private async Task<bool> CheckCommandAvailable(string command)
@@ -251,14 +258,14 @@ namespace UtilitiesManager
         // Skip the header line (usually index 0)
         for (int i = 1; i < lines.Length; i++)
         {
-            var line = lines[i].TrimStart();  // sometimes leading space on active line
+            var line = lines[i].TrimStart();  // Remove leading whitespace
             if (string.IsNullOrWhiteSpace(line))
                 continue;
 
             // Split on 2+ whitespace → should give us 8 or 9 parts
             var parts = Regex.Split(line, @"\s{2,}");
 
-            // In 2025–2026 reality: expect at least 8 parts
+            // Expect at least 8 parts for proper parsing
             if (parts.Length < 8) 
             {
                 Console.WriteLine($"Skipping weird line: {line}");
@@ -272,8 +279,7 @@ namespace UtilitiesManager
             // [0] IN-USE: "" or "*"
             network.IsActive = parts[idx++].Contains("*");
 
-            // [1] BSSID (you might want to store this)
-            // network.BSSID = parts[idx++].Trim();   // ← uncomment if you add the prop
+            // [1] BSSID (could be stored if needed)
 
             // [2] SSID
             network.SSID = parts[idx++].Trim();
@@ -290,8 +296,7 @@ namespace UtilitiesManager
             // [6] SIGNAL (e.g. "92")
             network.Signal = parts[idx++].Trim();
 
-            // [7] BARS (▂▄▆█ or ▂___ etc.) — you could store this too if you want to display it
-            // network.Bars = parts[idx++].Trim();
+            // [7] BARS (visual signal strength indicator)
 
             // [8..] SECURITY (can be multiple words, or "--", or empty)
             network.Security = string.Join(" ", parts.Skip(idx)).Trim();
@@ -311,7 +316,20 @@ namespace UtilitiesManager
     }
 
     return networks;
+        }
+
+        // POWER PROFILE
+        public async Task<string> GetCurrentPowerProfileAsync()
+        {
+            try
+            {
+                string output = await TerminalCommands.RunCommandAsync("powerprofilesctl get");
+                return output.Trim();
+            }
+            catch
+            {
+                return "Unknown";
             }
         }
-    }
+    }}
 

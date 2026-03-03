@@ -10,6 +10,7 @@
       "UtilitiesManager/1.0.0": {
         "dependencies": {
           "Avalonia": "11.3.12",
+          "Avalonia.Controls.DataGrid": "11.3.12",
           "Avalonia.Desktop": "11.3.12",
           "Avalonia.Fonts.Inter": "11.3.12",
           "Avalonia.Themes.Fluent": "11.3.12",
@@ -810,6 +811,17 @@
           }
         }
       },
+      "Avalonia.Controls.DataGrid/11.3.12": {
+        "dependencies": {
+          "Avalonia": "11.3.12"
+        },
+        "runtime": {
+          "lib/net8.0/Avalonia.Controls.DataGrid.dll": {
+            "assemblyVersion": "11.3.12.0",
+            "fileVersion": "11.3.12.0"
+          }
+        }
+      },
       "Avalonia.Desktop/11.3.12": {
         "dependencies": {
           "Avalonia": "11.3.12",
@@ -989,6 +1001,13 @@
       "sha512": "sha512-CHB0gXMSba8gTXqTrO9lS1te9ejH52ngHPm+0i/RfXFzqHXHPQ3yciFc/GfGnXUBjqjwH85J1rhYNl4/EujP0w==",
       "path": "avalonia/11.3.12",
       "hashPath": "avalonia.11.3.12.nupkg.sha512"
+    },
+    "Avalonia.Controls.DataGrid/11.3.12": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-9zlVkd23gaFtJwi4n7JaKnGdCSkD1fuiRdflzfkLoVXxHKQ2pTOcsUB26rAs7uMTCRvvte8OPwbsK8otA1wNPg==",
+      "path": "avalonia.controls.datagrid/11.3.12",
+      "hashPath": "avalonia.controls.datagrid.11.3.12.nupkg.sha512"
     },
     "Avalonia.Desktop/11.3.12": {
       "type": "package",
