@@ -7,11 +7,10 @@ Current functionalities include:
 2. an audio slider
 3. a battery status window
 4. a Wi-Fi management window
+5. Battery profile selector
 
 Future updates include:
-1. Better edge-case handling
-2. More attractive UI
+1. More attractive UI
+2. APT package GUI manager
 3. A user manager window
 4. A bluetooth management window
-5. Battery profile selector
-6. APT package GUI manager
