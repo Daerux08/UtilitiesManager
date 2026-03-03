@@ -2,7 +2,7 @@
 set -e
 
 APP_NAME="utilitiesmanager"
-APP_VERSION="1.0.0"
+APP_VERSION="0.3.0~alpha$(date +%Y%m%d%H%M)"
 ARCH="amd64"
 
 # Your actual project file
@@ -63,7 +63,8 @@ echo "==> Setting permissions"
 chmod -R 755 "$DEB_DIR"
 
 echo "==> Building .deb package"
-dpkg-deb --build "$DEB_DIR"
+OUTPUT_FILE="${APP_NAME}_${APP_VERSION}_${ARCH}.deb"
+dpkg-deb --build "$DEB_DIR" "$OUTPUT_FILE"
 
 echo "==> Done!"
-echo "Created package: Package.deb"
+echo "Created package: $OUTPUT_FILE"
