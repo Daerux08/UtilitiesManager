@@ -66,10 +66,12 @@
                 <TextBlock Text="{Binding SoundAvailable, Converter={StaticResource BoolToStringConverter}, ConverterParameter='pactl is not found|Volume control'}" />
             </ToolTip.Tip>
         </Slider>
-        <TextBlock Text="{Binding SoundLevel, StringFormat='Volume {0:F0}%'}"
-                   HorizontalAlignment="Center"
-                   FontWeight="SemiBold"
-                   Foreground="#000000"/>
+        <TextBox Text="{Binding SoundLevelText}"
+                 HorizontalAlignment="Center"
+                 FontWeight="SemiBold"
+                 Foreground="#000000"
+                 Width="60"
+                 TextAlignment="Center"/>
         <TextBlock Text="Slider 2 – Screen Brightness"/>
         <Slider Minimum="0" Maximum="100"
                 Value="{Binding Brightness}"
@@ -79,10 +81,12 @@
                 <TextBlock Text="{Binding BrightnessAvailable, Converter={StaticResource BoolToStringConverter}, ConverterParameter='brightnessctl is not found|Brightness control'}" />
             </ToolTip.Tip>
         </Slider>
-        <TextBlock Text="{Binding Brightness, StringFormat='Brightness: {0:F0}% – '}"
-                   HorizontalAlignment="Center"
-                   FontWeight="SemiBold"
-                   Foreground="#000000"/>
+        <TextBox Text="{Binding BrightnessText}"
+                 HorizontalAlignment="Center"
+                 FontWeight="SemiBold"
+                 Foreground="#000000"
+                 Width="60"
+                 TextAlignment="Center"/>
 
                     <!-- Wi-Fi-->
         <StackPanel Orientation="Horizontal"

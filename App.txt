@@ -2,6 +2,7 @@ packages used:
 1. Brightnessctl
 2. Pactl
 3. nmcli
+4. 
 
 using:
 1. GTKsharp

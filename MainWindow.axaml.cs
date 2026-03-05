@@ -33,6 +33,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private readonly ChangeValueCommand _changer = new();
     private int _soundLevel;
     private int _brightness;
+    private string _soundLevelText;
+    private string _brightnessText;
     private bool _brightnessAvailable;
     private bool _soundAvailable;
     private bool _batteryAvailable;
@@ -46,8 +48,26 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             if (_soundLevel != value)
             {
                 _soundLevel = value;
+                SoundLevelText = value.ToString();
                 if (_soundAvailable)
                     _ = _changer.SetVolumeAsync(value); // Sets the system volume
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public string SoundLevelText
+    {
+        get => _soundLevelText;
+        set
+        {
+            if (_soundLevelText != value)
+            {
+                _soundLevelText = value;
+                if (int.TryParse(value, out int newValue) && newValue >= 0 && newValue <= 100)
+                {
+                    SoundLevel = newValue;
+                }
                 OnPropertyChanged();
             }
         }
@@ -61,8 +81,26 @@ public partial class MainWindow : Window, INotifyPropertyChanged
             if (_brightness != value)
             {
                 _brightness = value;
+                BrightnessText = value.ToString();
                 if (_brightnessAvailable)
                     _ = _changer.SetBrightnessAsync(value); // Sets the screen brightness
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public string BrightnessText
+    {
+        get => _brightnessText;
+        set
+        {
+            if (_brightnessText != value)
+            {
+                _brightnessText = value;
+                if (int.TryParse(value, out int newValue) && newValue >= 0 && newValue <= 100)
+                {
+                    Brightness = newValue;
+                }
                 OnPropertyChanged();
             }
         }
@@ -123,6 +161,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
         await _checker.LoadOriginalValuesAsync();
         SoundLevel = _checker.OriginalValueSound;
         Brightness = _checker.OriginalValueLight;
+        SoundLevelText = SoundLevel.ToString();
+        BrightnessText = Brightness.ToString();
         BrightnessAvailable = _checker.IsBrightnessCtlAvailable;
         SoundAvailable = _checker.IsPactlAvailable;
         BatteryAvailable = _checker.IsUpowerAvailable;

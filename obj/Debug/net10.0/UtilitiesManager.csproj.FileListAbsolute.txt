@@ -73,3 +73,7 @@
 /home/mr-owl/UtilitiesManager/obj/Debug/net10.0/UtilitiesManager.genruntimeconfig.cache
 /home/mr-owl/UtilitiesManager/obj/Debug/net10.0/ref/UtilitiesManager.dll
 /home/mr-owl/UtilitiesManager/bin/Debug/net10.0/Avalonia.Controls.DataGrid.dll
+/home/mr-owl/UtilitiesManager/bin/Debug/net10.0/DialogHost.Avalonia.dll
+/home/mr-owl/UtilitiesManager/bin/Debug/net10.0/DotNetBlueZ.dll
+/home/mr-owl/UtilitiesManager/bin/Debug/net10.0/MsBox.Avalonia.dll
+/home/mr-owl/UtilitiesManager/bin/Debug/net10.0/Tmds.DBus.dll

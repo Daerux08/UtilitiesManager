@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "lKqBdmzlC3I=",
+  "dgSpecHash": "17wtcBjcclw=",
   "success": true,
   "projectFilePath": "/home/mr-owl/UtilitiesManager/UtilitiesManager.csproj",
   "expectedPackageFiles": [
@@ -20,17 +20,21 @@
     "/home/mr-owl/.nuget/packages/avalonia.themes.simple/11.3.12/avalonia.themes.simple.11.3.12.nupkg.sha512",
     "/home/mr-owl/.nuget/packages/avalonia.win32/11.3.12/avalonia.win32.11.3.12.nupkg.sha512",
     "/home/mr-owl/.nuget/packages/avalonia.x11/11.3.12/avalonia.x11.11.3.12.nupkg.sha512",
+    "/home/mr-owl/.nuget/packages/dialoghost.avalonia/0.8.1/dialoghost.avalonia.0.8.1.nupkg.sha512",
     "/home/mr-owl/.nuget/packages/harfbuzzsharp/8.3.1.1/harfbuzzsharp.8.3.1.1.nupkg.sha512",
     "/home/mr-owl/.nuget/packages/harfbuzzsharp.nativeassets.linux/8.3.1.1/harfbuzzsharp.nativeassets.linux.8.3.1.1.nupkg.sha512",
     "/home/mr-owl/.nuget/packages/harfbuzzsharp.nativeassets.macos/8.3.1.1/harfbuzzsharp.nativeassets.macos.8.3.1.1.nupkg.sha512",
     "/home/mr-owl/.nuget/packages/harfbuzzsharp.nativeassets.webassembly/8.3.1.1/harfbuzzsharp.nativeassets.webassembly.8.3.1.1.nupkg.sha512",
     "/home/mr-owl/.nuget/packages/harfbuzzsharp.nativeassets.win32/8.3.1.1/harfbuzzsharp.nativeassets.win32.8.3.1.1.nupkg.sha512",
+    "/home/mr-owl/.nuget/packages/hashtagchris.dotnetbluez/1.3.1/hashtagchris.dotnetbluez.1.3.1.nupkg.sha512",
+    "/home/mr-owl/.nuget/packages/messagebox.avalonia/3.3.1.1/messagebox.avalonia.3.3.1.1.nupkg.sha512",
     "/home/mr-owl/.nuget/packages/microcom.runtime/0.11.0/microcom.runtime.0.11.0.nupkg.sha512",
     "/home/mr-owl/.nuget/packages/skiasharp/2.88.9/skiasharp.2.88.9.nupkg.sha512",
     "/home/mr-owl/.nuget/packages/skiasharp.nativeassets.linux/2.88.9/skiasharp.nativeassets.linux.2.88.9.nupkg.sha512",
     "/home/mr-owl/.nuget/packages/skiasharp.nativeassets.macos/2.88.9/skiasharp.nativeassets.macos.2.88.9.nupkg.sha512",
     "/home/mr-owl/.nuget/packages/skiasharp.nativeassets.webassembly/2.88.9/skiasharp.nativeassets.webassembly.2.88.9.nupkg.sha512",
     "/home/mr-owl/.nuget/packages/skiasharp.nativeassets.win32/2.88.9/skiasharp.nativeassets.win32.2.88.9.nupkg.sha512",
+    "/home/mr-owl/.nuget/packages/tmds.dbus/0.7.0/tmds.dbus.0.7.0.nupkg.sha512",
     "/home/mr-owl/.nuget/packages/tmds.dbus.protocol/0.21.2/tmds.dbus.protocol.0.21.2.nupkg.sha512"
   ],
   "logs": []
