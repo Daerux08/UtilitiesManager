@@ -244,78 +244,303 @@ namespace UtilitiesManager
 
         // WIFI
         public async Task<ObservableCollection<WiFiInfo>> GetWiFiNetworksAsync()
-{
-    var networks = new ObservableCollection<WiFiInfo>();
-    try
-    {
-        // Keep the pretty output with bars
-        string output = await TerminalCommands.RunCommandAsync("nmcli device wifi list");
-        if (string.IsNullOrWhiteSpace(output))
-            return networks;
-
-        var lines = output.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
-
-        // Skip the header line (usually index 0)
-        for (int i = 1; i < lines.Length; i++)
         {
-            var line = lines[i].TrimStart();  // Remove leading whitespace
-            if (string.IsNullOrWhiteSpace(line))
-                continue;
-
-            // Split on 2+ whitespace → should give us 8 or 9 parts
-            var parts = Regex.Split(line, @"\s{2,}");
-
-            // Expect at least 8 parts for proper parsing
-            if (parts.Length < 8) 
+            var networks = new ObservableCollection<WiFiInfo>();
+            int maxRetries = 3;
+            int retryDelayMs = 1000;
+            
+            for (int attempt = 1; attempt <= maxRetries; attempt++)
             {
-                Console.WriteLine($"Skipping weird line: {line}");
-                continue;
+                try
+                {
+                    Console.WriteLine($"WiFi parsing attempt {attempt}/{maxRetries}");
+                    
+                    string output = await TerminalCommands.RunCommandAsync("nmcli device wifi list");
+                    if (string.IsNullOrWhiteSpace(output))
+                    {
+                        Console.WriteLine("WiFi: No output from nmcli command");
+                        if (attempt < maxRetries)
+                        {
+                            Console.WriteLine($"Retrying in {retryDelayMs}ms...");
+                            await Task.Delay(retryDelayMs);
+                            continue;
+                        }
+                        return networks;
+                    }
+
+                    var lines = output.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+                    
+                    // Try multiple parsing strategies
+                    var parsedNetworks = TryParseWithColumnStrategy(lines) ?? 
+                                       TryParseWithRegexStrategy(lines) ??
+                                       TryParseWithFlexibleStrategy(lines);
+
+                    if (parsedNetworks != null)
+                    {
+                        foreach (var network in parsedNetworks)
+                        {
+                            if (ValidateWiFiInfo(network))
+                            {
+                                networks.Add(network);
+                                Console.WriteLine($"Successfully parsed: {network.SSID,-25} | Signal: {network.Signal,-3} | Security: {network.Security}");
+                            }
+                            else
+                            {
+                                Console.WriteLine($"Skipped invalid network: SSID='{network.SSID}', Signal='{network.Signal}'");
+                            }
+                        }
+                        
+                        Console.WriteLine($"WiFi parsing complete. Valid networks found: {networks.Count}");
+                        return networks; // Success, exit retry loop
+                    }
+                    else
+                    {
+                        Console.WriteLine($"All parsing strategies failed on attempt {attempt}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"WiFi parsing failed on attempt {attempt}: {ex.GetType().Name}: {ex.Message}");
+                    Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                }
+
+                if (attempt < maxRetries)
+                {
+                    Console.WriteLine($"Retrying in {retryDelayMs}ms...");
+                    await Task.Delay(retryDelayMs);
+                }
             }
 
-            var network = new WiFiInfo();
-
-            int idx = 0;
-
-            // [0] IN-USE: "" or "*"
-            network.IsActive = parts[idx++].Contains("*");
-
-            // [1] BSSID (could be stored if needed)
-
-            // [2] SSID
-            network.SSID = parts[idx++].Trim();
-
-            // [3] MODE
-            network.Mode = parts[idx++].Trim();
-
-            // [4] CHAN
-            network.Chan = parts[idx++].Trim();
-
-            // [5] RATE
-            network.Rate = parts[idx++].Trim();
-
-            // [6] SIGNAL (e.g. "92")
-            network.Signal = parts[idx++].Trim();
-
-            // [7] BARS (visual signal strength indicator)
-
-            // [8..] SECURITY (can be multiple words, or "--", or empty)
-            network.Security = string.Join(" ", parts.Skip(idx)).Trim();
-            if (network.Security == "--" || string.IsNullOrEmpty(network.Security))
-                network.Security = "Open";
-
-            networks.Add(network);
-
-            Console.WriteLine($"Parsed: {network.SSID,-30} | Sig: {network.Signal,-3} | Bars: {parts[7]} | Sec: {network.Security}");
+            Console.WriteLine($"WiFi parsing failed after {maxRetries} attempts");
+            return networks;
         }
 
-        Console.WriteLine($"Total networks parsed: {networks.Count}");
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Parsing went tits-up: {ex.Message}");
-    }
+        private List<WiFiInfo>? TryParseWithColumnStrategy(string[] lines)
+        {
+            try
+            {
+                var networks = new List<WiFiInfo>();
+                
+                // Skip header line
+                for (int i = 1; i < lines.Length; i++)
+                {
+                    var line = lines[i].TrimStart();
+                    if (string.IsNullOrWhiteSpace(line)) continue;
 
-    return networks;
+                    var parts = Regex.Split(line, @"\s{2,}");
+                    if (parts.Length < 8)
+                    {
+                        Console.WriteLine($"Column strategy: Insufficient columns ({parts.Length}) in line: {line}");
+                        continue;
+                    }
+
+                    var network = ParseWiFiFromParts(parts);
+                    if (network != null)
+                        networks.Add(network);
+                }
+
+                return networks.Count > 0 ? networks : null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Column strategy failed: {ex.Message}");
+                return null;
+            }
+        }
+
+        private List<WiFiInfo>? TryParseWithRegexStrategy(string[] lines)
+        {
+            try
+            {
+                var networks = new List<WiFiInfo>();
+                
+                // Regex pattern to match nmcli output format
+                var pattern = @"^(\*?\s*)([0-9a-fA-F:]+|\s+)\s+([^:]+?)\s+(\w+)\s+(\d+)\s+([\d.]+[MG]?)\s+(\d+)\s+(\W+)\s*(.*)$";
+                
+                for (int i = 1; i < lines.Length; i++)
+                {
+                    var line = lines[i].Trim();
+                    if (string.IsNullOrWhiteSpace(line)) continue;
+
+                    var match = Regex.Match(line, pattern);
+                    if (!match.Success)
+                    {
+                        Console.WriteLine($"Regex strategy: No match for line: {line}");
+                        continue;
+                    }
+
+                    var network = new WiFiInfo
+                    {
+                        IsActive = match.Groups[1].Value.Contains("*"),
+                        SSID = match.Groups[3].Value.Trim(),
+                        Mode = match.Groups[4].Value.Trim(),
+                        Chan = match.Groups[5].Value.Trim(),
+                        Rate = match.Groups[6].Value.Trim(),
+                        Signal = match.Groups[7].Value.Trim(),
+                        Security = string.IsNullOrEmpty(match.Groups[9].Value.Trim()) ? "Open" : match.Groups[9].Value.Trim()
+                    };
+
+                    if (network.Security == "--")
+                        network.Security = "Open";
+
+                    networks.Add(network);
+                }
+
+                return networks.Count > 0 ? networks : null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Regex strategy failed: {ex.Message}");
+                return null;
+            }
+        }
+
+        private List<WiFiInfo>? TryParseWithFlexibleStrategy(string[] lines)
+        {
+            try
+            {
+                var networks = new List<WiFiInfo>();
+                
+                for (int i = 1; i < lines.Length; i++)
+                {
+                    var line = lines[i].Trim();
+                    if (string.IsNullOrWhiteSpace(line)) continue;
+
+                    // Split on multiple spaces but be more flexible about column count
+                    var parts = Regex.Split(line, @"\s{2,}").Select(p => p.Trim()).ToArray();
+                    
+                    if (parts.Length < 3) // Minimum: SSID, Mode, something else
+                    {
+                        Console.WriteLine($"Flexible strategy: Too few parts ({parts.Length}) in line: {line}");
+                        continue;
+                    }
+
+                    var network = new WiFiInfo();
+                    
+                    // Try to identify columns heuristically
+                    int activeIdx = 0;
+                    network.IsActive = parts[activeIdx].Contains("*");
+                    
+                    // Find SSID - usually the first non-empty, non-star field after active indicator
+                    int ssidIdx = -1;
+                    for (int j = activeIdx + 1; j < parts.Length; j++)
+                    {
+                        if (!string.IsNullOrEmpty(parts[j]) && !parts[j].Contains(":"))
+                        {
+                            ssidIdx = j;
+                            break;
+                        }
+                    }
+                    
+                    if (ssidIdx == -1) continue;
+                    
+                    network.SSID = parts[ssidIdx];
+                    
+                    // Assign remaining fields based on position and content
+                    if (ssidIdx + 1 < parts.Length) network.Mode = parts[ssidIdx + 1];
+                    if (ssidIdx + 2 < parts.Length) network.Chan = parts[ssidIdx + 2];
+                    if (ssidIdx + 3 < parts.Length) network.Rate = parts[ssidIdx + 3];
+                    if (ssidIdx + 4 < parts.Length) network.Signal = parts[ssidIdx + 4];
+                    
+                    // Security is usually the last field
+                    var securityParts = parts.Skip(ssidIdx + 5).Where(p => !string.IsNullOrEmpty(p));
+                    network.Security = securityParts.Any() ? string.Join(" ", securityParts) : "Open";
+                    if (network.Security == "--") network.Security = "Open";
+
+                    networks.Add(network);
+                }
+
+                return networks.Count > 0 ? networks : null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Flexible strategy failed: {ex.Message}");
+                return null;
+            }
+        }
+
+        private WiFiInfo? ParseWiFiFromParts(string[] parts)
+        {
+            try
+            {
+                var network = new WiFiInfo();
+                int idx = 0;
+
+                // IN-USE
+                network.IsActive = parts[idx++].Contains("*");
+
+                // BSSID (skip)
+                idx++;
+
+                // SSID
+                network.SSID = parts[idx++].Trim();
+
+                // MODE
+                network.Mode = parts[idx++].Trim();
+
+                // CHAN
+                network.Chan = parts[idx++].Trim();
+
+                // RATE
+                network.Rate = parts[idx++].Trim();
+
+                // SIGNAL
+                network.Signal = parts[idx++].Trim();
+
+                // BARS (skip)
+                idx++;
+
+                // SECURITY (remaining parts)
+                if (idx < parts.Length)
+                {
+                    network.Security = string.Join(" ", parts.Skip(idx)).Trim();
+                    if (network.Security == "--" || string.IsNullOrEmpty(network.Security))
+                        network.Security = "Open";
+                }
+                else
+                {
+                    network.Security = "Open";
+                }
+
+                return network;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to parse WiFi from parts: {ex.Message}");
+                return null;
+            }
+        }
+
+        private bool ValidateWiFiInfo(WiFiInfo network)
+        {
+            // SSID validation
+            if (string.IsNullOrWhiteSpace(network.SSID))
+            {
+                Console.WriteLine("Validation failed: Empty SSID");
+                return false;
+            }
+
+            // Signal strength validation (should be a reasonable number)
+            if (!string.IsNullOrEmpty(network.Signal))
+            {
+                if (!int.TryParse(network.Signal, out int signal) || signal < 0 || signal > 100)
+                {
+                    Console.WriteLine($"Validation failed: Invalid signal strength '{network.Signal}' for SSID '{network.SSID}'");
+                    return false;
+                }
+            }
+
+            // Channel validation
+            if (!string.IsNullOrEmpty(network.Chan))
+            {
+                if (!int.TryParse(network.Chan, out int channel) || channel < 1 || channel > 200)
+                {
+                    Console.WriteLine($"Validation failed: Invalid channel '{network.Chan}' for SSID '{network.SSID}'");
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         // POWER PROFILE
