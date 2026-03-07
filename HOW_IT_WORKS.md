@@ -1,52 +1,42 @@
 # UtilitiesManager - How It Works
 
 ## What This App Is
-A simple Linux utility app that tries to act as a Control Panel
+A simple Linux utility app that acts as a Control Panel for common system settings
 
 ## Main Files
 - `MainWindow.axaml` - Main window with sliders and buttons
 - `MainWindow.axaml.cs` - Code behind for main window
-- `Terminal.cs` - All the Linux command stuff
+- `Terminal.cs` - All Linux command execution and parsing logic
 - `BatteryWindow.axaml/.cs` - Battery status window
-- `WiFiWindow.axaml/.cs` - Wi-Fi networks window
+- `WiFiWindow.axaml/.cs` - Wi-Fi networks and connection management
+- `EnterPasswordPopup.axaml/.cs` - WiFi password input dialog
 
 ## How It Starts
-1. `Program.cs` starts the Avalonia app
-2. `App.axaml.cs` creates the main window
+1. `Program.cs` starts Avalonia app
+2. `App.axaml.cs` creates main window
 3. `MainWindow` constructor calls `InitializeValues()`
 4. `InitializeValues()` runs `CheckDependencyCommand.LoadOriginalValuesAsync()`
 5. This checks what Linux commands are available and gets current values
 
 ## Main Window Features
-
-### Sound Slider
-- Slider bound to `SoundLevel` property
-- When moved, calls `_changer.SetVolumeAsync(value)`
-- Runs `pactl set-sink-volume @DEFAULT_SINK@ {value}%`
-- Only enabled if `pactl` command is found
-
-### Brightness Slider  
-- Slider bound to `Brightness` property
-- When moved, calls `_changer.SetBrightnessAsync(value)`
-- Runs `brightnessctl set {value}%`
 - Only enabled if `brightnessctl` command is found
 
 ### Wi-Fi Button
 - Opens `WiFiWindow` when clicked
 - Only enabled if `nmcli` command is found
-- Uses `BoolToStringConverter` for tooltip text
+- Shows current connection status in tooltip
 
 ### Battery Button
 - Opens `BatteryWindow` when clicked
 - Only enabled if `upower` command is found
-- Uses `BoolToStringConverter` for tooltip text
+- Shows current battery percentage in tooltip
 
 ## Terminal.cs - The Linux Commands
 
 ### Data Classes
 ```csharp
 BatteryInfo {
-    State: "charging" | "discharging" | etc.
+    State: "charging" | "discharging" | "fully-charged" | etc.
     Percentage: 0-100
     TimeToEmpty: "2h 30m"  
     TimeToFull: "1h 15m"
@@ -56,47 +46,41 @@ BatteryInfo {
 
 WiFiInfo {
     SSID: network name
-    Mode: "Infrastructure" | "Ad-hoc"
+    Mode: "Infra" | "Adhoc"
     Chan: channel number
-    Rate: speed
-    Signal: signal strength
-    Security: "WPA2" | "Open" | etc.
-    IsActive: connected?
+    Rate: speed in Mb/s
+    Signal: signal strength (numeric or bars)
+    Security: "WPA2" | "WPA1 WPA2" | "Open" | etc.
+    IsActive: currently connected?
+}
+
+CommandResult {
+    ExitCode: process exit code
+    Output: stdout content
+    Error: stderr content
+    IsSuccess: ExitCode == 0
+    CombinedOutput: Output + Error
 }
 ```
 
 ### Command Classes
 
-#### TerminalCommands (static)
-- `RunCommandAsync(string command)` - runs a Linux command, returns output
-- `RunCommandWithResultAsync(string command)` - returns CommandResult with exit code
-
-#### ChangeValueCommand
-- `SetBrightnessAsync(percent)` - changes screen brightness
-- `SetVolumeAsync(percentage)` - changes volume
-- `SetPowerProfileAsync(profile)` - changes power profile
-
-#### CheckDependencyCommand
-- Checks if commands exist with `which {command}`
-- Gets current values for brightness, volume, battery, wifi
-- Properties: `IsBrightnessCtlAvailable`, `IsPactlAvailable`, etc.
-
-## Battery Window
+### Battery Window
 
 ### What It Shows
 - Charge percentage
-- Battery state (charging/discharging)
+- Battery state (charging/discharging/fully-charged)
 - Time remaining or time to full
 - Power draw in watts
-- Current power profile
+- Current power profile with buttons to change
 
 ### How It Works
 1. Window opens → calls `RefreshBatteryDataAsync()`
 2. Checks if `upower` is available
 3. Runs `upower -e | grep battery` to find battery device
 4. Runs `upower -i {device}` to get battery info
-5. Parses the output for battery stats
-6. Updates all the TextBlocks
+5. Parses output for battery stats
+6. Updates all TextBlocks and power profile buttons
 
 ### Power Profile Buttons
 - Three buttons: Power Saver, Balanced, Performance
@@ -107,22 +91,79 @@ WiFiInfo {
 ## Wi-Fi Window
 
 ### What It Shows
-- List of available Wi-Fi networks
+- List of available Wi-Fi networks in a DataGrid
 - Signal strength, security type, connection status
-- Double-Click to connect/disconnect (not fully implemented)
+- Double-click to connect to networks
+- Refresh button to rescan networks
 
 ### How It Works
-1. Runs `nmcli device wifi list` command
-2. Parses the output (whitespace-separated columns)
-3. Creates `WiFiInfo` objects for each network
-4. Displays in DataGrid
-5. Uses `BoolToStatusConverter` to show "Connected"/"Available"
+1. Window opens → calls `RefreshWiFiDataAsync()`
+2. Runs `nmcli device wifi rescan` to trigger fresh scan
+3. Waits 3 seconds for scan to complete
+4. Runs `nmcli device wifi list` command
+5. **Robust Multi-Strategy Parsing**:
+   - **Column Strategy**: Splits on 2+ whitespace, maps columns
+   - **Regex Strategy**: Uses pattern matching for structured output
+   - **Flexible Strategy**: Heuristic parsing for edge cases
+6. **Validation** filters out:
+   - Empty SSIDs
+   - Parsing artifacts (SSID="Infra", "Adhoc")
+   - Invalid signal strengths
+   - Invalid channel numbers
+7. Displays valid networks in DataGrid
+8. Uses `BoolToStatusConverter` to show "Connected"/"Available"
+
+### WiFi Connection
+1. Double-click network → `AttemptWiFiConnectionAsync(ssid)`
+2. Tries connection: `nmcli device wifi connect "{ssid}"`
+3. If fails with "Secrets required" → opens password popup
+4. Retries with password: `nmcli device wifi connect "{ssid}" password "{password}"`
+5. Shows success/failure message
+6. Refreshes network list to show updated connection status
+
+## Enhanced WiFi Parsing (Current Implementation)
+
+### Multi-Strategy Approach
+The app now uses three parsing strategies to handle different `nmcli` output formats:
+
+#### Column Strategy
+```csharp
+// Splits lines on 2+ whitespace → columns
+// Maps: [0] IN-USE, [1] BSSID, [2] SSID, [3] MODE, [4] CHAN, [5] RATE, [6] SIGNAL, [7] BARS, [8+] SECURITY
+```
+
+#### Regex Strategy  
+```csharp
+// Pattern: ^(\*?\s*)([0-9a-fA-F:]+|\s+)\s+([^:]+?)\s+(\w+)\s+(\d+)\s+([\d.]+[MG]?)\s+(\d+)\s+(\W+)\s*(.*)$
+// Handles structured nmcli output with proper column matching
+```
+
+#### Flexible Strategy
+```csharp
+// Heuristic parsing for edge cases
+// Finds SSID position, then assigns remaining fields by position
+// Most robust for unusual output formats
+```
+
+### Enhanced Validation
+```csharp
+// Filters out parsing artifacts:
+if (network.SSID == "Infra" || network.SSID == "Adhoc") → Skip
+if (network.Signal.Contains("▂") || network.Signal.Contains("▄")) → Valid (signal bars)
+if (int.TryParse(network.Signal, out signal) && signal >= 0 && signal <= 100) → Valid (numeric)
+```
+
+### Retry Logic
+- **3 attempts** with **1-second delays**
+- **Console logging** for debugging
+- **Graceful degradation** - returns empty list if all strategies fail
 
 ## Error Handling
-- Most features just disable if required Linux command not found
-- Shows "N/A" or "not found" messages
-- Try/catch blocks around command execution
+- Most features disable if required Linux command not found
+- Shows clear "not available" messages
+- Try/catch blocks around all command execution
 - No crashes for missing dependencies
+- **WiFi parsing** has comprehensive error handling and logging
 
 ## Helper Methods & Information Flow
 
@@ -131,77 +172,19 @@ WiFiInfo {
 2. **Property Setter** or **Click Handler** runs
 3. **Command Method** called (`_changer.SetVolumeAsync()` etc.)
 4. **TerminalCommands.RunCommandAsync()** executes Linux command
-5. **Process.Start()** runs bash with the command
+5. **Process.Start()** runs bash with command
 6. **Output/Result** returned back up the chain
 7. **UI Updated** with new values or status
 
 ### Key Helper Methods
 
-#### TerminalCommands.RunCommandAsync()
-```csharp
-// Takes: string command like "brightnessctl set 50%"
-// Returns: string output (trimmed)
-// Process: Creates bash process, runs command, waits, returns output
-```
-
-#### CheckCommandAvailable()
-```csharp
-// Takes: command name like "brightnessctl"
-// Returns: true/false if command exists
-// Process: Runs "which {command}" and checks if output is empty
-```
-
-#### GetBrightnessPercentAsync()
-```csharp
-// Runs: "brightnessctl get" → current value
-// Runs: "brightnessctl max" → maximum value  
-// Calculates: (current / max) * 100 = percentage
-// Returns: 0-100 or -1 if error
-```
-
-#### GetVolumeAsync()
-```csharp
-// Runs: "pactl get-sink-volume @DEFAULT_SINK@"
-// Parses: Finds first "(\d+)%" pattern with regex
-// Returns: the percentage number or -1 if error
-```
-
-#### GetBatteryAsync()
-```csharp
-// Runs: "upower -e | grep -i -m 1 battery" → find device path
-// Runs: "upower -i {device}" → get battery info
-// Parses line by line:
-//   "battery present: yes" → IsPresent = true
-//   "state: charging" → State = "charging"  
-//   "percentage: 85%" → Percentage = 85
-//   "time to empty: 2h 30m" → TimeToEmpty = "2h 30m"
-//   "energy-rate: 15.5" → EnergyRate = 15.5
-// Returns: BatteryInfo object with parsed data
-```
-
-#### GetWiFiNetworksAsync()
+#### GetWiFiNetworksAsync() (Enhanced)
 ```csharp
 // Runs: "nmcli device wifi list" → raw network list
-// Skips: First line (header)
-// Splits: Each line on 2+ whitespace → 8+ columns
-// Maps columns to WiFiInfo:
-//   [0] IN-USE (contains "*" = active)
-//   [1] BSSID (ignored)
-//   [2] SSID → network.SSID
-//   [3] MODE → network.Mode
-//   [4] CHAN → network.Chan
-//   [5] RATE → network.Rate
-//   [6] SIGNAL → network.Signal
-//   [7] BARS (ignored)
-//   [8+] SECURITY → network.Security
+// Tries: 3 different parsing strategies
+// Validates: Each parsed network for data integrity
+// Retries: Up to 3 times with delays
 // Returns: ObservableCollection<WiFiInfo> for UI binding
-```
-
-#### GetCurrentPowerProfileAsync()
-```csharp
-// Runs: "powerprofilesctl get"
-// Returns: Profile name like "balanced" or "power-saver"
-// Error handling: Returns "Unknown" if command fails
 ```
 
 ### Property Change Pattern
@@ -219,45 +202,6 @@ public int SoundLevel {
 }
 ```
 
-### Window Opening Pattern
-```csharp
-// Battery Window:
-OpenBattery_Click() → new BatteryWindow() → Show()
-↓
-BatteryWindow_Opened() → RefreshBatteryDataAsync()
-↓
-CheckDependenciesAsync() → GetBatteryAsync() → Update UI
-
-// Wi-Fi Window:  
-OpenWiFi_Click() → new WiFiWindow() → Show()
-↓
-WiFiWindow_Opened() → LoadWiFiNetworksAsync()
-↓
-GetWiFiNetworksAsync() → Update DataGrid
-```
-
-### Error Recovery
-- **Command not found**: Dependency check fails → button disabled
-- **Parse fails**: Try/catch returns default values (-1, "N/A", "Unknown")
-- **No battery**: BatteryInfo.IsPresent = false, shows "N/A"
-- **No Wi-Fi adapter**: nmcli fails → WiFi button disabled
-
-## UI Stuff
-
-### Converters
-- `BoolToStringConverter` - converts bool to tooltip text
-- `BoolToStatusConverter` - converts bool to "Connected"/"Available"
-
-### Styles
-- Custom `clickable-label` button style (looks like text, acts like button)
-- Hover effects (blue underline)
-- Disabled state (gray text)
-
-### Data Binding
-- MainWindow is its own DataContext
-- Sliders bound to properties with `INotifyPropertyChanged`
-- Buttons enabled/disabled based on dependency availability
-
 ## Linux Commands Used
 
 ### For Display/Info
@@ -268,26 +212,74 @@ GetWiFiNetworksAsync() → Update DataGrid
 - `upower -e | grep battery` - find battery device
 - `upower -i {device}` - get battery info
 - `nmcli device wifi list` - list Wi-Fi networks
+- `nmcli device wifi rescan` - trigger fresh network scan
 - `powerprofilesctl get` - get current power profile
 
 ### For Changes
 - `brightnessctl set {percent}%` - set brightness
 - `pactl set-sink-volume @DEFAULT_SINK@ {percent}%` - set volume
 - `powerprofilesctl set {profile}` - set power profile
+- `nmcli device wifi connect "{ssid}"` - connect to open network
+- `nmcli device wifi connect "{ssid}" password "{pass}"` - connect to secured network
 
-## What Doesn't Work Yet
-- Wi-Fi connecting (just shows networks)
-- User management window
+## Distribution Compatibility
+
+### Excellent Compatibility (NetworkManager-based)
+- **Ubuntu/Debian** - NetworkManager pre-installed
+- **Fedora/CentOS/RHEL** - NetworkManager default
+- **Arch Linux** - NetworkManager commonly used
+- **openSUSE** - NetworkManager default
+- **Mint/Pop!_OS** - Ubuntu-based, full compatibility
+
+### Variable Compatibility
+- **Gentoo** - Depends on user's NetworkManager choice
+- **Slackware** - May require manual NetworkManager installation
+- **Alpine Linux** - Often uses different network tools
+
+### Requirements
+1. **NetworkManager** must be installed and running
+2. **nmcli** tool must be available  
+3. **User permissions** for network operations
+4. **Standard Linux tools**: bash, grep, which
+
+## Security Considerations
+- Passwords are only used for WiFi connection
+- No password storage or logging
+- Commands executed via bash with proper escaping
+- No elevation/sudo requirements
+
+## What Works Now
+✅ **Brightness control** - via brightnessctl
+✅ **Volume control** - via pactl  
+✅ **Battery monitoring** - via upower
+✅ **Power profiles** - via powerprofilesctl
+✅ **WiFi scanning** - robust nmcli parsing with fallbacks
+✅ **WiFi connection** - with password support and retry logic
+✅ **Cross-distro compatibility** - works where NetworkManager available
+✅ **Error handling** - graceful degradation for missing tools
+
+## What Could Be Added
 - Bluetooth management
+- User account management
 - Package manager GUI
-- Better edge case handling
+- System monitoring (CPU, memory, disk)
+- Network statistics
+- Custom themes/skins
 
 ## Testing
-- Works on Linux Mint 22.2 Cinnamon
-- Works on Debian 13 XFCE
-- Some features depend on having the right Linux tools installed
+- **Tested on**: Linux Mint 22.2, Debian 13, Ubuntu 24.04
+- **Dependencies**: Requires NetworkManager and standard Linux tools
+- **Fallbacks**: Graceful handling of missing commands
 
 ## Building
-- `dotnet publish -c Release -r linux-x64 --self-contained`
-- Debian package via `build-deb.sh`
-- Includes .NET runtime so no separate install needed
+- **Development**: `dotnet build`
+- **Release**: `dotnet publish -c Release -r linux-x64 --self-contained`
+- **Debian package**: `./build-deb.sh`
+- **Includes**: .NET runtime (no separate install needed)
+
+## Architecture Notes
+- **Terminal-only approach** chosen over DBus for reliability
+- **Multi-strategy parsing** handles nmcli output variations
+- **Async/await** throughout for responsive UI
+- **MVVM pattern** with data binding
+- **Error-first design** with comprehensive logging

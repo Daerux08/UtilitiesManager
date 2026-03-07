@@ -102,7 +102,7 @@ public partial class WiFiWindow : Window, INotifyPropertyChanged
             else
             {
                 WiFiNetworks.Clear();
-                StatusText = "nmcli is not available.";
+                StatusText = "nmcli is not available. WiFi functionality requires NetworkManager.";
             }
         }
         catch (Exception ex)
@@ -110,8 +110,6 @@ public partial class WiFiWindow : Window, INotifyPropertyChanged
             WiFiNetworks.Clear();
             StatusText = $"Error loading WiFi networks: {ex.Message}";
         }
-
-        // No need to manually set ItemsSource since it's bound
     }
 
     private void Refresh_Click(object? sender, RoutedEventArgs e)

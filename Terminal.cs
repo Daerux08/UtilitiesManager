@@ -520,12 +520,36 @@ namespace UtilitiesManager
                 return false;
             }
 
-            // Signal strength validation (should be a reasonable number)
+            // Skip if SSID is just a mode name (parsing artifact)
+            if (network.SSID == "Infra" || network.SSID == "Adhoc" || network.SSID == "AP")
+            {
+                Console.WriteLine($"Validation failed: SSID '{network.SSID}' appears to be a mode name, not a network");
+                return false;
+            }
+
+            // Signal strength validation - handle both numeric and bar representations
             if (!string.IsNullOrEmpty(network.Signal))
             {
-                if (!int.TryParse(network.Signal, out int signal) || signal < 0 || signal > 100)
+                // Check for bar representation (like '▂___')
+                if (network.Signal.Contains("▂") || network.Signal.Contains("▄") || 
+                    network.Signal.Contains("█") || network.Signal.Contains("_"))
                 {
-                    Console.WriteLine($"Validation failed: Invalid signal strength '{network.Signal}' for SSID '{network.SSID}'");
+                    // Bar representation is valid
+                    return true;
+                }
+                
+                // Check for numeric representation
+                if (int.TryParse(network.Signal, out int signal))
+                {
+                    if (signal < 0 || signal > 100)
+                    {
+                        Console.WriteLine($"Validation failed: Invalid signal strength '{network.Signal}' for SSID '{network.SSID}'");
+                        return false;
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"Validation failed: Unrecognized signal format '{network.Signal}' for SSID '{network.SSID}'");
                     return false;
                 }
             }
@@ -533,7 +557,7 @@ namespace UtilitiesManager
             // Channel validation
             if (!string.IsNullOrEmpty(network.Chan))
             {
-                if (!int.TryParse(network.Chan, out int channel) || channel < 1 || channel > 200)
+                if (int.TryParse(network.Chan, out int channel) && (channel < 1 || channel > 200))
                 {
                     Console.WriteLine($"Validation failed: Invalid channel '{network.Chan}' for SSID '{network.SSID}'");
                     return false;
