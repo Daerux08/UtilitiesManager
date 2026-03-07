@@ -253,15 +253,11 @@ namespace UtilitiesManager
             {
                 try
                 {
-                    Console.WriteLine($"WiFi parsing attempt {attempt}/{maxRetries}");
-                    
                     string output = await TerminalCommands.RunCommandAsync("nmcli device wifi list");
                     if (string.IsNullOrWhiteSpace(output))
                     {
-                        Console.WriteLine("WiFi: No output from nmcli command");
                         if (attempt < maxRetries)
                         {
-                            Console.WriteLine($"Retrying in {retryDelayMs}ms...");
                             await Task.Delay(retryDelayMs);
                             continue;
                         }
@@ -282,36 +278,27 @@ namespace UtilitiesManager
                             if (ValidateWiFiInfo(network))
                             {
                                 networks.Add(network);
-                                Console.WriteLine($"Successfully parsed: {network.SSID,-25} | Signal: {network.Signal,-3} | Security: {network.Security}");
-                            }
-                            else
-                            {
-                                Console.WriteLine($"Skipped invalid network: SSID='{network.SSID}', Signal='{network.Signal}'");
                             }
                         }
                         
-                        Console.WriteLine($"WiFi parsing complete. Valid networks found: {networks.Count}");
-                        return networks; // Success, exit retry loop
+                        return networks;
                     }
                     else
                     {
-                        Console.WriteLine($"All parsing strategies failed on attempt {attempt}");
+                        // All parsing strategies failed
                     }
                 }
-                catch (Exception ex)
+                catch
                 {
-                    Console.WriteLine($"WiFi parsing failed on attempt {attempt}: {ex.GetType().Name}: {ex.Message}");
-                    Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                    // Parsing failed, will retry
                 }
 
                 if (attempt < maxRetries)
                 {
-                    Console.WriteLine($"Retrying in {retryDelayMs}ms...");
                     await Task.Delay(retryDelayMs);
                 }
             }
 
-            Console.WriteLine($"WiFi parsing failed after {maxRetries} attempts");
             return networks;
         }
 
@@ -330,7 +317,6 @@ namespace UtilitiesManager
                     var parts = Regex.Split(line, @"\s{2,}");
                     if (parts.Length < 8)
                     {
-                        Console.WriteLine($"Column strategy: Insufficient columns ({parts.Length}) in line: {line}");
                         continue;
                     }
 
@@ -341,9 +327,8 @@ namespace UtilitiesManager
 
                 return networks.Count > 0 ? networks : null;
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine($"Column strategy failed: {ex.Message}");
                 return null;
             }
         }
@@ -365,7 +350,6 @@ namespace UtilitiesManager
                     var match = Regex.Match(line, pattern);
                     if (!match.Success)
                     {
-                        Console.WriteLine($"Regex strategy: No match for line: {line}");
                         continue;
                     }
 
@@ -388,9 +372,8 @@ namespace UtilitiesManager
 
                 return networks.Count > 0 ? networks : null;
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine($"Regex strategy failed: {ex.Message}");
                 return null;
             }
         }
@@ -411,7 +394,6 @@ namespace UtilitiesManager
                     
                     if (parts.Length < 3) // Minimum: SSID, Mode, something else
                     {
-                        Console.WriteLine($"Flexible strategy: Too few parts ({parts.Length}) in line: {line}");
                         continue;
                     }
 
@@ -452,9 +434,8 @@ namespace UtilitiesManager
 
                 return networks.Count > 0 ? networks : null;
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine($"Flexible strategy failed: {ex.Message}");
                 return null;
             }
         }
@@ -504,9 +485,8 @@ namespace UtilitiesManager
 
                 return network;
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine($"Failed to parse WiFi from parts: {ex.Message}");
                 return null;
             }
         }
@@ -516,14 +496,12 @@ namespace UtilitiesManager
             // SSID validation
             if (string.IsNullOrWhiteSpace(network.SSID))
             {
-                Console.WriteLine("Validation failed: Empty SSID");
                 return false;
             }
 
             // Skip if SSID is just a mode name (parsing artifact)
             if (network.SSID == "Infra" || network.SSID == "Adhoc" || network.SSID == "AP")
             {
-                Console.WriteLine($"Validation failed: SSID '{network.SSID}' appears to be a mode name, not a network");
                 return false;
             }
 
@@ -543,13 +521,11 @@ namespace UtilitiesManager
                 {
                     if (signal < 0 || signal > 100)
                     {
-                        Console.WriteLine($"Validation failed: Invalid signal strength '{network.Signal}' for SSID '{network.SSID}'");
                         return false;
                     }
                 }
                 else
                 {
-                    Console.WriteLine($"Validation failed: Unrecognized signal format '{network.Signal}' for SSID '{network.SSID}'");
                     return false;
                 }
             }
@@ -559,7 +535,6 @@ namespace UtilitiesManager
             {
                 if (int.TryParse(network.Chan, out int channel) && (channel < 1 || channel > 200))
                 {
-                    Console.WriteLine($"Validation failed: Invalid channel '{network.Chan}' for SSID '{network.SSID}'");
                     return false;
                 }
             }

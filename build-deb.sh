@@ -2,7 +2,7 @@
 set -e
 
 APP_NAME="utilitiesmanager"
-APP_VERSION="0.3.0~alpha$(date +%Y%m%d%H%M)"
+APP_VERSION="0.4.0~alpha$(date +%Y%m%d%H%M)"
 ARCH="amd64"
 
 # project file
@@ -18,6 +18,8 @@ USR_SHARE_DIR="$DEB_DIR/usr/share/UtilitiesManager"
 echo "==> Cleaning old builds"
 rm -rf "$PUBLISH_DIR"
 rm -rf "$DEB_DIR"
+rm -f Package.deb
+rm -f utilitiesmanager_*.deb
 
 echo "==> Publishing Avalonia app"
 dotnet publish "$PROJECT_PATH" -c Release -r linux-x64 --self-contained true -o "$PUBLISH_DIR"

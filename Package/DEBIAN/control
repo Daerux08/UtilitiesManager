@@ -1,5 +1,5 @@
 Package: utilitiesmanager
-Version: 0.3.0~alpha202603031006
+Version: 0.4.0~alpha202603071211
 Section: utils
 Priority: optional
 Architecture: amd64

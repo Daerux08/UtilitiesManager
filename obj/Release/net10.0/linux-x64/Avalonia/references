@@ -20,6 +20,8 @@
 /home/mr-owl/.nuget/packages/avalonia.win32/11.3.12/lib/net8.0/Avalonia.Win32.Automation.dll
 /home/mr-owl/.nuget/packages/avalonia.win32/11.3.12/lib/net8.0/Avalonia.Win32.dll
 /home/mr-owl/.nuget/packages/avalonia.x11/11.3.12/lib/net8.0/Avalonia.X11.dll
+/home/mr-owl/.nuget/packages/dialoghost.avalonia/0.8.1/lib/netstandard2.0/DialogHost.Avalonia.dll
+/home/mr-owl/.nuget/packages/hashtagchris.dotnetbluez/1.3.1/lib/netstandard2.0/DotNetBlueZ.dll
 /home/mr-owl/.nuget/packages/harfbuzzsharp/8.3.1.1/lib/net8.0/HarfBuzzSharp.dll
 /home/mr-owl/.nuget/packages/microcom.runtime/0.11.0/lib/net5.0/MicroCom.Runtime.dll
 /home/mr-owl/.dotnet/packs/Microsoft.NETCore.App.Ref/10.0.3/ref/net10.0/Microsoft.CSharp.dll
@@ -27,6 +29,7 @@
 /home/mr-owl/.dotnet/packs/Microsoft.NETCore.App.Ref/10.0.3/ref/net10.0/Microsoft.VisualBasic.dll
 /home/mr-owl/.dotnet/packs/Microsoft.NETCore.App.Ref/10.0.3/ref/net10.0/Microsoft.Win32.Primitives.dll
 /home/mr-owl/.dotnet/packs/Microsoft.NETCore.App.Ref/10.0.3/ref/net10.0/Microsoft.Win32.Registry.dll
+/home/mr-owl/.nuget/packages/messagebox.avalonia/3.3.1.1/lib/netstandard2.0/MsBox.Avalonia.dll
 /home/mr-owl/.dotnet/packs/Microsoft.NETCore.App.Ref/10.0.3/ref/net10.0/mscorlib.dll
 /home/mr-owl/.dotnet/packs/Microsoft.NETCore.App.Ref/10.0.3/ref/net10.0/netstandard.dll
 /home/mr-owl/.nuget/packages/skiasharp/2.88.9/lib/net6.0/SkiaSharp.dll
@@ -189,5 +192,6 @@
 /home/mr-owl/.dotnet/packs/Microsoft.NETCore.App.Ref/10.0.3/ref/net10.0/System.Xml.XmlSerializer.dll
 /home/mr-owl/.dotnet/packs/Microsoft.NETCore.App.Ref/10.0.3/ref/net10.0/System.Xml.XPath.dll
 /home/mr-owl/.dotnet/packs/Microsoft.NETCore.App.Ref/10.0.3/ref/net10.0/System.Xml.XPath.XDocument.dll
+/home/mr-owl/.nuget/packages/tmds.dbus/0.7.0/lib/netstandard2.0/Tmds.DBus.dll
 /home/mr-owl/.nuget/packages/tmds.dbus.protocol/0.21.2/lib/net8.0/Tmds.DBus.Protocol.dll
 /home/mr-owl/.dotnet/packs/Microsoft.NETCore.App.Ref/10.0.3/ref/net10.0/WindowsBase.dll

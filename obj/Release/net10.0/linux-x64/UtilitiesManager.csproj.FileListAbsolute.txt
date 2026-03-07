@@ -232,3 +232,7 @@
 /home/mr-owl/UtilitiesManager/obj/Release/net10.0/linux-x64/UtilitiesManager.pdb
 /home/mr-owl/UtilitiesManager/obj/Release/net10.0/linux-x64/UtilitiesManager.genruntimeconfig.cache
 /home/mr-owl/UtilitiesManager/obj/Release/net10.0/linux-x64/ref/UtilitiesManager.dll
+/home/mr-owl/UtilitiesManager/bin/Release/net10.0/linux-x64/DialogHost.Avalonia.dll
+/home/mr-owl/UtilitiesManager/bin/Release/net10.0/linux-x64/DotNetBlueZ.dll
+/home/mr-owl/UtilitiesManager/bin/Release/net10.0/linux-x64/MsBox.Avalonia.dll
+/home/mr-owl/UtilitiesManager/bin/Release/net10.0/linux-x64/Tmds.DBus.dll

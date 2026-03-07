@@ -2,12 +2,10 @@ packages used:
 1. Brightnessctl
 2. Pactl
 3. nmcli
-4. 
 
 using:
-1. GTKsharp
-2. Visual Code
-3. c# (duh)
+1. Visual Code
+2. c# (duh)
 
 
 

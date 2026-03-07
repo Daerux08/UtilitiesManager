@@ -7,7 +7,6 @@
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
   </PropertyGroup>
 
-  <!-- Embed your PNG so Avalonia can load it at runtime -->
   <ItemGroup>
     <AvaloniaResource Include="UtilManagerV3.png" />
   </ItemGroup>
@@ -19,11 +18,7 @@
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.12" />
     <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.12" />
 
-    <!-- Remove Avalonia.Diagnostics from Release builds -->
-    <PackageReference Include="Avalonia.Diagnostics" Version="11.3.12">
-      <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
-      <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
-    </PackageReference>
+    <PackageReference Include="Avalonia.Diagnostics" Version="11.3.12" Condition="'$(Configuration)' == 'Debug'" />
     <PackageReference Include="HashtagChris.DotNetBlueZ" Version="1.3.1" />
     <PackageReference Include="MessageBox.Avalonia" Version="3.3.1.1" />
   </ItemGroup>

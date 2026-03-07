@@ -33,8 +33,8 @@ public partial class MainWindow : Window, INotifyPropertyChanged
     private readonly ChangeValueCommand _changer = new();
     private int _soundLevel;
     private int _brightness;
-    private string _soundLevelText;
-    private string _brightnessText;
+    private string _soundLevelText = "";
+    private string _brightnessText = "";
     private bool _brightnessAvailable;
     private bool _soundAvailable;
     private bool _batteryAvailable;

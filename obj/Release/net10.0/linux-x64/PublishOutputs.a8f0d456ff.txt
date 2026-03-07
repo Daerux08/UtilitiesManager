@@ -211,9 +211,13 @@
 /home/mr-owl/UtilitiesManager/publish/Avalonia.Win32.Automation.dll
 /home/mr-owl/UtilitiesManager/publish/Avalonia.Win32.dll
 /home/mr-owl/UtilitiesManager/publish/Avalonia.X11.dll
+/home/mr-owl/UtilitiesManager/publish/DialogHost.Avalonia.dll
 /home/mr-owl/UtilitiesManager/publish/HarfBuzzSharp.dll
+/home/mr-owl/UtilitiesManager/publish/DotNetBlueZ.dll
+/home/mr-owl/UtilitiesManager/publish/MsBox.Avalonia.dll
 /home/mr-owl/UtilitiesManager/publish/MicroCom.Runtime.dll
 /home/mr-owl/UtilitiesManager/publish/SkiaSharp.dll
+/home/mr-owl/UtilitiesManager/publish/Tmds.DBus.dll
 /home/mr-owl/UtilitiesManager/publish/Tmds.DBus.Protocol.dll
 /home/mr-owl/UtilitiesManager/publish/libHarfBuzzSharp.so
 /home/mr-owl/UtilitiesManager/publish/libSkiaSharp.so
