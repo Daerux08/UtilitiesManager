@@ -1,19 +1,21 @@
-﻿using Avalonia;
-using System;
+﻿using System;
+using System.Threading.Tasks;
+using UtilitiesManager;
 
-namespace UtilitiesManager;
-
-class Program
+namespace UtilitiesManager
 {
-    
-    [STAThread]
-    public static void Main(string[] args) => BuildAvaloniaApp()
-        .StartWithClassicDesktopLifetime(args);
-
-    // Avalonia configuration, don't remove;
-    public static AppBuilder BuildAvaloniaApp()
-        => AppBuilder.Configure<App>()
-            .UsePlatformDetect()
-            .WithInterFont()
-            .LogToTrace();
+    class Program
+    {
+        static async Task Main(string[] args)
+        {
+            if (args.Length > 0)
+            {
+                await CliUtilMan.RunCliMode(args);
+            }
+            else
+            {
+                await CliUtilMan.RunInteractiveMode();
+            }
+        }
+    }
 }
