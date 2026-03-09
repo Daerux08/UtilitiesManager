@@ -267,7 +267,8 @@ namespace UtilitiesManager
                     var lines = output.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
                     
                     // Try multiple parsing strategies
-                    var parsedNetworks = TryParseWithColumnStrategy(lines) ?? 
+                    var parsedNetworks = TryParseWithMultiLineStrategy(lines) ??
+                                       TryParseWithColumnStrategy(lines) ?? 
                                        TryParseWithRegexStrategy(lines) ??
                                        TryParseWithFlexibleStrategy(lines);
 
@@ -300,6 +301,152 @@ namespace UtilitiesManager
             }
 
             return networks;
+        }
+
+        private List<WiFiInfo>? TryParseWithMultiLineStrategy(string[] lines)
+        {
+            try
+            {
+                var networks = new List<WiFiInfo>();
+                
+                // Skip header line
+                for (int i = 1; i < lines.Length; i++)
+                {
+                    var line = lines[i].Trim();
+                    if (string.IsNullOrWhiteSpace(line)) continue;
+
+                    // Check if this line contains a BSSID (MAC address format) anywhere in the line
+                    if (Regex.IsMatch(line, @"([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}"))
+                    {
+                        // Use a more robust parsing approach that handles SSIDs with spaces
+                        var network = ParseNetworkLine(line);
+                        if (network != null && !string.IsNullOrEmpty(network.SSID) && network.SSID != "--")
+                        {
+                            networks.Add(network);
+                        }
+                    }
+                }
+
+                return networks.Count > 0 ? networks : null;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private WiFiInfo? ParseNetworkLine(string line)
+        {
+            try
+            {
+                var network = new WiFiInfo();
+                
+                // Find the IN-USE field (starts with * or is empty)
+                var inUseMatch = Regex.Match(line, @"^(\*|\s+)\s+");
+                if (inUseMatch.Success)
+                {
+                    network.IsActive = inUseMatch.Groups[1].Value.Contains("*");
+                }
+                
+                // Find BSSID (MAC address)
+                var bssidMatch = Regex.Match(line, @"([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}");
+                if (!bssidMatch.Success) return null;
+                
+                // Find the parts after BSSID
+                var afterBssid = line.Substring(bssidMatch.Index + bssidMatch.Length).Trim();
+                
+                // Use regex to capture the remaining fields
+                // SSID, MODE, CHAN, RATE, SIGNAL, BARS, SECURITY
+                var pattern = @"^(.+?)\s+(\w+)\s+(\d+)\s+([\d.]+\s*[MG]?)\s+(\d+)\s+([▂▄▆█_]+)\s+(.+)$";
+                var match = Regex.Match(afterBssid, pattern);
+                
+                if (match.Success)
+                {
+                    network.SSID = match.Groups[1].Value.Trim();
+                    network.Mode = match.Groups[2].Value.Trim();
+                    network.Chan = match.Groups[3].Value.Trim();
+                    network.Rate = match.Groups[4].Value.Trim();
+                    network.Signal = match.Groups[5].Value.Trim();
+                    // Skip BARS (group 6)
+                    network.Security = match.Groups[7].Value.Trim();
+                    
+                    if (network.Security == "--" || string.IsNullOrEmpty(network.Security))
+                        network.Security = "Open";
+                    
+                    return network;
+                }
+                
+                // Fallback: try to parse manually
+                var parts = afterBssid.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length >= 6)
+                {
+                    // Try to identify the pattern by looking for known field values
+                    // Look for mode (Infra, Ad-Hoc)
+                    int modeIndex = -1;
+                    for (int j = 0; j < parts.Length - 1; j++)
+                    {
+                        if (parts[j] == "Infra" || parts[j] == "Ad-Hoc")
+                        {
+                            modeIndex = j;
+                            break;
+                        }
+                    }
+                    
+                    if (modeIndex > 0)
+                    {
+                        // SSID is everything before the mode
+                        network.SSID = string.Join(" ", parts.Take(modeIndex)).Trim();
+                        
+                        // Mode
+                        network.Mode = parts[modeIndex];
+                        
+                        // Channel (should be a number)
+                        if (modeIndex + 1 < parts.Length && int.TryParse(parts[modeIndex + 1], out _))
+                        {
+                            network.Chan = parts[modeIndex + 1];
+                            modeIndex++;
+                        }
+                        
+                        // Rate (should contain Mbit/s or Gbit/s)
+                        if (modeIndex + 1 < parts.Length && parts[modeIndex + 1].Contains("Mbit/s"))
+                        {
+                            network.Rate = parts[modeIndex + 1];
+                            modeIndex++;
+                        }
+                        else if (modeIndex + 2 < parts.Length && parts[modeIndex + 2].Contains("Mbit/s"))
+                        {
+                            // Rate might be two parts (e.g., "270 Mbit/s")
+                            network.Rate = parts[modeIndex + 1] + " " + parts[modeIndex + 2];
+                            modeIndex += 2;
+                        }
+                        
+                        // Signal (should be a number)
+                        if (modeIndex + 1 < parts.Length && int.TryParse(parts[modeIndex + 1], out _))
+                        {
+                            network.Signal = parts[modeIndex + 1];
+                            modeIndex++;
+                        }
+                        
+                        // Skip BARS
+                        
+                        // Security is everything else
+                        if (modeIndex + 2 < parts.Length)
+                        {
+                            network.Security = string.Join(" ", parts.Skip(modeIndex + 2)).Trim();
+                            if (network.Security == "--" || string.IsNullOrEmpty(network.Security))
+                                network.Security = "Open";
+                        }
+                        
+                        return network;
+                    }
+                }
+                
+                return null;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         private List<WiFiInfo>? TryParseWithColumnStrategy(string[] lines)
