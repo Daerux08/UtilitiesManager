@@ -127,6 +127,21 @@ namespace UtilitiesManager
         public bool IsNmcliAvailable { get; private set; }
         public bool IsPowerProfilesCtlAvailable { get; private set; }
 
+        // Terminal/Server monitoring booleans
+        public bool IsProcpsAvailable { get; private set; }
+        public bool IsLmSensorsAvailable { get; private set; }
+        public bool IsSysstatAvailable { get; private set; }
+        public bool IsIotopAvailable { get; private set; }
+        public bool IsNethogsAvailable { get; private set; }
+        public bool IsSystemctlAvailable { get; private set; }
+        public bool IsUseraddAvailable { get; private set; }
+        public bool IsJournalctlAvailable { get; private set; }
+        public bool IsUfwAvailable { get; private set; }
+        public bool IsIptablesAvailable { get; private set; }
+        public bool IsFail2banAvailable { get; private set; }
+        public bool IsBleachbitAvailable { get; private set; }
+        public bool IsNcduAvailable { get; private set; }
+
         public async Task LoadOriginalValuesAsync()
         {
             await CheckDependenciesAsync();
@@ -137,11 +152,27 @@ namespace UtilitiesManager
 
         public async Task CheckDependenciesAsync()
         {
+            // Original dependencies
             IsBrightnessCtlAvailable = await CheckCommandAvailable("brightnessctl");
             IsPactlAvailable = await CheckCommandAvailable("pactl");
             IsUpowerAvailable = await CheckCommandAvailable("upower");
             IsNmcliAvailable = await CheckCommandAvailable("nmcli");
             IsPowerProfilesCtlAvailable = await CheckCommandAvailable("powerprofilesctl");
+
+            // Terminal/Server monitoring dependencies
+            IsProcpsAvailable = await CheckCommandAvailable("ps") && await CheckCommandAvailable("free");
+            IsLmSensorsAvailable = await CheckCommandAvailable("sensors");
+            IsSysstatAvailable = await CheckCommandAvailable("iostat") && await CheckCommandAvailable("mpstat");
+            IsIotopAvailable = await CheckCommandAvailable("iotop");
+            IsNethogsAvailable = await CheckCommandAvailable("nethogs");
+            IsSystemctlAvailable = await CheckCommandAvailable("systemctl");
+            IsUseraddAvailable = await CheckCommandAvailable("useradd");
+            IsJournalctlAvailable = await CheckCommandAvailable("journalctl");
+            IsUfwAvailable = await CheckCommandAvailable("ufw");
+            IsIptablesAvailable = await CheckCommandAvailable("iptables");
+            IsFail2banAvailable = await CheckCommandAvailable("fail2ban-client");
+            IsBleachbitAvailable = await CheckCommandAvailable("bleachbit");
+            IsNcduAvailable = await CheckCommandAvailable("ncdu");
         }
 
         private async Task<bool> CheckCommandAvailable(string command)
@@ -702,5 +733,440 @@ namespace UtilitiesManager
                 return "Unknown";
             }
         }
-    }}
 
+    // SYSTEM MONITORING METHODS
+    public async Task<SystemInfo> GetSystemInfoAsync()
+    {
+        var info = new SystemInfo();
+        
+        // CPU Information
+        if (IsProcpsAvailable)
+        {
+            try
+            {
+                var uptimeOutput = await TerminalCommands.RunCommandAsync("uptime");
+                info.Uptime = uptimeOutput.Trim();
+                
+                var loadAvgOutput = await TerminalCommands.RunCommandAsync("cat /proc/loadavg");
+                info.LoadAverage = loadAvgOutput.Split(' ')[0..2];
+            }
+            catch { }
+        }
+
+        // Memory Information
+        if (IsProcpsAvailable)
+        {
+            try
+            {
+                var memOutput = await TerminalCommands.RunCommandAsync("free -h");
+                info.MemoryInfo = ParseMemoryInfo(memOutput);
+            }
+            catch { }
+        }
+
+        // CPU Temperature
+        if (IsLmSensorsAvailable)
+        {
+            try
+            {
+                var tempOutput = await TerminalCommands.RunCommandAsync("sensors");
+                info.Temperatures = ParseTemperatureInfo(tempOutput);
+            }
+            catch { }
+        }
+
+        // Disk Usage
+        try
+        {
+            var diskOutput = await TerminalCommands.RunCommandAsync("df -h");
+            info.DiskUsage = ParseDiskUsage(diskOutput);
+        }
+        catch { }
+
+        // Network Interfaces
+        try
+        {
+            var netOutput = await TerminalCommands.RunCommandAsync("ip addr show");
+            info.NetworkInterfaces = ParseNetworkInterfaces(netOutput);
+        }
+        catch { }
+
+        return info;
+    }
+
+    public async Task<List<ServiceInfo>> GetServicesAsync()
+    {
+        var services = new List<ServiceInfo>();
+        
+        if (!IsSystemctlAvailable) return services;
+
+        try
+        {
+            var output = await TerminalCommands.RunCommandAsync("systemctl list-units --type=service --state=running,stopped,failed --no-pager --no-legend");
+            var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+            
+            foreach (var line in lines.Take(20)) // Limit to first 20 services
+            {
+                var parts = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length >= 4)
+                {
+                    services.Add(new ServiceInfo
+                    {
+                        Name = parts[0],
+                        Load = parts[1],
+                        Active = parts[2],
+                        Sub = parts[3],
+                        Description = parts.Length > 4 ? string.Join(" ", parts.Skip(4)) : ""
+                    });
+                }
+            }
+        }
+        catch { }
+
+        return services;
+    }
+
+    public async Task<List<UserInfo>> GetUsersAsync()
+    {
+        var users = new List<UserInfo>();
+        
+        try
+        {
+            // Get user list from /etc/passwd
+            var passwdOutput = await TerminalCommands.RunCommandAsync("cat /etc/passwd");
+            var lines = passwdOutput.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+            
+            foreach (var line in lines.Take(10)) // Limit to first 10 users
+            {
+                var parts = line.Split(':');
+                if (parts.Length >= 7)
+                {
+                    users.Add(new UserInfo
+                    {
+                        Username = parts[0],
+                        UID = parts[2],
+                        GID = parts[3],
+                        Home = parts[5],
+                        Shell = parts[6]
+                    });
+                }
+            }
+
+            // Get currently logged in users
+            if (IsProcpsAvailable)
+            {
+                try
+                {
+                    var whoOutput = await TerminalCommands.RunCommandAsync("who");
+                    var loggedInUsers = whoOutput.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+                    
+                    foreach (var loggedIn in loggedInUsers)
+                    {
+                        var parts = loggedIn.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                        if (parts.Length > 0)
+                        {
+                            var user = users.FirstOrDefault(u => u.Username == parts[0]);
+                            if (user != null)
+                            {
+                                user.IsLoggedIn = true;
+                            }
+                        }
+                    }
+                }
+                catch { }
+            }
+        }
+        catch { }
+
+        return users;
+    }
+
+    public async Task<List<LogEntry>> GetRecentLogsAsync(string logType = "system")
+    {
+        var logs = new List<LogEntry>();
+        
+        if (!IsJournalctlAvailable) return logs;
+
+        try
+        {
+            var command = logType.ToLower() switch
+            {
+                "kernel" => "journalctl -k --no-pager -n 20",
+                "boot" => "journalctl -b --no-pager -n 20",
+                _ => "journalctl --no-pager -n 20"
+            };
+
+            var output = await TerminalCommands.RunCommandAsync(command);
+            var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+            
+            foreach (var line in lines.Take(20))
+            {
+                logs.Add(new LogEntry
+                {
+                    Timestamp = ExtractTimestamp(line),
+                    Message = line
+                });
+            }
+        }
+        catch { }
+
+        return logs;
+    }
+
+    public async Task<FirewallStatus> GetFirewallStatusAsync()
+    {
+        var status = new FirewallStatus();
+        
+        if (IsUfwAvailable)
+        {
+            try
+            {
+                var output = await TerminalCommands.RunCommandAsync("ufw status");
+                status.UfwStatus = ParseUfwStatus(output);
+            }
+            catch { }
+        }
+
+        if (IsIptablesAvailable)
+        {
+            try
+            {
+                var output = await TerminalCommands.RunCommandAsync("iptables -L --line-numbers");
+                status.IptablesRules = ParseIptablesRules(output);
+            }
+            catch { }
+        }
+
+        if (IsFail2banAvailable)
+        {
+            try
+            {
+                var output = await TerminalCommands.RunCommandAsync("fail2ban-client status");
+                status.Fail2banStatus = ParseFail2banStatus(output);
+            }
+            catch { }
+        }
+
+        return status;
+    }
+
+    // Helper methods for parsing system information
+    private Dictionary<string, string> ParseMemoryInfo(string output)
+    {
+        var info = new Dictionary<string, string>();
+        var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        
+        foreach (var line in lines)
+        {
+            if (line.StartsWith("Mem:"))
+            {
+                var parts = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length >= 3)
+                {
+                    info["Total"] = parts[1];
+                    info["Used"] = parts[2];
+                    info["Free"] = parts[3];
+                }
+            }
+            else if (line.StartsWith("Swap:"))
+            {
+                var parts = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length >= 3)
+                {
+                    info["SwapTotal"] = parts[1];
+                    info["SwapUsed"] = parts[2];
+                    info["SwapFree"] = parts[3];
+                }
+            }
+        }
+        
+        return info;
+    }
+
+    private Dictionary<string, string> ParseTemperatureInfo(string output)
+    {
+        var temps = new Dictionary<string, string>();
+        var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        
+        foreach (var line in lines)
+        {
+            if (line.Contains("°C"))
+            {
+                var parts = line.Split(':');
+                if (parts.Length >= 2)
+                {
+                    var sensor = parts[0].Trim();
+                    var temp = parts[1].Trim();
+                    temps[sensor] = temp;
+                }
+            }
+        }
+        
+        return temps;
+    }
+
+    private List<DiskInfo> ParseDiskUsage(string output)
+    {
+        var disks = new List<DiskInfo>();
+        var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        
+        foreach (var line in lines.Skip(1)) // Skip header
+        {
+            var parts = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length >= 6)
+            {
+                disks.Add(new DiskInfo
+                {
+                    Filesystem = parts[0],
+                    Size = parts[1],
+                    Used = parts[2],
+                    Available = parts[3],
+                    UsePercent = parts[4],
+                    MountPoint = parts[5]
+                });
+            }
+        }
+        
+        return disks;
+    }
+
+    private List<NetworkInterface> ParseNetworkInterfaces(string output)
+    {
+        var interfaces = new List<NetworkInterface>();
+        var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        
+        foreach (var line in lines)
+        {
+            if (line.TrimStart().StartsWith("inet "))
+            {
+                var parts = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length >= 2)
+                {
+                    interfaces.Add(new NetworkInterface
+                    {
+                        IPAddress = parts[1],
+                        Interface = ExtractInterfaceName(output, line)
+                    });
+                }
+            }
+        }
+        
+        return interfaces;
+    }
+
+    private string ParseUfwStatus(string output)
+    {
+        if (output.Contains("Status: active"))
+            return "Active";
+        else if (output.Contains("Status: inactive"))
+            return "Inactive";
+        else
+            return "Unknown";
+    }
+
+    private List<string> ParseIptablesRules(string output)
+    {
+        return output.Split('\n', StringSplitOptions.RemoveEmptyEntries)
+                     .Where(line => !line.StartsWith("Chain") && !line.StartsWith("target"))
+                     .Take(10)
+                     .ToList();
+    }
+
+    private string ParseFail2banStatus(string output)
+    {
+        if (output.Contains("Status"))
+            return output.Split('\n').FirstOrDefault(line => line.Contains("Status")) ?? "Unknown";
+        return "Unknown";
+    }
+
+    private string ExtractTimestamp(string logLine)
+    {
+        var parts = logLine.Split(' ');
+        if (parts.Length >= 3)
+        {
+            return $"{parts[0]} {parts[1]} {parts[2]}";
+        }
+        return "";
+    }
+
+    private string ExtractInterfaceName(string fullOutput, string currentLine)
+    {
+        var lines = fullOutput.Split('\n');
+        var currentIndex = Array.IndexOf(lines, currentLine);
+        
+        for (int i = currentIndex - 1; i >= 0; i--)
+        {
+            var line = lines[i].Trim();
+            if (line.Length > 0 && !line.StartsWith(" ") && !line.StartsWith("\t"))
+            {
+                var parts = line.Split(':');
+                if (parts.Length > 0)
+                {
+                    return parts[0].Trim();
+                }
+            }
+        }
+        
+        return "Unknown";
+    }
+}
+
+// Additional data classes for system monitoring
+public class SystemInfo
+{
+    public string Uptime { get; set; } = "";
+    public string[] LoadAverage { get; set; } = new string[0];
+    public Dictionary<string, string> MemoryInfo { get; set; } = new();
+    public Dictionary<string, string> Temperatures { get; set; } = new();
+    public List<DiskInfo> DiskUsage { get; set; } = new();
+    public List<NetworkInterface> NetworkInterfaces { get; set; } = new();
+}
+
+public class ServiceInfo
+{
+    public string Name { get; set; } = "";
+    public string Load { get; set; } = "";
+    public string Active { get; set; } = "";
+    public string Sub { get; set; } = "";
+    public string Description { get; set; } = "";
+}
+
+public class UserInfo
+{
+    public string Username { get; set; } = "";
+    public string UID { get; set; } = "";
+    public string GID { get; set; } = "";
+    public string Home { get; set; } = "";
+    public string Shell { get; set; } = "";
+    public bool IsLoggedIn { get; set; } = false;
+}
+
+public class LogEntry
+{
+    public string Timestamp { get; set; } = "";
+    public string Message { get; set; } = "";
+}
+
+public class FirewallStatus
+{
+    public string UfwStatus { get; set; } = "";
+    public List<string> IptablesRules { get; set; } = new();
+    public string Fail2banStatus { get; set; } = "";
+}
+
+public class DiskInfo
+{
+    public string Filesystem { get; set; } = "";
+    public string Size { get; set; } = "";
+    public string Used { get; set; } = "";
+    public string Available { get; set; } = "";
+    public string UsePercent { get; set; } = "";
+    public string MountPoint { get; set; } = "";
+}
+
+public class NetworkInterface
+{
+    public string Interface { get; set; } = "";
+    public string IPAddress { get; set; } = "";
+}
+}
