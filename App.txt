@@ -1,13 +1,25 @@
 packages used:
-1. Brightnessctl
-2. Pactl
-3. nmcli
+1. brightnessctl - Screen brightness control
+2. pactl - Audio volume control
+3. upower - Battery monitoring
+4. nmcli - WiFi management
+5. powerprofilesctl - Power profile management
+6. procps (ps/free) - System monitoring
+7. lm-sensors - Temperature sensors
+8. sysstat - System statistics
+9. systemctl - Service management
+10. journalctl - Log management
+11. ufw - Firewall management
+12. fail2ban - Intrusion prevention
+13. bleachbit - System cleanup
+14. ncdu - Disk usage analysis
 
 using:
-1. Visual Code
-2. c# (duh)
-
-
+1. Visual Studio Code - IDE
+2. C# - Programming language
+3. .NET 8.0 - Framework
+4. Avalonia UI - GUI framework
+5. Git - Version control
 
 dotnet new console -o UtilitiesManager
 cd UtilitiesManager

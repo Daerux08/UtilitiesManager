@@ -744,13 +744,26 @@ namespace UtilitiesManager
         {
             try
             {
-                var uptimeOutput = await TerminalCommands.RunCommandAsync("uptime");
-                info.Uptime = uptimeOutput.Trim();
+                var uptimeResult = await TerminalCommands.RunCommandWithResultAsync("uptime");
+                info.Uptime = uptimeResult.Output.Trim();
                 
-                var loadAvgOutput = await TerminalCommands.RunCommandAsync("cat /proc/loadavg");
-                info.LoadAverage = loadAvgOutput.Split(' ')[0..2];
+                var loadAvgResult = await TerminalCommands.RunCommandWithResultAsync("cat /proc/loadavg");
+                var loadAvgParts = loadAvgResult.Output.Split(' ');
+                if (loadAvgParts.Length >= 3)
+                {
+                    info.LoadAverage = loadAvgParts[0..3];
+                }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                // Log the exception for debugging
+                System.Diagnostics.Debug.WriteLine($"CPU info error: {ex.Message}");
+            }
+        }
+        else
+        {
+            // Debug: Show that procps is not available
+            System.Diagnostics.Debug.WriteLine("procps not available for CPU info");
         }
 
         // Memory Information
@@ -758,8 +771,8 @@ namespace UtilitiesManager
         {
             try
             {
-                var memOutput = await TerminalCommands.RunCommandAsync("free -h");
-                info.MemoryInfo = ParseMemoryInfo(memOutput);
+                var memResult = await TerminalCommands.RunCommandWithResultAsync("free -h");
+                info.MemoryInfo = ParseMemoryInfo(memResult.Output);
             }
             catch { }
         }
@@ -769,8 +782,8 @@ namespace UtilitiesManager
         {
             try
             {
-                var tempOutput = await TerminalCommands.RunCommandAsync("sensors");
-                info.Temperatures = ParseTemperatureInfo(tempOutput);
+                var tempResult = await TerminalCommands.RunCommandWithResultAsync("sensors");
+                info.Temperatures = ParseTemperatureInfo(tempResult.Output);
             }
             catch { }
         }
@@ -778,16 +791,16 @@ namespace UtilitiesManager
         // Disk Usage
         try
         {
-            var diskOutput = await TerminalCommands.RunCommandAsync("df -h");
-            info.DiskUsage = ParseDiskUsage(diskOutput);
+            var diskResult = await TerminalCommands.RunCommandWithResultAsync("df -h");
+            info.DiskUsage = ParseDiskUsage(diskResult.Output);
         }
         catch { }
 
         // Network Interfaces
         try
         {
-            var netOutput = await TerminalCommands.RunCommandAsync("ip addr show");
-            info.NetworkInterfaces = ParseNetworkInterfaces(netOutput);
+            var netResult = await TerminalCommands.RunCommandWithResultAsync("ip addr show");
+            info.NetworkInterfaces = ParseNetworkInterfaces(netResult.Output);
         }
         catch { }
 
@@ -802,8 +815,8 @@ namespace UtilitiesManager
 
         try
         {
-            var output = await TerminalCommands.RunCommandAsync("systemctl list-units --type=service --state=running,stopped,failed --no-pager --no-legend");
-            var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+            var result = await TerminalCommands.RunCommandWithResultAsync("systemctl list-units --type=service --state=running,stopped,failed --no-pager --no-legend");
+            var lines = result.Output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
             
             foreach (var line in lines.Take(20)) // Limit to first 20 services
             {

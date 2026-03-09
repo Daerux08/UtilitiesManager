@@ -46,7 +46,8 @@ namespace UtilitiesManager
                 case "memory":
                 case "disk":
                 case "network":
-                    await HandleSystemMonitoringCommand(command);
+                    var checker = new CheckDependencyCommand();
+                    await HandleSystemMonitoringCommand(checker, command);
                     break;
 
                 case "services":
@@ -634,9 +635,9 @@ namespace UtilitiesManager
             Console.WriteLine($"ufw: {(checker.IsUfwAvailable ? "Available" : "Not available")}");
         }
 
-        private static async Task HandleSystemMonitoringCommand(string command)
+        private static async Task HandleSystemMonitoringCommand(CheckDependencyCommand checker, string command)
         {
-            var checker = new CheckDependencyCommand();
+            await checker.CheckDependenciesAsync();
             var systemInfo = await checker.GetSystemInfoAsync();
 
             switch (command.ToLower())
@@ -828,7 +829,8 @@ namespace UtilitiesManager
         private static async Task SystemMonitoringMenu()
         {
             var checker = new CheckDependencyCommand();
-            
+            await checker.CheckDependenciesAsync();
+
             while (true)
             {
                 Console.WriteLine("=== SYSTEM MONITORING ===");
@@ -845,26 +847,26 @@ namespace UtilitiesManager
                 switch (choice)
                 {
                     case "1":
-                        await HandleSystemMonitoringCommand("cpu");
+                        await HandleSystemMonitoringCommand(checker, "cpu");
                         break;
                     case "2":
-                        await HandleSystemMonitoringCommand("memory");
+                        await HandleSystemMonitoringCommand(checker, "memory");
                         break;
                     case "3":
-                        await HandleSystemMonitoringCommand("disk");
+                        await HandleSystemMonitoringCommand(checker, "disk");
                         break;
                     case "4":
-                        await HandleSystemMonitoringCommand("network");
+                        await HandleSystemMonitoringCommand(checker, "network");
                         break;
                     case "5":
                         var systemInfo = await checker.GetSystemInfoAsync();
-                        await HandleSystemMonitoringCommand("cpu");
+                        await HandleSystemMonitoringCommand(checker, "cpu");
                         Console.WriteLine();
-                        await HandleSystemMonitoringCommand("memory");
+                        await HandleSystemMonitoringCommand(checker, "memory");
                         Console.WriteLine();
-                        await HandleSystemMonitoringCommand("disk");
+                        await HandleSystemMonitoringCommand(checker, "disk");
                         Console.WriteLine();
-                        await HandleSystemMonitoringCommand("network");
+                        await HandleSystemMonitoringCommand(checker, "network");
                         break;
                     case "6":
                         return;
