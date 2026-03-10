@@ -40,6 +40,7 @@
 /home/mr-owl/.dotnet/packs/Microsoft.NETCore.App.Ref/10.0.3/ref/net10.0/System.Collections.Immutable.dll
 /home/mr-owl/.dotnet/packs/Microsoft.NETCore.App.Ref/10.0.3/ref/net10.0/System.Collections.NonGeneric.dll
 /home/mr-owl/.dotnet/packs/Microsoft.NETCore.App.Ref/10.0.3/ref/net10.0/System.Collections.Specialized.dll
+/home/mr-owl/.nuget/packages/system.commandline/2.0.0-beta4.22272.1/lib/net6.0/System.CommandLine.dll
 /home/mr-owl/.dotnet/packs/Microsoft.NETCore.App.Ref/10.0.3/ref/net10.0/System.ComponentModel.Annotations.dll
 /home/mr-owl/.dotnet/packs/Microsoft.NETCore.App.Ref/10.0.3/ref/net10.0/System.ComponentModel.DataAnnotations.dll
 /home/mr-owl/.dotnet/packs/Microsoft.NETCore.App.Ref/10.0.3/ref/net10.0/System.ComponentModel.dll
