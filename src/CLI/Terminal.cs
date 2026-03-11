@@ -179,8 +179,8 @@ namespace UtilitiesManager
         {
             try
             {
-                string output = await TerminalCommands.RunCommandAsync($"which {command}");
-                return !string.IsNullOrWhiteSpace(output);
+                var result = await TerminalCommands.RunCommandWithResultAsync($"which {command}");
+                return result.IsSuccess && !string.IsNullOrWhiteSpace(result.Output);
             }
             catch
             {

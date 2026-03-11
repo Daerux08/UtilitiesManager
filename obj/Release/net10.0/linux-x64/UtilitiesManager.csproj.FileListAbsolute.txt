@@ -1,3 +1,9 @@
+/home/mr-owl/UtilitiesManager/obj/Release/net10.0/linux-x64/UtilitiesManager.csproj.AssemblyReference.cache
+/home/mr-owl/UtilitiesManager/obj/Release/net10.0/linux-x64/Avalonia/Resources.Inputs.cache
+/home/mr-owl/UtilitiesManager/obj/Release/net10.0/linux-x64/Avalonia/resources
+/home/mr-owl/UtilitiesManager/obj/Release/net10.0/linux-x64/UtilitiesManager.GeneratedMSBuildEditorConfig.editorconfig
+/home/mr-owl/UtilitiesManager/obj/Release/net10.0/linux-x64/UtilitiesManager.csproj.CoreCompileInputs.cache
+/home/mr-owl/UtilitiesManager/obj/Release/net10.0/linux-x64/UtilitiesManager.sourcelink.json
 /home/mr-owl/UtilitiesManager/bin/Release/net10.0/linux-x64/UtilitiesManager
 /home/mr-owl/UtilitiesManager/bin/Release/net10.0/linux-x64/UtilitiesManager.deps.json
 /home/mr-owl/UtilitiesManager/bin/Release/net10.0/linux-x64/UtilitiesManager.runtimeconfig.json
@@ -236,14 +242,6 @@
 /home/mr-owl/UtilitiesManager/bin/Release/net10.0/linux-x64/libhostpolicy.so
 /home/mr-owl/UtilitiesManager/bin/Release/net10.0/linux-x64/libmscordaccore.so
 /home/mr-owl/UtilitiesManager/bin/Release/net10.0/linux-x64/libmscordbi.so
-/home/mr-owl/UtilitiesManager/obj/Release/net10.0/linux-x64/UtilitiesManager.csproj.AssemblyReference.cache
-/home/mr-owl/UtilitiesManager/obj/Release/net10.0/linux-x64/Avalonia/Resources.Inputs.cache
-/home/mr-owl/UtilitiesManager/obj/Release/net10.0/linux-x64/Avalonia/resources
-/home/mr-owl/UtilitiesManager/obj/Release/net10.0/linux-x64/UtilitiesManager.GeneratedMSBuildEditorConfig.editorconfig
-/home/mr-owl/UtilitiesManager/obj/Release/net10.0/linux-x64/UtilitiesManager.AssemblyInfoInputs.cache
-/home/mr-owl/UtilitiesManager/obj/Release/net10.0/linux-x64/UtilitiesManager.AssemblyInfo.cs
-/home/mr-owl/UtilitiesManager/obj/Release/net10.0/linux-x64/UtilitiesManager.csproj.CoreCompileInputs.cache
-/home/mr-owl/UtilitiesManager/obj/Release/net10.0/linux-x64/UtilitiesManager.sourcelink.json
 /home/mr-owl/UtilitiesManager/obj/Release/net10.0/linux-x64/Utilitie.271F01B4.Up2Date
 /home/mr-owl/UtilitiesManager/obj/Release/net10.0/linux-x64/UtilitiesManager.dll
 /home/mr-owl/UtilitiesManager/obj/Release/net10.0/linux-x64/refint/UtilitiesManager.dll
