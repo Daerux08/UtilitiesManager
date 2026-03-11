@@ -193,7 +193,6 @@ namespace UtilitiesManager
         {
             try
             {
-<<<<<<< HEAD:Terminal.cs
                 // Try multiple common paths for the command
                 string[] paths = { 
                     $"/usr/bin/{command}", 
@@ -258,10 +257,6 @@ namespace UtilitiesManager
                 }
                 
                 return found;
-=======
-                var result = await TerminalCommands.RunCommandWithResultAsync($"which {command}");
-                return result.IsSuccess && !string.IsNullOrWhiteSpace(result.Output);
->>>>>>> 99733f621130962f36cd5d36232e6d019e8f5431:src/CLI/Terminal.cs
             }
             catch
             {
