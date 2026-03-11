@@ -1,5 +1,9 @@
 Package: utilitiesmanager
+<<<<<<< HEAD
 Version: 0.4.0~alpha202603101802
+=======
+Version: 0.4.0~alpha202603110830
+>>>>>>> 99733f621130962f36cd5d36232e6d019e8f5431
 Section: utils
 Priority: optional
 Architecture: amd64

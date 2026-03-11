@@ -55,6 +55,10 @@
               "target": "Package",
               "version": "[11.3.12, )"
             },
+            "Avalonia.Diagnostics": {
+              "target": "Package",
+              "version": "[11.3.12, )"
+            },
             "Avalonia.Fonts.Inter": {
               "target": "Package",
               "version": "[11.3.12, )"
@@ -87,6 +91,7 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+<<<<<<< HEAD
           "downloadDependencies": [
             {
               "name": "Microsoft.AspNetCore.App.Runtime.linux-x64",
@@ -97,17 +102,14 @@
               "version": "[8.0.24, 8.0.24]"
             }
           ],
+=======
+>>>>>>> 99733f621130962f36cd5d36232e6d019e8f5431
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
           "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/8.0.418/PortableRuntimeIdentifierGraph.json"
-        }
-      },
-      "runtimes": {
-        "linux-x64": {
-          "#import": []
         }
       }
     }

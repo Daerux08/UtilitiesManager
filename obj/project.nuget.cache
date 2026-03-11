@@ -1,20 +1,27 @@
 {
   "version": 2,
+<<<<<<< HEAD
   "dgSpecHash": "CH/75kvCOiM=",
+=======
+  "dgSpecHash": "31cyLWldMnc=",
+>>>>>>> 99733f621130962f36cd5d36232e6d019e8f5431
   "success": true,
   "projectFilePath": "/home/mr-owl/Documents/GitHub/UtilitiesManager/UtilitiesManager.csproj",
   "expectedPackageFiles": [
     "/home/mr-owl/.nuget/packages/avalonia/11.3.12/avalonia.11.3.12.nupkg.sha512",
     "/home/mr-owl/.nuget/packages/avalonia.angle.windows.natives/2.1.25547.20250602/avalonia.angle.windows.natives.2.1.25547.20250602.nupkg.sha512",
     "/home/mr-owl/.nuget/packages/avalonia.buildservices/11.3.2/avalonia.buildservices.11.3.2.nupkg.sha512",
+    "/home/mr-owl/.nuget/packages/avalonia.controls.colorpicker/11.3.12/avalonia.controls.colorpicker.11.3.12.nupkg.sha512",
     "/home/mr-owl/.nuget/packages/avalonia.controls.datagrid/11.3.12/avalonia.controls.datagrid.11.3.12.nupkg.sha512",
     "/home/mr-owl/.nuget/packages/avalonia.desktop/11.3.12/avalonia.desktop.11.3.12.nupkg.sha512",
+    "/home/mr-owl/.nuget/packages/avalonia.diagnostics/11.3.12/avalonia.diagnostics.11.3.12.nupkg.sha512",
     "/home/mr-owl/.nuget/packages/avalonia.fonts.inter/11.3.12/avalonia.fonts.inter.11.3.12.nupkg.sha512",
     "/home/mr-owl/.nuget/packages/avalonia.freedesktop/11.3.12/avalonia.freedesktop.11.3.12.nupkg.sha512",
     "/home/mr-owl/.nuget/packages/avalonia.native/11.3.12/avalonia.native.11.3.12.nupkg.sha512",
     "/home/mr-owl/.nuget/packages/avalonia.remote.protocol/11.3.12/avalonia.remote.protocol.11.3.12.nupkg.sha512",
     "/home/mr-owl/.nuget/packages/avalonia.skia/11.3.12/avalonia.skia.11.3.12.nupkg.sha512",
     "/home/mr-owl/.nuget/packages/avalonia.themes.fluent/11.3.12/avalonia.themes.fluent.11.3.12.nupkg.sha512",
+    "/home/mr-owl/.nuget/packages/avalonia.themes.simple/11.3.12/avalonia.themes.simple.11.3.12.nupkg.sha512",
     "/home/mr-owl/.nuget/packages/avalonia.win32/11.3.12/avalonia.win32.11.3.12.nupkg.sha512",
     "/home/mr-owl/.nuget/packages/avalonia.x11/11.3.12/avalonia.x11.11.3.12.nupkg.sha512",
     "/home/mr-owl/.nuget/packages/dialoghost.avalonia/0.8.1/dialoghost.avalonia.0.8.1.nupkg.sha512",
@@ -54,9 +61,13 @@
     "/home/mr-owl/.nuget/packages/system.text.encoding/4.3.0/system.text.encoding.4.3.0.nupkg.sha512",
     "/home/mr-owl/.nuget/packages/system.threading.tasks/4.3.0/system.threading.tasks.4.3.0.nupkg.sha512",
     "/home/mr-owl/.nuget/packages/tmds.dbus/0.7.0/tmds.dbus.0.7.0.nupkg.sha512",
+<<<<<<< HEAD
     "/home/mr-owl/.nuget/packages/tmds.dbus.protocol/0.21.2/tmds.dbus.protocol.0.21.2.nupkg.sha512",
     "/home/mr-owl/.nuget/packages/microsoft.netcore.app.runtime.linux-x64/8.0.24/microsoft.netcore.app.runtime.linux-x64.8.0.24.nupkg.sha512",
     "/home/mr-owl/.nuget/packages/microsoft.aspnetcore.app.runtime.linux-x64/8.0.24/microsoft.aspnetcore.app.runtime.linux-x64.8.0.24.nupkg.sha512"
+=======
+    "/home/mr-owl/.nuget/packages/tmds.dbus.protocol/0.21.2/tmds.dbus.protocol.0.21.2.nupkg.sha512"
+>>>>>>> 99733f621130962f36cd5d36232e6d019e8f5431
   ],
   "logs": []
 }
