@@ -466,111 +466,231 @@ namespace UtilitiesManager
 
         private static async Task WiFiMenu()
         {
-            Console.WriteLine("=== WIFI NETWORKS ===");
-            
-            var checker = new CheckDependencyCommand();
-            if (!checker.IsNmcliAvailable)
+            while (true)
             {
-                Console.WriteLine("nmcli (NetworkManager) is not available on this system.");
-                return;
-            }
-
-            var networks = await checker.GetWiFiNetworksAsync();
-            
-            Console.WriteLine("Available WiFi Networks:");
-            Console.WriteLine("{0,-20} {1,-8} {2,-6} {3,-10} {4,-8} {5,-15}", 
-                "SSID", "Mode", "Chan", "Rate", "Signal", "Security");
-            Console.WriteLine(new string('-', 80));
-            
-            foreach (var network in networks)
-            {
-                var marker = network.IsActive ? "* " : "  ";
-                Console.WriteLine("{0}{1,-20} {2,-8} {3,-6} {4,-10} {5,-8} {6,-15}",
-                    marker, network.SSID, network.Mode, network.Chan, network.Rate, 
-                    network.Signal, network.Security);
-            }
-
-            Console.WriteLine("\nOptions:");
-            Console.WriteLine("1. Refresh network list");
-            Console.WriteLine("2. Back to main menu");
-            Console.Write("Choose option: ");
-
-            var choice = Console.ReadLine()?.Trim();
-
-            switch (choice)
-            {
-                case "1":
-                    // Refresh is automatic when menu loads again
-                    break;
-                case "2":
+                var checker = new CheckDependencyCommand();
+                await checker.CheckDependenciesAsync();
+                
+                if (!checker.IsNmcliAvailable)
+                {
+                    MenuHelper.ShowError("WiFi Networks", "nmcli (NetworkManager) is not available on this system.");
                     return;
-                default:
-                    Console.WriteLine("Invalid option.");
-                    break;
+                }
+
+                var networks = await checker.GetWiFiNetworksAsync();
+                
+                if (networks.Count == 0)
+                {
+                    MenuHelper.ShowMessage("WiFi Networks", "No WiFi networks found. Please check your WiFi adapter.", false);
+                    Console.WriteLine("\nPress any key to refresh or 'Q' to go back...");
+                    var key = Console.ReadKey(true);
+                    if (key.Key == ConsoleKey.Q || key.Key == ConsoleKey.Escape)
+                        return;
+                    continue;
+                }
+
+                // Create menu options from WiFi networks
+                var menuOptions = new List<string>();
+                foreach (var network in networks)
+                {
+                    var status = network.IsActive ? "[CONNECTED]" : "[AVAILABLE]";
+                    var signal = !string.IsNullOrEmpty(network.Signal) ? $" ({network.Signal})" : "";
+                    menuOptions.Add($"{status} {network.SSID}{signal}");
+                }
+                
+                // Add control options at the end
+                menuOptions.Add("🔄 Refresh networks");
+                menuOptions.Add("⬅ Back to main menu");
+
+                var choice = MenuHelper.ShowArrowMenu("WiFi Networks", menuOptions);
+
+                if (choice == -1 || choice == menuOptions.Count - 1)
+                {
+                    // User cancelled or selected "Back"
+                    return;
+                }
+                else if (choice == menuOptions.Count - 2)
+                {
+                    // User selected "Refresh"
+                    continue;
+                }
+                else if (choice >= 0 && choice < networks.Count)
+                {
+                    // User selected a WiFi network
+                    var selectedNetwork = networks[choice];
+                    await HandleWiFiSelection(selectedNetwork);
+                }
+            }
+        }
+
+        private static async Task HandleWiFiSelection(WiFiInfo network)
+        {
+            if (network.IsActive)
+            {
+                // Already connected - show disconnect option
+                var options = new List<string>
+                {
+                    $"Connected to {network.SSID}",
+                    "Disconnect from this network",
+                    "Back to network list"
+                };
+                
+                var choice = MenuHelper.ShowArrowMenu("WiFi Connection", options);
+                
+                if (choice == 1)
+                {
+                    await DisconnectFromWiFi(network.SSID);
+                }
+                // choice 0 or 2 (or -1) just returns to network list
+            }
+            else
+            {
+                // Not connected - attempt to connect
+                await ConnectToWiFi(network);
+            }
+        }
+
+        private static async Task ConnectToWiFi(WiFiInfo network)
+        {
+            try
+            {
+                Console.Clear();
+                Console.WriteLine($"=== Connecting to {network.SSID} ===");
+                Console.WriteLine();
+                Console.WriteLine("Attempting connection...");
+                
+                // First try to connect without password
+                var command = $"nmcli device wifi connect \"{network.SSID}\"";
+                var result = await TerminalCommands.RunCommandWithResultAsync(command);
+
+                if (result.IsSuccess)
+                {
+                    MenuHelper.ShowMessage("Connection Successful", $"Successfully connected to {network.SSID}");
+                    return;
+                }
+
+                // Check if password is required
+                if (result.CombinedOutput.Contains("Secrets were required", StringComparison.OrdinalIgnoreCase) ||
+                    result.CombinedOutput.Contains("no-secrets", StringComparison.OrdinalIgnoreCase) ||
+                    result.CombinedOutput.Contains("Secrets", StringComparison.OrdinalIgnoreCase) ||
+                    result.ExitCode == 7)
+                {
+                    // Prompt for password
+                    var password = MenuHelper.GetUserInput($"Enter password for {network.SSID}");
+                    
+                    if (!string.IsNullOrEmpty(password))
+                    {
+                        Console.WriteLine("Attempting connection with password...");
+                        var commandWithPassword = $"nmcli device wifi connect \"{network.SSID}\" password \"{password}\"";
+                        var resultWithPassword = await TerminalCommands.RunCommandWithResultAsync(commandWithPassword);
+                        
+                        if (resultWithPassword.IsSuccess)
+                        {
+                            MenuHelper.ShowMessage("Connection Successful", $"Successfully connected to {network.SSID}");
+                        }
+                        else
+                        {
+                            MenuHelper.ShowError("Connection Failed", $"Failed to connect to {network.SSID}:\n{resultWithPassword.CombinedOutput}");
+                        }
+                    }
+                    else
+                    {
+                        MenuHelper.ShowMessage("Connection Cancelled", "No password provided.");
+                    }
+                }
+                else
+                {
+                    MenuHelper.ShowError("Connection Failed", $"Failed to connect to {network.SSID}:\n{result.CombinedOutput}");
+                }
+            }
+            catch (Exception ex)
+            {
+                MenuHelper.ShowError("Connection Error", $"Error connecting to {network.SSID}: {ex.Message}");
+            }
+        }
+
+        private static async Task DisconnectFromWiFi(string ssid)
+        {
+            try
+            {
+                Console.Clear();
+                Console.WriteLine($"=== Disconnecting from {ssid} ===");
+                Console.WriteLine();
+                Console.WriteLine("Attempting disconnection...");
+                
+                var command = $"nmcli connection down \"{ssid}\"";
+                var result = await TerminalCommands.RunCommandWithResultAsync(command);
+                
+                if (result.IsSuccess)
+                {
+                    MenuHelper.ShowMessage("Disconnection Successful", $"Successfully disconnected from {ssid}");
+                }
+                else
+                {
+                    MenuHelper.ShowError("Disconnection Failed", $"Failed to disconnect from {ssid}:\n{result.CombinedOutput}");
+                }
+            }
+            catch (Exception ex)
+            {
+                MenuHelper.ShowError("Disconnection Error", $"Error disconnecting from {ssid}: {ex.Message}");
             }
         }
 
         private static async Task PowerMenu()
         {
-            Console.WriteLine("=== POWER PROFILES ===");
-            
             var checker = new CheckDependencyCommand();
             if (!checker.IsPowerProfilesCtlAvailable)
             {
-                Console.WriteLine("powerprofilesctl is not available on this system.");
+                MenuHelper.ShowError("Power Profiles", "powerprofilesctl is not available on this system.");
                 return;
             }
 
-            var currentProfile = await checker.GetCurrentPowerProfileAsync();
-            Console.WriteLine($"Current power profile: {currentProfile}");
-            Console.WriteLine();
-
             while (true)
             {
-                Console.WriteLine("Power Profile Options:");
-                Console.WriteLine("1. Set performance mode");
-                Console.WriteLine("2. Set balanced mode");
-                Console.WriteLine("3. Set power-saver mode");
-                Console.WriteLine("4. Show current profile");
-                Console.WriteLine("5. Back to main menu");
-                Console.Write("Choose option: ");
+                var currentProfile = await checker.GetCurrentPowerProfileAsync();
+                
+                var menuOptions = new List<string>
+                {
+                    $"⚡ Set performance mode {(currentProfile == "performance" ? "[CURRENT]" : "")}",
+                    $"⚖️ Set balanced mode {(currentProfile == "balanced" ? "[CURRENT]" : "")}",
+                    $"🔋 Set power-saver mode {(currentProfile == "power-saver" ? "[CURRENT]" : "")}",
+                    "📊 Show current profile",
+                    "⬅ Back to main menu"
+                };
 
-                var choice = Console.ReadLine()?.Trim();
+                var choice = MenuHelper.ShowArrowMenu("POWER PROFILES", menuOptions);
 
                 switch (choice)
                 {
-                    case "1":
+                    case 0:
                         var changer = new ChangeValueCommand();
                         await changer.SetPowerProfileAsync("performance");
-                        Console.WriteLine("Power profile set to performance");
+                        MenuHelper.ShowMessage("Success", "Power profile set to performance");
                         break;
 
-                    case "2":
+                    case 1:
                         changer = new ChangeValueCommand();
                         await changer.SetPowerProfileAsync("balanced");
-                        Console.WriteLine("Power profile set to balanced");
+                        MenuHelper.ShowMessage("Success", "Power profile set to balanced");
                         break;
 
-                    case "3":
+                    case 2:
                         changer = new ChangeValueCommand();
                         await changer.SetPowerProfileAsync("power-saver");
-                        Console.WriteLine("Power profile set to power-saver");
+                        MenuHelper.ShowMessage("Success", "Power profile set to power-saver");
                         break;
 
-                    case "4":
+                    case 3:
                         currentProfile = await checker.GetCurrentPowerProfileAsync();
-                        Console.WriteLine($"Current power profile: {currentProfile}");
+                        MenuHelper.ShowMessage("Current Profile", $"Current power profile: {currentProfile}");
                         break;
 
-                    case "5":
+                    case 4:
                         return;
 
-                    default:
-                        Console.WriteLine("Invalid option.");
-                        break;
+                    case -1:
+                        return;
                 }
-
-                Console.WriteLine();
             }
         }
 
@@ -833,119 +953,193 @@ namespace UtilitiesManager
 
             while (true)
             {
-                Console.WriteLine("=== SYSTEM MONITORING ===");
-                Console.WriteLine("1. CPU Information");
-                Console.WriteLine("2. Memory Usage");
-                Console.WriteLine("3. Disk Usage");
-                Console.WriteLine("4. Network Interfaces");
-                Console.WriteLine("5. Full System Overview");
-                Console.WriteLine("6. Back to main menu");
-                Console.Write("Choose option: ");
+                var menuOptions = new List<string>
+                {
+                    "🖥️ CPU Information - Usage, load, temperature",
+                    "💾 Memory Usage - RAM and swap usage", 
+                    "💿 Disk Usage - Storage space and mount points",
+                    "🌐 Network Interfaces - IP addresses and connections",
+                    "📊 Full System Overview - All information at once",
+                    "⬅ Back to main menu"
+                };
 
-                var choice = Console.ReadLine()?.Trim();
+                var choice = MenuHelper.ShowArrowMenu("SYSTEM MONITORING", menuOptions);
 
                 switch (choice)
                 {
-                    case "1":
+                    case 0:
                         await HandleSystemMonitoringCommand(checker, "cpu");
+                        Console.WriteLine();
+                        Console.WriteLine("Press any key to continue...");
+                        Console.ReadKey(true);
                         break;
-                    case "2":
+                    case 1:
                         await HandleSystemMonitoringCommand(checker, "memory");
+                        Console.WriteLine();
+                        Console.WriteLine("Press any key to continue...");
+                        Console.ReadKey(true);
                         break;
-                    case "3":
+                    case 2:
                         await HandleSystemMonitoringCommand(checker, "disk");
+                        Console.WriteLine();
+                        Console.WriteLine("Press any key to continue...");
+                        Console.ReadKey(true);
                         break;
-                    case "4":
+                    case 3:
                         await HandleSystemMonitoringCommand(checker, "network");
+                        Console.WriteLine();
+                        Console.WriteLine("Press any key to continue...");
+                        Console.ReadKey(true);
                         break;
-                    case "5":
+                    case 4:
                         var systemInfo = await checker.GetSystemInfoAsync();
+                        
+                        // Display Full System Overview
+                        Console.Clear();
+                        Console.WriteLine("=== FULL SYSTEM OVERVIEW ===");
+                        Console.WriteLine();
+                        
+                        // CPU Information
                         await HandleSystemMonitoringCommand(checker, "cpu");
                         Console.WriteLine();
+                        
+                        // Memory Information  
                         await HandleSystemMonitoringCommand(checker, "memory");
                         Console.WriteLine();
+                        
+                        // Disk Information
                         await HandleSystemMonitoringCommand(checker, "disk");
                         Console.WriteLine();
+                        
+                        // Network Information
                         await HandleSystemMonitoringCommand(checker, "network");
+                        
+                        Console.WriteLine();
+                        Console.WriteLine("Press any key to continue...");
+                        Console.ReadKey(true);
                         break;
-                    case "6":
+                    case 5:
                         return;
-                    default:
-                        Console.WriteLine("Invalid option.");
-                        break;
+                    case -1:
+                        return;
                 }
-
-                Console.WriteLine();
             }
         }
 
         private static async Task ServiceManagementMenu()
         {
+            Console.WriteLine("DEBUG: Starting Service Management Menu");
             var checker = new CheckDependencyCommand();
+            await checker.CheckDependenciesAsync();
+            Console.WriteLine($"DEBUG: IsSystemctlAvailable = {checker.IsSystemctlAvailable}");
+            
             if (!checker.IsSystemctlAvailable)
             {
-                Console.WriteLine("systemctl is not available on this system.");
+                MenuHelper.ShowError("Service Management", "systemctl is not available on this system.");
                 return;
             }
 
             while (true)
             {
-                Console.WriteLine("=== SERVICE MANAGEMENT ===");
-                Console.WriteLine("1. List services");
-                Console.WriteLine("2. Service status");
-                Console.WriteLine("3. Start service");
-                Console.WriteLine("4. Stop service");
-                Console.WriteLine("5. Restart service");
-                Console.WriteLine("6. Back to main menu");
-                Console.Write("Choose option: ");
+                var menuOptions = new List<string>
+                {
+                    "📋 List all services",
+                    "🔍 Check specific service status",
+                    "▶️ Start a service",
+                    "⏹️ Stop a service", 
+                    "🔄 Restart a service",
+                    "ℹ️ What are services?",
+                    "⬅ Back to main menu"
+                };
 
-                var choice = Console.ReadLine()?.Trim();
+                var choice = MenuHelper.ShowArrowMenu("SERVICE MANAGEMENT", menuOptions);
 
                 switch (choice)
                 {
-                    case "1":
+                    case 0:
                         await HandleServicesCommand(new string[] { "services" });
+                        Console.WriteLine();
+                        Console.WriteLine("Press any key to continue...");
+                        Console.ReadKey(true);
                         break;
-                    case "2":
-                        Console.Write("Enter service name: ");
-                        var serviceName = Console.ReadLine()?.Trim();
+                    case 1:
+                        var serviceName = MenuHelper.GetUserInput("Enter service name");
                         if (!string.IsNullOrEmpty(serviceName))
                         {
                             await HandleServicesCommand(new string[] { "services", "status", serviceName });
                         }
+                        Console.WriteLine();
+                        Console.WriteLine("Press any key to continue...");
+                        Console.ReadKey(true);
                         break;
-                    case "3":
-                        Console.Write("Enter service name to start: ");
-                        var startService = Console.ReadLine()?.Trim();
+                    case 2:
+                        var startService = MenuHelper.GetUserInput("Enter service name to start");
                         if (!string.IsNullOrEmpty(startService))
                         {
                             await HandleServicesCommand(new string[] { "services", "start", startService });
                         }
+                        Console.WriteLine();
+                        Console.WriteLine("Press any key to continue...");
+                        Console.ReadKey(true);
                         break;
-                    case "4":
-                        Console.Write("Enter service name to stop: ");
-                        var stopService = Console.ReadLine()?.Trim();
+                    case 3:
+                        var stopService = MenuHelper.GetUserInput("Enter service name to stop");
                         if (!string.IsNullOrEmpty(stopService))
                         {
                             await HandleServicesCommand(new string[] { "services", "stop", stopService });
                         }
+                        Console.WriteLine();
+                        Console.WriteLine("Press any key to continue...");
+                        Console.ReadKey(true);
                         break;
-                    case "5":
-                        Console.Write("Enter service name to restart: ");
-                        var restartService = Console.ReadLine()?.Trim();
+                    case 4:
+                        var restartService = MenuHelper.GetUserInput("Enter service name to restart");
                         if (!string.IsNullOrEmpty(restartService))
                         {
                             await HandleServicesCommand(new string[] { "services", "restart", restartService });
                         }
+                        Console.WriteLine();
+                        Console.WriteLine("Press any key to continue...");
+                        Console.ReadKey(true);
                         break;
-                    case "6":
-                        return;
-                    default:
-                        Console.WriteLine("Invalid option.");
-                        break;
-                }
+                    case 5:
+                        var helpText = @"=== WHAT ARE SYSTEMD SERVICES? ===
 
-                Console.WriteLine();
+Services (systemd services) are background programs that run on your Linux system.
+They manage core system functionality and applications.
+
+COMMON SERVICES:
+• sshd - Secure Shell server for remote access
+• nginx - Web server
+• docker - Container management
+• ufw - Firewall management
+• NetworkManager - Network connections
+• cron - Scheduled tasks
+
+SERVICE STATES:
+• active (running) - Service is currently running
+• inactive (dead) - Service is stopped
+• enabled - Service starts automatically on boot
+• disabled - Service must be started manually
+
+WHY MANAGE SERVICES?
+• Fix problems by restarting problematic services
+• Improve security by stopping unused services  
+• Save resources by disabling unnecessary services
+• Debug system issues by checking service status
+
+TIPS:
+• Be careful when stopping system-critical services
+• Use 'status' first before making changes
+• Some services require sudo privileges to control";
+                        
+                        MenuHelper.ShowMessage("About Services", helpText);
+                        break;
+                    case 6:
+                        return;
+                    case -1:
+                        return;
+                }
             }
         }
 
@@ -953,40 +1147,43 @@ namespace UtilitiesManager
         {
             while (true)
             {
-                Console.WriteLine("=== USER MANAGEMENT ===");
-                Console.WriteLine("1. List users");
-                Console.WriteLine("2. Show logged in users");
-                Console.WriteLine("3. Back to main menu");
-                Console.Write("Choose option: ");
+                var menuOptions = new List<string>
+                {
+                    "👥 List users",
+                    "🔐 Show logged in users",
+                    "⬅ Back to main menu"
+                };
 
-                var choice = Console.ReadLine()?.Trim();
+                var choice = MenuHelper.ShowArrowMenu("USER MANAGEMENT", menuOptions);
 
                 switch (choice)
                 {
-                    case "1":
+                    case 0:
                         await HandleUsersCommand(new string[] { "users" });
+                        Console.WriteLine();
+                        Console.WriteLine("Press any key to continue...");
+                        Console.ReadKey(true);
                         break;
-                    case "2":
+                    case 1:
                         var checker = new CheckDependencyCommand();
                         if (checker.IsProcpsAvailable)
                         {
                             var whoOutput = await TerminalCommands.RunCommandAsync("who");
-                            Console.WriteLine("=== LOGGED IN USERS ===");
-                            Console.WriteLine(whoOutput);
+                            MenuHelper.ShowMessage("Logged In Users", whoOutput);
                         }
                         else
                         {
-                            Console.WriteLine("who command is not available.");
+                            MenuHelper.ShowError("User Management", "who command is not available on this system.");
                         }
+                        Console.WriteLine();
+                        Console.WriteLine("Press any key to continue...");
+                        Console.ReadKey(true);
                         break;
-                    case "3":
+                    case 2:
                         return;
-                    default:
-                        Console.WriteLine("Invalid option.");
-                        break;
+                    case -1:
+                        return;
                 }
-
-                Console.WriteLine();
             }
         }
 
@@ -995,40 +1192,47 @@ namespace UtilitiesManager
             var checker = new CheckDependencyCommand();
             if (!checker.IsJournalctlAvailable)
             {
-                Console.WriteLine("journalctl is not available on this system.");
+                MenuHelper.ShowError("Log Management", "journalctl is not available on this system.");
                 return;
             }
 
             while (true)
             {
-                Console.WriteLine("=== LOG MANAGEMENT ===");
-                Console.WriteLine("1. System logs");
-                Console.WriteLine("2. Kernel logs");
-                Console.WriteLine("3. Boot logs");
-                Console.WriteLine("4. Back to main menu");
-                Console.Write("Choose option: ");
+                var menuOptions = new List<string>
+                {
+                    "📄 System logs",
+                    "🔧 Kernel logs",
+                    "🚀 Boot logs",
+                    "⬅ Back to main menu"
+                };
 
-                var choice = Console.ReadLine()?.Trim();
+                var choice = MenuHelper.ShowArrowMenu("LOG MANAGEMENT", menuOptions);
 
                 switch (choice)
                 {
-                    case "1":
+                    case 0:
                         await HandleLogsCommand(new string[] { "logs", "system" });
+                        Console.WriteLine();
+                        Console.WriteLine("Press any key to continue...");
+                        Console.ReadKey(true);
                         break;
-                    case "2":
+                    case 1:
                         await HandleLogsCommand(new string[] { "logs", "kernel" });
+                        Console.WriteLine();
+                        Console.WriteLine("Press any key to continue...");
+                        Console.ReadKey(true);
                         break;
-                    case "3":
+                    case 2:
                         await HandleLogsCommand(new string[] { "logs", "boot" });
+                        Console.WriteLine();
+                        Console.WriteLine("Press any key to continue...");
+                        Console.ReadKey(true);
                         break;
-                    case "4":
+                    case 3:
                         return;
-                    default:
-                        Console.WriteLine("Invalid option.");
-                        break;
+                    case -1:
+                        return;
                 }
-
-                Console.WriteLine();
             }
         }
 
@@ -1036,26 +1240,27 @@ namespace UtilitiesManager
         {
             while (true)
             {
-                Console.WriteLine("=== FIREWALL MANAGEMENT ===");
-                Console.WriteLine("1. Show firewall status");
-                Console.WriteLine("2. Back to main menu");
-                Console.Write("Choose option: ");
+                var menuOptions = new List<string>
+                {
+                    "🛡️ Show firewall status",
+                    "⬅ Back to main menu"
+                };
 
-                var choice = Console.ReadLine()?.Trim();
+                var choice = MenuHelper.ShowArrowMenu("FIREWALL MANAGEMENT", menuOptions);
 
                 switch (choice)
                 {
-                    case "1":
+                    case 0:
                         await HandleFirewallCommand(new string[] { "firewall" });
+                        Console.WriteLine();
+                        Console.WriteLine("Press any key to continue...");
+                        Console.ReadKey(true);
                         break;
-                    case "2":
+                    case 1:
                         return;
-                    default:
-                        Console.WriteLine("Invalid option.");
-                        break;
+                    case -1:
+                        return;
                 }
-
-                Console.WriteLine();
             }
         }
 
@@ -1097,42 +1302,55 @@ namespace UtilitiesManager
         {
             while (true)
             {
-                Console.WriteLine("=== PACKAGE INSTALLATION ===");
-                Console.WriteLine("1. Install all packages");
-                Console.WriteLine("2. Install packages individually");
-                Console.WriteLine("3. Show package status");
-                Console.WriteLine("4. Setup hardware sensors");
-                Console.WriteLine("5. Configure firewall");
-                Console.WriteLine("6. Back to main menu");
-                Console.Write("Choose option: ");
+                var menuOptions = new List<string>
+                {
+                    "📦 Install all packages",
+                    "📋 Install packages individually",
+                    "📊 Show package status",
+                    "🔧 Setup hardware sensors",
+                    "🛡️ Configure firewall",
+                    "⬅ Back to main menu"
+                };
 
-                var choice = Console.ReadLine()?.Trim();
+                var choice = MenuHelper.ShowArrowMenu("PACKAGE INSTALLATION", menuOptions);
 
                 switch (choice)
                 {
-                    case "1":
+                    case 0:
                         await DownloadScript.RunPackageInstallationAsync();
+                        Console.WriteLine();
+                        Console.WriteLine("Press any key to continue...");
+                        Console.ReadKey(true);
                         break;
-                    case "2":
+                    case 1:
                         await DownloadScript.InstallIndividualPackagesAsync();
+                        Console.WriteLine();
+                        Console.WriteLine("Press any key to continue...");
+                        Console.ReadKey(true);
                         break;
-                    case "3":
+                    case 2:
                         await DownloadScript.ShowPackageStatusAsync();
+                        Console.WriteLine();
+                        Console.WriteLine("Press any key to continue...");
+                        Console.ReadKey(true);
                         break;
-                    case "4":
+                    case 3:
                         await DownloadScript.SetupSensorsAsync();
+                        Console.WriteLine();
+                        Console.WriteLine("Press any key to continue...");
+                        Console.ReadKey(true);
                         break;
-                    case "5":
+                    case 4:
                         await DownloadScript.ConfigureFirewallAsync();
+                        Console.WriteLine();
+                        Console.WriteLine("Press any key to continue...");
+                        Console.ReadKey(true);
                         break;
-                    case "6":
+                    case 5:
                         return;
-                    default:
-                        Console.WriteLine("Invalid option.");
-                        break;
+                    case -1:
+                        return;
                 }
-
-                Console.WriteLine();
             }
         }
     }

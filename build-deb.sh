@@ -40,6 +40,10 @@ exec /usr/share/UtilitiesManager/UtilitiesManager "\$@"
 EOF
 chmod +x "$USR_BIN_DIR/$APP_NAME"
 
+echo "==> Creating symlink for common command name"
+# Create symlink from UtilMan to utilitiesmanager for easier access
+ln -sf "$APP_NAME" "$USR_BIN_DIR/UtilMan"
+
 echo "==> Creating .desktop file"
 cat <<EOF > "$DEB_DIR/usr/share/applications/$APP_NAME.desktop"
 [Desktop Entry]

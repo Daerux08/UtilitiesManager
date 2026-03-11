@@ -6,29 +6,46 @@ namespace UtilitiesManager
 {
     public static class DownloadScript
     {
-        private static readonly string[] RequiredPackages = {
-            // Original packages
-            "brightnessctl",
-            "pactl", 
-            "upower",
-            "nmcli",
-            "powerprofilesctl",
+        private static readonly (string Package, string Description)[] RequiredPackages = {
+            // Core system utilities
+            ("brightnessctl", "Screen brightness control for laptops and monitors"),
+            ("pactl", "PulseAudio command-line sound server control"), 
+            ("upower", "Power management and battery information"),
+            ("nmcli", "NetworkManager command-line interface for WiFi/network control"),
+            ("powerprofilesctl", "Power profile management for performance modes"),
             
-            // Server monitoring packages
-            "procps",           // Usually pre-installed, but included for completeness
-            "lm-sensors",
-            "sysstat",
-            "iotop",
-            "nethogs",
-            "ufw",
-            "fail2ban",
-            "bleachbit",
-            "ncdu"
+            // System monitoring packages
+            ("procps", "Process utilities (ps, free, top, who - usually pre-installed)"),
+            ("lm-sensors", "Hardware sensor monitoring (temperature, fan speed)"),
+            ("sysstat", "System performance monitoring (iostat, mpstat, sar)"),
+            ("iotop", "I/O monitoring for disk usage by process"),
+            ("nethogs", "Network monitoring showing bandwidth by process"),
+            
+            // Security and maintenance
+            ("ufw", "Uncomplicated Firewall - easy iptables frontend"),
+            ("fail2ban", "Intrusion prevention that bans suspicious IPs"),
+            ("bleachbit", "System cleaner - removes temporary files and frees space"),
+            ("ncdu", "NCurses Disk Usage - interactive disk space analyzer"),
+            
+            // Additional useful utilities
+            ("htop", "Interactive process viewer (better than top)"),
+            ("tree", "Directory tree viewer"),
+            ("jq", "JSON command-line processor"),
+            ("curl", "Data transfer utility with multiple protocols"),
+            ("wget", "File download utility"),
+            ("vim", "Improved vi text editor (or nano)"),
+            ("git", "Version control system"),
+            ("unzip", "ZIP archive extractor"),
+            ("tar", "Archive utility for .tar files"),
+            ("net-tools", "Network tools (ping, netstat, arp, traceroute)"),
+            ("dnsutils", "DNS tools (nslookup, dig)"),
+            ("man-db", "Manual pages database"),
+            ("sudo", "Superuser do command - should be pre-installed")
         };
 
         private static readonly string[] PackageCommands = {
             "apt update",
-            "apt install -y brightnessctl lm-sensors sysstat iotop nethogs ufw fail2ban bleachbit ncdu"
+            "apt install -y brightnessctl pactl upower nmcli powerprofilesctl procps lm-sensors sysstat iotop nethogs ufw fail2ban bleachbit ncdu htop tree jq curl wget vim git unzip tar net-tools dnsutils man-db sudo"
         };
 
         public static async Task<bool> RunPackageInstallationAsync()
@@ -37,9 +54,9 @@ namespace UtilitiesManager
             Console.WriteLine("This script will install all required packages for Utilities Manager.");
             Console.WriteLine();
             Console.WriteLine("Packages to be installed:");
-            foreach (var pkg in RequiredPackages)
+            foreach (var (package, description) in RequiredPackages)
             {
-                Console.WriteLine($"  - {pkg}");
+                Console.WriteLine($"  - {package} - {description}");
             }
             Console.WriteLine();
 
@@ -259,9 +276,11 @@ namespace UtilitiesManager
             var successCount = 0;
             var totalCount = RequiredPackages.Length;
 
-            foreach (var package in RequiredPackages)
+            foreach (var packageTuple in RequiredPackages)
             {
-                Console.WriteLine($"Processing {package}...");
+                var package = packageTuple.Package;
+                var description = packageTuple.Description;
+                Console.WriteLine($"Processing {package} - {description}...");
                 if (await CheckAndInstallPackageAsync(package))
                 {
                     successCount++;
@@ -279,17 +298,19 @@ namespace UtilitiesManager
             Console.WriteLine("{0,-20} {1,-10}", "Package", "Status");
             Console.WriteLine(new string('-', 30));
 
-            foreach (var package in RequiredPackages)
+            foreach (var packageTuple in RequiredPackages)
             {
+                var package = packageTuple.Package;
+                var description = packageTuple.Description;
                 try
                 {
                     var result = await TerminalCommands.RunCommandWithResultAsync($"dpkg -l | grep -w {package}");
                     var status = (result.ExitCode == 0 && !string.IsNullOrEmpty(result.Output)) ? "Installed" : "Not found";
-                    Console.WriteLine("{0,-20} {1,-10}", package, status);
+                    Console.WriteLine("{0,-20} {1,-10} {2,-50}", package, status, description);
                 }
                 catch
                 {
-                    Console.WriteLine("{0,-20} {1,-10}", package, "Error");
+                    Console.WriteLine("{0,-20} {1,-10} {2,-50}", package, "Error", description);
                 }
             }
         }

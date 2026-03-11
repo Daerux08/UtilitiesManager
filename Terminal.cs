@@ -165,7 +165,21 @@ namespace UtilitiesManager
             IsSysstatAvailable = await CheckCommandAvailable("iostat") && await CheckCommandAvailable("mpstat");
             IsIotopAvailable = await CheckCommandAvailable("iotop");
             IsNethogsAvailable = await CheckCommandAvailable("nethogs");
-            IsSystemctlAvailable = await CheckCommandAvailable("systemctl");
+            
+            // Special case for systemctl - always assume available on systemd systems
+            try
+            {
+                var systemdCheck = await TerminalCommands.RunCommandAsync("ps aux | grep '[s]ystemd' | head -1");
+                IsSystemctlAvailable = !string.IsNullOrWhiteSpace(systemdCheck);
+                Console.WriteLine($"DEBUG: SystemD check result: '{systemdCheck.Trim()}', systemctl available: {IsSystemctlAvailable}");
+            }
+            catch
+            {
+                Console.WriteLine("DEBUG: SystemD check failed, using fallback method");
+                IsSystemctlAvailable = await CheckCommandAvailable("systemctl");
+                Console.WriteLine($"DEBUG: Fallback systemctl available: {IsSystemctlAvailable}");
+            }
+            
             IsUseraddAvailable = await CheckCommandAvailable("useradd");
             IsJournalctlAvailable = await CheckCommandAvailable("journalctl");
             IsUfwAvailable = await CheckCommandAvailable("ufw");
@@ -179,8 +193,70 @@ namespace UtilitiesManager
         {
             try
             {
-                string output = await TerminalCommands.RunCommandAsync($"which {command}");
-                return !string.IsNullOrWhiteSpace(output);
+                // Try multiple common paths for the command
+                string[] paths = { 
+                    $"/usr/bin/{command}", 
+                    $"/bin/{command}", 
+                    $"/usr/local/bin/{command}",
+                    command // fallback to which
+                };
+                
+                bool found = false;
+                string debugInfo = "";
+                
+                foreach (string path in paths)
+                {
+                    try
+                    {
+                        // First try direct path execution
+                        string testOutput = await TerminalCommands.RunCommandAsync($"test -x {path} && echo 'found'");
+                        if (testOutput.Contains("found"))
+                        {
+                            found = true;
+                            debugInfo = $"Found at: {path}";
+                            break;
+                        }
+                    }
+                    catch
+                    {
+                        // Continue to next path
+                    }
+                }
+                
+                // Fallback to which command
+                if (!found)
+                {
+                    string output = await TerminalCommands.RunCommandAsync($"which {command}");
+                    found = !string.IsNullOrWhiteSpace(output);
+                    debugInfo = found ? $"Found via which: {output.Trim()}" : "Not found via which";
+                }
+                
+                // Debug logging for systemctl specifically
+                if (command == "systemctl" && !found)
+                {
+                    // Try additional checks
+                    try
+                    {
+                        var systemdCheck = await TerminalCommands.RunCommandAsync("ps aux | grep '[s]ystemd' | head -1");
+                        var systemdRunning = !string.IsNullOrWhiteSpace(systemdCheck);
+                        debugInfo += $" | SystemD running: {systemdRunning}";
+                        
+                        var systemctlPath = await TerminalCommands.RunCommandAsync("command -v systemctl");
+                        debugInfo += $" | systemctl path: {systemctlPath.Trim()}";
+                    }
+                    catch
+                    {
+                        debugInfo += " | Additional checks failed";
+                    }
+                }
+                
+                // Log debug info for troubleshooting
+                if (!found)
+                {
+                    Console.WriteLine($"DEBUG: {command} check failed - {debugInfo}");
+                }
+                
+                return found;
             }
             catch
             {
