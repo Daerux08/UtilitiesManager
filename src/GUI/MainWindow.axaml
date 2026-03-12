@@ -8,7 +8,7 @@
         x:DataType="local:MainWindow"
         Title="UtilitiesManager"
         WindowStartupLocation="CenterScreen"
-        Icon="avares://UtilitiesManager/UtilManagerV3.png">
+        Icon="avares://UtilitiesManager/Assets/UtilManagerV3.png">
     <Window.Resources>
         <local:BoolToStringConverter x:Key="BoolToStringConverter" />
     </Window.Resources>

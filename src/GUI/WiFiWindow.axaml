@@ -8,7 +8,7 @@
         x:DataType="local:WiFiWindow"
         Title="Wi-Fi Networks"
         WindowStartupLocation="CenterScreen"
-        Icon="avares://UtilitiesManager/UtilManagerV3.png">
+        Icon="avares://UtilitiesManager/Assets/UtilManagerV3.png">
 
     <Window.Resources>
         <local:BoolToStatusConverter x:Key="BoolToStatusConverter" />

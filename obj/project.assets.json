@@ -3318,11 +3318,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/mr-owl/Documents/GitHub/UtilitiesManager/UtilitiesManager.csproj",
+      "projectUniqueName": "/home/mr-owl/UtilitiesManager/UtilitiesManager.csproj",
       "projectName": "UtilitiesManager",
-      "projectPath": "/home/mr-owl/Documents/GitHub/UtilitiesManager/UtilitiesManager.csproj",
+      "projectPath": "/home/mr-owl/UtilitiesManager/UtilitiesManager.csproj",
       "packagesPath": "/home/mr-owl/.nuget/packages/",
-      "outputPath": "/home/mr-owl/Documents/GitHub/UtilitiesManager/obj/",
+      "outputPath": "/home/mr-owl/UtilitiesManager/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/home/mr-owl/.nuget/NuGet/NuGet.Config"
@@ -3348,7 +3348,8 @@
         "enableAudit": "true",
         "auditLevel": "low",
         "auditMode": "direct"
-      }
+      },
+      "SdkAnalysisLevel": "10.0.100"
     },
     "frameworks": {
       "net8.0": {
@@ -3400,7 +3401,19 @@
         "warn": true,
         "downloadDependencies": [
           {
+            "name": "Microsoft.AspNetCore.App.Ref",
+            "version": "[8.0.24, 8.0.24]"
+          },
+          {
             "name": "Microsoft.AspNetCore.App.Runtime.linux-x64",
+            "version": "[8.0.24, 8.0.24]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Host.linux-x64",
+            "version": "[8.0.24, 8.0.24]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Ref",
             "version": "[8.0.24, 8.0.24]"
           },
           {
@@ -3413,7 +3426,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/8.0.418/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/home/mr-owl/.dotnet/sdk/10.0.103/PortableRuntimeIdentifierGraph.json"
       }
     },
     "runtimes": {
