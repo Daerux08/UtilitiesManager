@@ -90,3 +90,8 @@ dotnet build
 - Advanced system monitoring
 - User account management
 - Backup & recovery tools
+
+## Known Bugs
+  1. the detection for systemctl is unreliable
+  2. there are some CLI menus which are not with the arrowkey standart
+  3. the install command doesnt work
