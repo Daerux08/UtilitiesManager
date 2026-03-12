@@ -147,3 +147,5 @@ publish/
 
 # Build scripts output
 Package/
+obj/project.assets.json
+*.cache
