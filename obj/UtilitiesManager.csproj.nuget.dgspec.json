@@ -56,6 +56,10 @@
               "target": "Package",
               "version": "[11.3.12, )"
             },
+            "Avalonia.Diagnostics": {
+              "target": "Package",
+              "version": "[11.3.12, )"
+            },
             "Avalonia.Fonts.Inter": {
               "target": "Package",
               "version": "[11.3.12, )"
@@ -94,19 +98,11 @@
               "version": "[8.0.24, 8.0.24]"
             },
             {
-              "name": "Microsoft.AspNetCore.App.Runtime.linux-x64",
-              "version": "[8.0.24, 8.0.24]"
-            },
-            {
               "name": "Microsoft.NETCore.App.Host.linux-x64",
               "version": "[8.0.24, 8.0.24]"
             },
             {
               "name": "Microsoft.NETCore.App.Ref",
-              "version": "[8.0.24, 8.0.24]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Runtime.linux-x64",
               "version": "[8.0.24, 8.0.24]"
             }
           ],
@@ -116,11 +112,6 @@
             }
           },
           "runtimeIdentifierGraphPath": "/home/mr-owl/.dotnet/sdk/10.0.103/PortableRuntimeIdentifierGraph.json"
-        }
-      },
-      "runtimes": {
-        "linux-x64": {
-          "#import": []
         }
       }
     }

@@ -156,7 +156,7 @@ namespace UtilitiesManager
             // Original dependencies
             IsBrightnessCtlAvailable = await CheckCommandAvailable("brightnessctl");
             IsPactlAvailable = await CheckCommandAvailable("pactl");
-            IsUpowerAvailable = await CheckCommandAvailable("upower");
+            IsUpowerAvailable = await CheckUpowerAvailable();
             IsNmcliAvailable = await CheckCommandAvailable("nmcli");
             IsPowerProfilesCtlAvailable = await CheckCommandAvailable("powerprofilesctl");
 
@@ -258,6 +258,39 @@ namespace UtilitiesManager
                 }
                 
                 return found;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private async Task<bool> CheckUpowerAvailable()
+        {
+            try
+            {
+                // First check if upower command is available
+                bool upowerCommandExists = await CheckCommandAvailable("upower");
+                if (!upowerCommandExists)
+                    return false;
+
+                // Then check if there are actual battery devices
+                string deviceList = await TerminalCommands.RunCommandAsync("upower -e | grep -i battery");
+                if (string.IsNullOrWhiteSpace(deviceList))
+                {
+                    // No battery devices found
+                    return false;
+                }
+
+                // Additional check: verify at least one battery is present
+                string devicePath = deviceList.Split('\n')[0].Trim();
+                if (!string.IsNullOrWhiteSpace(devicePath))
+                {
+                    string batteryInfo = await TerminalCommands.RunCommandAsync($"upower -i \"{devicePath}\"");
+                    return batteryInfo.Contains("battery present: yes", StringComparison.OrdinalIgnoreCase);
+                }
+
+                return false;
             }
             catch
             {
