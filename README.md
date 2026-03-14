@@ -63,21 +63,36 @@ UtilMan status
 ## Dependencies
 
 ### Core
-- brightnessctl, pactl, upower, nmcli, powerprofilesctl
+- brightnessctl, pulseaudio-utils, upower, network-manager, power-profiles-daemon
 
 ### Server Features
 - procps, lm-sensors, sysstat, systemctl, journalctl, ufw, fail2ban, bleachbit, ncdu
 
+
 ## Installation
 ```bash
-sudo dpkg -i UtilitiesManager_0.4.0_amd64-PreAlpha.deb
+# Install the .deb package
+sudo dpkg -i utilitiesmanager_0.4.0~alpha*.deb
+
+# If there are dependency issues, run:
 sudo apt-get install -f
+
+# Or install dependencies manually:
+utilitiesmanager install all
 ```
 
 ## Building
 ```bash
+# Install .NET SDK 10.0
+curl -sSL https://dot.net/v1/dotnet-install.sh | bash /dev/stdin --channel 10.0
+export PATH="$PATH:$HOME/.dotnet"
+
+# Build and package
 dotnet build
 ./build-deb.sh
+
+# Install the resulting package
+sudo dpkg -i utilitiesmanager_*.deb
 ```
 
 ## Documentation
@@ -92,6 +107,12 @@ dotnet build
 - Backup & recovery tools
 
 ## Known Bugs
-  1. the detection for systemctl is unreliable
-  2. there are some CLI menus which are not with the arrowkey standart
-  3. the install command doesnt work
+  1. there are some CLI menus which are not with the arrowkey standart
+  2. Not exactly a bug, but CLI_UTILMAN.cs is a Monolithic Class (to be refactored later)
+
+## Recent Changes:
+1. 14-03:
+A. Fixed package names in installation script
+B. Fixed systemctl detection
+C. Fixed GUI launch
+D. Fixed install command

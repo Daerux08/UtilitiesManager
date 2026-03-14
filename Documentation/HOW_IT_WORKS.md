@@ -3,6 +3,13 @@
 ## What this app is
 A Linux utility manager that provides both GUI and CLI interfaces for controlling system settings and monitoring server resources.
 
+## Recent Updates (v0.4.0~alpha)
+- **Fixed GUI Launch** - Application now properly launches GUI when display is available
+- **Fixed systemctl Detection** - Service management commands now work reliably
+- **Updated Package Names** - Using correct Debian package names for dependencies
+- **Improved Package Installation** - All operations now use `apt-get` instead of `apt`
+- **Better Error Handling** - Graceful fallback from GUI to CLI mode when needed
+
 ## Architecture Overview
 UtilitiesManager uses a dual-interface approach:
 - **GUI Mode**: Avalonia desktop application for interactive use
@@ -10,9 +17,11 @@ UtilitiesManager uses a dual-interface approach:
 
 ## Environment Detection
 The application automatically detects the appropriate mode:
-1. Checks for DISPLAY/WAYLAND_DISPLAY environment variables
-2. Falls back to CLI mode in headless environments
-3. Can force CLI mode with command-line arguments
+1. Checks for command-line arguments (CLI mode forced)
+2. Checks UTILITIES_MANAGER_CLI environment variable
+3. Checks for DISPLAY environment variable
+4. Falls back to CLI mode in headless environments
+5. Attempts GUI launch with fallback to CLI on failure
 
 ## Main Components
 

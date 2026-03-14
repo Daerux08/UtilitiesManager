@@ -8,10 +8,10 @@ namespace UtilitiesManagerCLI
         private static readonly (string Package, string Description)[] RequiredPackages = {
             // Core system utilities
             ("brightnessctl", "Screen brightness control for laptops and monitors"),
-            ("pactl", "PulseAudio command-line sound server control"), 
+            ("pulseaudio-utils", "PulseAudio command-line sound server control"), 
             ("upower", "Power management and battery information"),
-            ("nmcli", "NetworkManager command-line interface for WiFi/network control"),
-            ("powerprofilesctl", "Power profile management for performance modes"),
+            ("network-manager", "NetworkManager command-line interface for WiFi/network control"),
+            ("power-profiles-daemon", "Power profile management for performance modes"),
             
             // System monitoring packages
             ("procps", "Process utilities (ps, free, top, who - usually pre-installed)"),
@@ -43,8 +43,8 @@ namespace UtilitiesManagerCLI
         };
 
         private static readonly string[] PackageCommands = {
-            "apt update",
-            "apt install -y brightnessctl pactl upower nmcli powerprofilesctl procps lm-sensors sysstat iotop nethogs ufw fail2ban bleachbit ncdu htop tree jq curl wget vim git unzip tar net-tools dnsutils man-db sudo"
+            "apt-get update",
+            "apt-get install -y brightnessctl pulseaudio-utils upower network-manager power-profiles-daemon procps lm-sensors sysstat iotop nethogs ufw fail2ban bleachbit ncdu htop tree jq curl wget vim git unzip tar net-tools dnsutils man-db sudo"
         };
 
         public static async Task<bool> RunPackageInstallationAsync()
@@ -239,8 +239,8 @@ namespace UtilitiesManagerCLI
                 Console.WriteLine($"Installing {packageName}...");
                 
                 var installCommand = await IsRunningAsRoot() 
-                    ? $"apt install -y {packageName}"
-                    : $"sudo apt install -y {packageName}";
+                    ? $"apt-get install -y {packageName}"
+                    : $"sudo apt-get install -y {packageName}";
                 
                 var result = await TerminalCommands.RunCommandWithResultAsync(installCommand);
                 

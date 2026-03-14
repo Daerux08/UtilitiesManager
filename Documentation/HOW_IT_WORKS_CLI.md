@@ -147,7 +147,7 @@ UtilMan status                 # Show system overview and dependencies
 ### Package Management Commands
 1. `which {command}` - Check command availability
 2. `dpkg -l | grep {package}` - Check installed packages
-3. `apt install {package}` - Package installation
+3. `apt-get install {package}` - Package installation
 4. `sensors-detect --auto` - Hardware sensor setup
 5. `ufw --force enable` - Enable firewall
 6. `ufw default deny incoming` - Set default firewall rules
@@ -168,10 +168,10 @@ UtilMan status                 # Show system overview and dependencies
 
 ### Core Dependencies
 - **brightnessctl** - Screen brightness control
-- **pactl** (pulseaudio) - Audio volume control
+- **pulseaudio-utils** - Audio volume control (provides pactl)
 - **upower** - Battery monitoring
-- **nmcli** (NetworkManager) - WiFi management
-- **powerprofilesctl** - Power profile management
+- **network-manager** - WiFi management (provides nmcli)
+- **power-profiles-daemon** - Power profile management (provides powerprofilesctl)
 
 ### Server Dependencies
 - **procps** (ps/free) - Basic system monitoring
@@ -193,6 +193,16 @@ UtilMan status                 # Show system overview and dependencies
 - **Permission Errors** - Suggests sudo or group membership
 - **Command Failures** - Shows error messages and continues
 - **Input Redirection** - Falls back to numbered input
+
+## Recent Fixes (v0.4.0~alpha)
+- **systemctl Detection** - Fixed unreliable service management detection
+- **Package Installation** - Fixed install commands to use proper package names
+- **GUI/CLI Mode** - Improved automatic mode detection and fallback
+- **Package Names** - Updated to use correct Debian package names:
+  - `pactl` → `pulseaudio-utils`
+  - `nmcli` → `network-manager` 
+  - `powerprofilesctl` → `power-profiles-daemon`
+- **apt-get Usage** - All package operations now use `apt-get` instead of `apt`
 - **Authentication** - Handles sudo password prompts
 
 ## CLI Testing

@@ -498,8 +498,8 @@ namespace UtilitiesManagerCLI
                 }
                 
                 // Add control options at the end
-                menuOptions.Add("🔄 Refresh networks");
-                menuOptions.Add("⬅ Back to main menu");
+                menuOptions.Add("Refresh networks");
+                menuOptions.Add(" Back to main menu");
 
                 var choice = MenuHelper.ShowArrowMenu("WiFi Networks", menuOptions);
 
@@ -650,11 +650,11 @@ namespace UtilitiesManagerCLI
                 
                 var menuOptions = new List<string>
                 {
-                    $"⚡ Set performance mode {(currentProfile == "performance" ? "[CURRENT]" : "")}",
-                    $"⚖️ Set balanced mode {(currentProfile == "balanced" ? "[CURRENT]" : "")}",
-                    $"🔋 Set power-saver mode {(currentProfile == "power-saver" ? "[CURRENT]" : "")}",
-                    "📊 Show current profile",
-                    "⬅ Back to main menu"
+                    $"Set performance mode {(currentProfile == "performance" ? "[CURRENT]" : "")}",
+                    $"Set balanced mode {(currentProfile == "balanced" ? "[CURRENT]" : "")}",
+                    $"Set power-saver mode {(currentProfile == "power-saver" ? "[CURRENT]" : "")}",
+                    "Show current profile",
+                    "Back to main menu"
                 };
 
                 var choice = MenuHelper.ShowArrowMenu("POWER PROFILES", menuOptions);
@@ -822,6 +822,7 @@ namespace UtilitiesManagerCLI
         private static async Task HandleServicesCommand(string[] args)
         {
             var checker = new CheckDependencyCommand();
+            await checker.CheckDependenciesAsync();
             if (!checker.IsSystemctlAvailable)
             {
                 Console.WriteLine("systemctl is not available on this system.");
@@ -954,12 +955,12 @@ namespace UtilitiesManagerCLI
             {
                 var menuOptions = new List<string>
                 {
-                    "🖥️ CPU Information - Usage, load, temperature",
-                    "💾 Memory Usage - RAM and swap usage", 
-                    "💿 Disk Usage - Storage space and mount points",
-                    "🌐 Network Interfaces - IP addresses and connections",
-                    "📊 Full System Overview - All information at once",
-                    "⬅ Back to main menu"
+                    "CPU Information - Usage, load, temperature",
+                    "Memory Usage - RAM and swap usage", 
+                    "Disk Usage - Storage space and mount points",
+                    "Network Interfaces - IP addresses and connections",
+                    "Full System Overview - All information at once",
+                    "Back to main menu"
                 };
 
                 var choice = MenuHelper.ShowArrowMenu("SYSTEM MONITORING", menuOptions);
@@ -1042,13 +1043,13 @@ namespace UtilitiesManagerCLI
             {
                 var menuOptions = new List<string>
                 {
-                    "📋 List all services",
-                    "🔍 Check specific service status",
-                    "▶️ Start a service",
-                    "⏹️ Stop a service", 
-                    "🔄 Restart a service",
-                    "ℹ️ What are services?",
-                    "⬅ Back to main menu"
+                    "List all services",
+                    "Check specific service status",
+                    "Start a service",
+                    "Stop a service", 
+                    "Restart a service",
+                    "What are services?",
+                    "Back to main menu"
                 };
 
                 var choice = MenuHelper.ShowArrowMenu("SERVICE MANAGEMENT", menuOptions);
@@ -1148,9 +1149,9 @@ TIPS:
             {
                 var menuOptions = new List<string>
                 {
-                    "👥 List users",
-                    "🔐 Show logged in users",
-                    "⬅ Back to main menu"
+                    "List users",
+                    "Show logged in users",
+                    "Back to main menu"
                 };
 
                 var choice = MenuHelper.ShowArrowMenu("USER MANAGEMENT", menuOptions);
@@ -1199,10 +1200,10 @@ TIPS:
             {
                 var menuOptions = new List<string>
                 {
-                    "📄 System logs",
-                    "🔧 Kernel logs",
-                    "🚀 Boot logs",
-                    "⬅ Back to main menu"
+                    "System logs",
+                    "Kernel logs",
+                    "Boot logs",
+                    "Back to main menu"
                 };
 
                 var choice = MenuHelper.ShowArrowMenu("LOG MANAGEMENT", menuOptions);
@@ -1241,8 +1242,8 @@ TIPS:
             {
                 var menuOptions = new List<string>
                 {
-                    "🛡️ Show firewall status",
-                    "⬅ Back to main menu"
+                    "Show firewall status",
+                    "Back to main menu"
                 };
 
                 var choice = MenuHelper.ShowArrowMenu("FIREWALL MANAGEMENT", menuOptions);
@@ -1303,12 +1304,12 @@ TIPS:
             {
                 var menuOptions = new List<string>
                 {
-                    "📦 Install all packages",
-                    "📋 Install packages individually",
-                    "📊 Show package status",
-                    "🔧 Setup hardware sensors",
-                    "🛡️ Configure firewall",
-                    "⬅ Back to main menu"
+                    "Install all packages",
+                    "Install packages individually",
+                    "Show package status",
+                    "Setup hardware sensors",
+                    "Configure firewall",
+                    "Back to main menu"
                 };
 
                 var choice = MenuHelper.ShowArrowMenu("PACKAGE INSTALLATION", menuOptions);
