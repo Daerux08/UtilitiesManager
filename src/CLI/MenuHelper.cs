@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-namespace UtilitiesManager
+namespace UtilitiesManagerCLI
 {
     public static class MenuHelper
     {

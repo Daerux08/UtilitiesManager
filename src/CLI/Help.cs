@@ -1,6 +1,6 @@
 using System;
 
-namespace UtilitiesManager
+namespace UtilitiesManagerCLI
 {
     public static class Help
     {
@@ -248,7 +248,7 @@ namespace UtilitiesManager
             Console.WriteLine("  Utilities Manager is a Linux system utility manager that provides");
             Console.WriteLine("  both GUI and CLI interfaces for controlling common system settings.");
             Console.WriteLine();
-            Console.WriteLine("  Originally designed as an Avalonia GUI application, it now supports");
+            Console.WriteLine("  Originally designed as a GUI application, it now supports");
             Console.WriteLine("  headless CLI operation for servers and automation.");
             Console.WriteLine();
             Console.WriteLine("COMPATIBILITY:");
@@ -263,7 +263,7 @@ namespace UtilitiesManager
             Console.WriteLine("  - Includes: .NET 8.0 runtime (no separate install needed)");
             Console.WriteLine();
             Console.WriteLine("TECHNICAL DETAILS:");
-            Console.WriteLine("  - Framework: .NET 8.0 with Avalonia UI");
+            Console.WriteLine("  - Framework: .NET 10.0");
             Console.WriteLine("  - CLI Library: System.CommandLine");
             Console.WriteLine("  - Architecture: MVVM pattern with shared backend logic");
             Console.WriteLine("  - Error Handling: Graceful degradation for missing dependencies");

@@ -4,6 +4,7 @@ using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using System;
 using System.Threading.Tasks;
+using UtilitiesManagerCLI;
 
 namespace UtilitiesManager;
 

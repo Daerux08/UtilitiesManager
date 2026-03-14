@@ -1,8 +1,7 @@
 using System;
 using System.Threading.Tasks;
-using UtilitiesManager;
 
-namespace UtilitiesManager
+namespace UtilitiesManagerCLI
 {
     public static class DownloadScript
     {

@@ -10,12 +10,12 @@ namespace UtilitiesManagerCLI
         {
             if (args.Length > 0)
             {
-                await UtilitiesManager.CliUtilMan.RunCliMode(args);
+                await UtilitiesManagerCLI.CliUtilMan.RunCliMode(args);
             }
             else
             {
                 // Run CLI interactive mode
-                await UtilitiesManager.CliUtilMan.RunInteractiveMode();
+                await UtilitiesManagerCLI.CliUtilMan.RunInteractiveMode();
             }
         }
     }
