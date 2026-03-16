@@ -100,6 +100,9 @@ sudo dpkg -i utilitiesmanager_*.deb
 - `HOW_IT_WORKS_CLI.md` - CLI-specific features and commands
 - `HOW_IT_WORKS_GUI.md` - GUI-specific features and components
 
+## Testers
+- If you wish to become a tester, you can! Just write an issue (or email me), list your DE(GNOME, XFCE, Headless, etc), your Linux distro (Debian, Mint, Manjaro, etc), and I'll walk you through testing the app!
+
 ## Future Updates
 - Bluetooth management
 - Advanced system monitoring
