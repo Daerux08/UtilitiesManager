@@ -19,11 +19,23 @@ bld/
 [Ll]og/
 [Ll]ogs/
 
-# .NET Core
+# .NET specific
+**/[Oo]bj/
+**/[Bb]in/
+!**/packages/build/
 project.lock.json
 project.fragment.lock.json
 artifacts/
 **/Properties/launchSettings.json
+*.cache
+*.user
+*.suo
+*.rsuser
+*.docstates
+
+# Rider
+.idea/
+*.sln.iml
 
 # MSTest test Results
 [Tt]est[Rr]esult*/
@@ -40,15 +52,8 @@ artifacts/
 **/*.nuget.targets
 
 # Avalonia specific
-*.axaml.cs
-!**/*.axaml.cs
-
-# User-specific files
-*.rsuser
-*.suo
-*.user
-*.userosscache
-*.sln.docstates
+# Note: *.axaml.cs should NOT be ignored as they contain generated code
+# Only ignore the designer files if you don't want them in source control
 
 # Mono auto generated files
 mono_crash.*
@@ -147,5 +152,8 @@ publish/
 
 # Build scripts output
 Package/
-obj/project.assets.json
-*.cache
+
+# Lock files (keep the .~lock.* pattern)
+.~lock.*
+
+# End of file
