@@ -92,6 +92,3 @@ dotnet build
 
 ## Known Bugs
   1. there are some CLI menus which are not with the arrowkey standard
-	
-  2. 
-  3. the install command doesnt work
