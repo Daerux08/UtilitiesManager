@@ -70,7 +70,7 @@ UtilMan status
 
 ## Installation
 ```bash
-sudo dpkg -i UtilitiesManager_0.4.0_amd64-PreAlpha.deb
+sudo dpkg -i UtilitiesManager_0.5.0_amd64-PreAlpha.deb
 sudo apt-get install -f
 ```
 
