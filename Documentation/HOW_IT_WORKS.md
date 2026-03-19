@@ -29,9 +29,22 @@ The application automatically detects the appropriate mode:
 8. `EnterPasswordPopup.axaml/.cs` - WiFi password dialog
 
 ### CLI Components
-9. `CLI_UTILMAN.cs` - CLI interface and interactive menus
+9. `CLI_UTILMAN.cs` - CLI interface routing and main menu coordination
 10. `MenuHelper.cs` - Arrow key navigation and menu system
 11. `DownloadScript.cs` - Package installation with sudo handling
+12. **Service Classes** - Modular service-based architecture:
+    - `BrightnessService.cs` - Screen brightness control
+    - `VolumeService.cs` - Audio volume management
+    - `BatteryService.cs` - Battery status and power profiles
+    - `WifiService.cs` - WiFi network management
+    - `PowerService.cs` - Power profile management
+    - `StatusService.cs` - System status overview
+    - `SystemMonitoringService.cs` - CPU, memory, disk, network monitoring
+    - `ServicesService.cs` - System service management
+    - `UserService.cs` - User account management
+    - `LogService.cs` - System log viewing
+    - `FirewallService.cs` - Firewall status and management
+    - `PackageService.cs` - Package installation and management
 
 ## Documentation Structure
 - `HOW_IT_WORKS.md` - This file (general overview)
@@ -44,6 +57,7 @@ Both GUI and CLI interfaces share:
 - **Dependency checking** and error handling
 - **Linux command parsing** with multiple fallbacks
 - **Cross-distribution compatibility**
+- **Service-based architecture** for maintainable code (CLI)
 
 ## What works now
 1. Brightness control - via brightnessctl

@@ -7,13 +7,11 @@ Tested on Linux Mint 22.2, Linux Debian 13, Ubuntu 24.04, and headless servers.
 ## Features
 
 ### Original Features (GUI & CLI)
-1. Brightness control
-2. Volume control  
-3. Battery status
-4. WiFi management
-5. Power profiles
-
-### New CLI Features
+1. **Brightness control**
+2. **Volume control**
+3. **Battery status**
+4. **WiFi management**
+5. **Power profiles**
 6. **System Monitoring** - CPU, memory, disk, network stats
 7. **Service Management** - Start/stop/restart services
 8. **User Management** - View user accounts
@@ -21,6 +19,7 @@ Tested on Linux Mint 22.2, Linux Debian 13, Ubuntu 24.04, and headless servers.
 10. **Firewall Management** - UFW/iptables configuration
 11. **Package Installation** - Auto-install all dependencies
 12. **Arrow Key Navigation** - Modern menu interface
+
 
 ## Usage
 
@@ -92,6 +91,7 @@ dotnet build
 - Backup & recovery tools
 
 ## Known Bugs
-  1. the detection for systemctl is unreliable
-  2. there are some CLI menus which are not with the arrowkey standart
+  1. there are some CLI menus which are not with the arrowkey standard
+	
+  2. 
   3. the install command doesnt work

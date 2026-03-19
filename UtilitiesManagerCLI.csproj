@@ -15,6 +15,18 @@
   <ItemGroup>
     <Compile Include="Program_CLI.cs" />
     <Compile Include="src/CLI/CLI_UTILMAN.cs" />
+	  <Compile Include="src/CLI/BrightnessService.cs" />
+	  <Compile Include="src/CLI/VolumeService.cs" />
+	  <Compile Include="src/CLI/BatteryService.cs" />
+	  <Compile Include="src/CLI/WifiService.cs" />
+	  <Compile Include="src/CLI/ServicesService.cs" />
+	  <Compile Include="src/CLI/PackageService.cs" />
+	  <Compile Include="src/CLI/LogService.cs" />
+	  <Compile Include="src/CLI/FirewallService.cs" />
+	  <Compile Include="src/CLI/StatusService.cs" />
+	  <Compile Include="src/CLI/SystemMonitoringService.cs" />
+	  <Compile Include="src/CLI/UserService.cs" />
+	  <Compile Include="src/CLI/PowerService.cs" />
     <Compile Include="src/CLI/Help.cs" />
     <Compile Include="src/CLI/MenuHelper.cs" />
     <Compile Include="src/CLI/Terminal.cs" />

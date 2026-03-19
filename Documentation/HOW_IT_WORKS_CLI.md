@@ -5,17 +5,42 @@ The CLI interface provides comprehensive system control and monitoring capabilit
 
 ## CLI Main Files
 1. `Program.cs` - Entry point and environment detection
-2. `CLI_UTILMAN.cs` - CLI interface and interactive menus
+2. `CLI_UTILMAN.cs` - CLI interface routing and main menu coordination
 3. `MenuHelper.cs` - Arrow key navigation and menu system
 4. `DownloadScript.cs` - Package installation with sudo handling
 5. `Terminal.cs` - Linux command execution and parsing
 6. `Help.cs` - Comprehensive help documentation
 
+## CLI Service Architecture
+The CLI has been refactored into a modular service-based architecture:
+
+### Core Service Classes
+- `BrightnessService.cs` - Screen brightness control
+- `VolumeService.cs` - Audio volume management
+- `BatteryService.cs` - Battery status and power profiles
+- `WifiService.cs` - WiFi network management
+- `PowerService.cs` - Power profile management
+- `StatusService.cs` - System status overview
+- `SystemMonitoringService.cs` - CPU, memory, disk, network monitoring
+- `ServicesService.cs` - System service management
+- `UserService.cs` - User account management
+- `LogService.cs` - System log viewing
+- `FirewallService.cs` - Firewall status and management
+- `PackageService.cs` - Package installation and management
+
+### Service Pattern
+Each service follows a consistent pattern:
+- **Static classes** for stateless operations
+- **HandleXYZCommand()** methods for CLI command processing
+- **XYZMenu()** methods for interactive menu interfaces
+- **Dependency checking** and graceful error handling
+
 ## How CLI Mode Starts
 1. `Program.cs` checks environment variables (DISPLAY/WAYLAND_DISPLAY)
 2. Falls back to CLI mode if GUI not available
-3. `CLI_UTILMAN.cs` handles command-line arguments or interactive mode
-4. `MenuHelper.cs` provides arrow key navigation with numbered fallback
+3. `CLI_UTILMAN.cs` routes commands to appropriate service classes
+4. Service classes handle CLI commands and interactive menus
+5. `MenuHelper.cs` provides arrow key navigation with numbered fallback
 
 ## Interactive Menu System
 
@@ -153,16 +178,18 @@ UtilMan status                 # Show system overview and dependencies
 6. `ufw default deny incoming` - Set default firewall rules
 
 ## CLI Features Working
-1. **Arrow Key Navigation** - Modern menu interface with fallback
-2. **System Monitoring** - CPU, memory, disk, network statistics
-3. **Service Management** - Full systemd service control
-4. **User Management** - User account information display
-5. **Log Management** - System, kernel, and boot log viewing
-6. **Firewall Management** - UFW and iptables configuration
-7. **Package Installation** - Automated dependency installation
-8. **Environment Detection** - Automatic GUI/CLI mode selection
-9. **Error Handling** - Graceful degradation for missing tools
-10. **Cross-Distro Compatibility** - Works on major Linux distributions
+1. **Modular Service Architecture** - Separated concerns into focused service classes
+2. **Arrow Key Navigation** - Modern menu interface with fallback
+3. **System Monitoring** - CPU, memory, disk, network statistics
+4. **Service Management** - Full systemd service control
+5. **User Management** - User account information display
+6. **Log Management** - System, kernel, and boot log viewing
+7. **Firewall Management** - UFW and iptables configuration
+8. **Package Installation** - Automated dependency installation
+9. **Environment Detection** - Automatic GUI/CLI mode selection
+10. **Error Handling** - Graceful degradation for missing tools
+11. **Cross-Distro Compatibility** - Works on major Linux distributions
+12. **Maintainable Code** - Each service has single responsibility
 
 ## CLI Dependencies
 
