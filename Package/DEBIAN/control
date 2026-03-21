@@ -1,7 +1,0 @@
-Package: utilitiesmanager
-Version: 0.4.0~alpha202603121109
-Section: utils
-Priority: optional
-Architecture: amd64
-Maintainer: Alexander
-Description: Utilities Manager - Avalonia application packaged as a .deb

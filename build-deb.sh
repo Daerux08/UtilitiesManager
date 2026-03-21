@@ -2,7 +2,7 @@
 set -e
 
 APP_NAME="utilitiesmanager"
-APP_VERSION="0.4.0~alpha$(date +%Y%m%d%H%M)"
+APP_VERSION="0.6.0-prealpha6"
 ARCH="amd64"
 
 # project file

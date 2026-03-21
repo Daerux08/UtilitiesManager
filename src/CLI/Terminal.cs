@@ -153,128 +153,106 @@ namespace UtilitiesManager
 
         public async Task CheckDependenciesAsync()
         {
-            // Original dependencies
-            IsBrightnessCtlAvailable = await CheckCommandAvailable("brightnessctl");
-            IsPactlAvailable = await CheckCommandAvailable("pactl");
-            IsUpowerAvailable = await CheckUpowerAvailable();
-            IsNmcliAvailable = await CheckCommandAvailable("nmcli");
-            IsPowerProfilesCtlAvailable = await CheckCommandAvailable("powerprofilesctl");
+            string[] deps = { "upower", "pactl", "brightnessctl", "nmcli", "powerprofilesctl", "ps", "free", "sensors", "iostat", "mpstat", "iotop", "nethogs", "systemctl", "useradd", "journalctl", "ufw", "iptables", "fail2ban-client", "bleachbit", "ncdu" }; 
 
-            // Terminal/Server monitoring dependencies
-            IsProcpsAvailable = await CheckCommandAvailable("ps") && await CheckCommandAvailable("free");
-            IsLmSensorsAvailable = await CheckCommandAvailable("sensors");
-            IsSysstatAvailable = await CheckCommandAvailable("iostat") && await CheckCommandAvailable("mpstat");
-            IsIotopAvailable = await CheckCommandAvailable("iotop");
-            IsNethogsAvailable = await CheckCommandAvailable("nethogs");
-            
-            // Special case for systemctl - always assume available on systemd systems
-            try
-            {
-                var systemdCheck = await TerminalCommands.RunCommandAsync("ps aux | grep '[s]ystemd' | head -1");
-                IsSystemctlAvailable = !string.IsNullOrWhiteSpace(systemdCheck);
-                Console.WriteLine($"DEBUG: SystemD check result: '{systemdCheck.Trim()}', systemctl available: {IsSystemctlAvailable}");
-            }
-            catch
-            {
-                Console.WriteLine("DEBUG: SystemD check failed, using fallback method");
-                IsSystemctlAvailable = await CheckCommandAvailable("systemctl");
-                Console.WriteLine($"DEBUG: Fallback systemctl available: {IsSystemctlAvailable}");
-            }
-            
-            IsUseraddAvailable = await CheckCommandAvailable("useradd");
-            IsJournalctlAvailable = await CheckCommandAvailable("journalctl");
-            IsUfwAvailable = await CheckCommandAvailable("ufw");
-            IsIptablesAvailable = await CheckCommandAvailable("iptables");
-            IsFail2banAvailable = await CheckCommandAvailable("fail2ban-client");
-            IsBleachbitAvailable = await CheckCommandAvailable("bleachbit");
-            IsNcduAvailable = await CheckCommandAvailable("ncdu");
-        }
-
-        private async Task<bool> CheckCommandAvailable(string command)
-        {
-            try
-            {
-                // Try multiple common paths for the command
-                string[] paths = { 
-                    $"/usr/bin/{command}", 
-                    $"/bin/{command}", 
-                    $"/usr/local/bin/{command}",
-                    command // fallback to which
-                };
+            foreach (string dep in deps) 
+            { 
+                int exitCode = await CheckAsync(dep); 
+                Console.WriteLine($"{dep}: {(exitCode == 0 ? "1" : "0")}"); 
                 
-                bool found = false;
-                string debugInfo = "";
-                
-                foreach (string path in paths)
+                // Set the corresponding boolean properties
+                switch (dep)
                 {
-                    try
-                    {
-                        // First try direct path execution
-                        string testOutput = await TerminalCommands.RunCommandAsync($"test -x {path} && echo 'found'");
-                        if (testOutput.Contains("found"))
-                        {
-                            found = true;
-                            debugInfo = $"Found at: {path}";
-                            break;
-                        }
-                    }
-                    catch
-                    {
-                        // Continue to next path
-                    }
+                    case "brightnessctl":
+                        IsBrightnessCtlAvailable = exitCode == 0;
+                        break;
+                    case "pactl":
+                        IsPactlAvailable = exitCode == 0;
+                        break;
+                    case "upower":
+                        IsUpowerAvailable = exitCode == 0 && await CheckUpowerBatteryAvailable();
+                        break;
+                    case "nmcli":
+                        IsNmcliAvailable = exitCode == 0;
+                        break;
+                    case "powerprofilesctl":
+                        IsPowerProfilesCtlAvailable = exitCode == 0;
+                        break;
+                    case "ps":
+                        // Will be combined with "free" for IsProcpsAvailable
+                        break;
+                    case "free":
+                        // Set IsProcpsAvailable if both ps and free are available
+                        int psExitCode = await CheckAsync("ps");
+                        IsProcpsAvailable = exitCode == 0 && psExitCode == 0;
+                        break;
+                    case "sensors":
+                        IsLmSensorsAvailable = exitCode == 0;
+                        break;
+                    case "iostat":
+                        // Will be combined with "mpstat" for IsSysstatAvailable
+                        break;
+                    case "mpstat":
+                        // Set IsSysstatAvailable if both iostat and mpstat are available
+                        int iostatExitCode = await CheckAsync("iostat");
+                        IsSysstatAvailable = exitCode == 0 && iostatExitCode == 0;
+                        break;
+                    case "iotop":
+                        IsIotopAvailable = exitCode == 0;
+                        break;
+                    case "nethogs":
+                        IsNethogsAvailable = exitCode == 0;
+                        break;
+                    case "systemctl":
+                        IsSystemctlAvailable = exitCode == 0;
+                        break;
+                    case "useradd":
+                        IsUseraddAvailable = exitCode == 0;
+                        break;
+                    case "journalctl":
+                        IsJournalctlAvailable = exitCode == 0;
+                        break;
+                    case "ufw":
+                        IsUfwAvailable = exitCode == 0;
+                        break;
+                    case "iptables":
+                        IsIptablesAvailable = exitCode == 0;
+                        break;
+                    case "fail2ban-client":
+                        IsFail2banAvailable = exitCode == 0;
+                        break;
+                    case "bleachbit":
+                        IsBleachbitAvailable = exitCode == 0;
+                        break;
+                    case "ncdu":
+                        IsNcduAvailable = exitCode == 0;
+                        break;
                 }
-                
-                // Fallback to which command
-                if (!found)
-                {
-                    string output = await TerminalCommands.RunCommandAsync($"which {command}");
-                    found = !string.IsNullOrWhiteSpace(output);
-                    debugInfo = found ? $"Found via which: {output.Trim()}" : "Not found via which";
-                }
-                
-                // Debug logging for systemctl specifically
-                if (command == "systemctl" && !found)
-                {
-                    // Try additional checks
-                    try
-                    {
-                        var systemdCheck = await TerminalCommands.RunCommandAsync("ps aux | grep '[s]ystemd' | head -1");
-                        var systemdRunning = !string.IsNullOrWhiteSpace(systemdCheck);
-                        debugInfo += $" | SystemD running: {systemdRunning}";
-                        
-                        var systemctlPath = await TerminalCommands.RunCommandAsync("command -v systemctl");
-                        debugInfo += $" | systemctl path: {systemctlPath.Trim()}";
-                    }
-                    catch
-                    {
-                        debugInfo += " | Additional checks failed";
-                    }
-                }
-                
-                // Log debug info for troubleshooting
-                if (!found)
-                {
-                    Console.WriteLine($"DEBUG: {command} check failed - {debugInfo}");
-                }
-                
-                return found;
-            }
-            catch
-            {
-                return false;
             }
         }
 
-        private async Task<bool> CheckUpowerAvailable()
+        static async Task<int> CheckAsync(string command) 
+        { 
+            var process = new Process 
+            { 
+                StartInfo = new ProcessStartInfo 
+                { 
+                    FileName = "/bin/bash", 
+                    Arguments = $"-c \"which {command} > /dev/null 2>&1\"", 
+                    UseShellExecute = false, 
+                    RedirectStandardOutput = false, 
+                } 
+            }; 
+            process.Start(); 
+            await process.WaitForExitAsync(); 
+            return process.ExitCode; 
+        }
+
+        private async Task<bool> CheckUpowerBatteryAvailable()
         {
             try
             {
-                // First check if upower command is available
-                bool upowerCommandExists = await CheckCommandAvailable("upower");
-                if (!upowerCommandExists)
-                    return false;
-
-                // Then check if there are actual battery devices
+                // Check if there are actual battery devices
                 string deviceList = await TerminalCommands.RunCommandAsync("upower -e | grep -i battery");
                 if (string.IsNullOrWhiteSpace(deviceList))
                 {
@@ -287,7 +265,17 @@ namespace UtilitiesManager
                 if (!string.IsNullOrWhiteSpace(devicePath))
                 {
                     string batteryInfo = await TerminalCommands.RunCommandAsync($"upower -i \"{devicePath}\"");
-                    return batteryInfo.Contains("battery present: yes", StringComparison.OrdinalIgnoreCase);
+                    // Check for "present: yes" in the battery section (handles various spacing)
+                    var lines = batteryInfo.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var line in lines)
+                    {
+                        var trimmed = line.Trim();
+                        if (trimmed.Contains("present:") && trimmed.Contains("yes"))
+                        {
+                            return true;
+                        }
+                    }
+                    return false;
                 }
 
                 return false;

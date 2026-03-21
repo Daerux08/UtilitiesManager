@@ -3,7 +3,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UtilitiesManager"
-        mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="320"
+        Width="505" Height="520"
         x:Class="UtilitiesManager.MainWindow"
         x:DataType="local:MainWindow"
         Title="UtilitiesManager"
@@ -15,100 +15,172 @@
 
     <Window.Styles>
         <Style Selector="TextBlock">
-            <Setter Property="Margin" Value="0,5,0,1"/>
-            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Margin" Value="0,2,0,1"/>
+            <Setter Property="FontSize" Value="13"/>
         </Style>
         <Style Selector="Slider">
-            <Setter Property="Margin" Value="0,0,0,16"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
         </Style>
 
+        <!-- Material Design Card Style -->
+        <Style Selector="Border.card">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="BoxShadow" Value="0 1 4 0 rgba(0,0,0,0.08)"/>
+            <Setter Property="Padding" Value="12"/>
+            <Setter Property="Margin" Value="0,4"/>
+        </Style>
 
         <!--   Clickable-label-style buttons          -->
         <Style Selector="Button.clickable-label">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding" Value="0"/>
-            <Setter Property="Margin" Value="4,6,4,6"/>           
+            <Setter Property="Margin" Value="2,3,2,3"/>           
             <Setter Property="MinWidth" Value="0"/>
             <Setter Property="MinHeight" Value="0"/>
             <Setter Property="HorizontalContentAlignment" Value="Center"/>
             <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Foreground" Value="Black"/>
-            <Setter Property="FontSize" Value="14"/>               
+            <Setter Property="Foreground" Value="#2196F3"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="Medium"/>               
         </Style>
 
         <!-- Hover underline-->
         <Style Selector="Button.clickable-label:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-            <Setter Property="TextBlock.Foreground" Value="#0066CC"/>
+            <Setter Property="TextBlock.Foreground" Value="#1976D2"/>
             <Setter Property="TextBlock.TextDecorations" Value="Underline"/>
         </Style>
 
         <!-- Disabled state -->
         <Style Selector="Button.clickable-label:disabled">
-            <Setter Property="Foreground" Value="#888888"/>
+            <Setter Property="Foreground" Value="#BDBDBD"/>
             <Setter Property="Cursor" Value="Arrow"/>
+        </Style>
+
+        <!-- Material TextBox Style -->
+        <Style Selector="TextBox.material">
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Background" Value="#FAFAFA"/>
+        </Style>
+
+        <!-- Material Slider Style -->
+        <Style Selector="Slider.material">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Margin" Value="0,4,0,8"/>
+            <Setter Property="MinHeight" Value="36"/>
         </Style>
     </Window.Styles>
 
-    <StackPanel Margin="25,35,25,25"
-                HorizontalAlignment="Stretch"
-                VerticalAlignment="Center"
-                MaxWidth="420">
-        <TextBlock Text="Utility Manager v0.0 – "
-                   FontSize="16" FontWeight="Bold" HorizontalAlignment="Center"/>
-        <TextBlock Text="Slider 1 – Sound Level"/>
-        <Slider Minimum="0" Maximum="100"
-                Value="{Binding SoundLevel}"
-                TickFrequency="1" IsSnapToTickEnabled="True"
-                IsEnabled="{Binding SoundAvailable}">
-            <ToolTip.Tip>
-                <TextBlock Text="{Binding SoundAvailable, Converter={StaticResource BoolToStringConverter}, ConverterParameter='pactl is not found|Volume control'}" />
-            </ToolTip.Tip>
-        </Slider>
-        <TextBox Text="{Binding SoundLevelText}"
-                 HorizontalAlignment="Center"
-                 FontWeight="SemiBold"
-                 Foreground="#000000"
-                 Width="60"
-                 TextAlignment="Center"/>
-        <TextBlock Text="Slider 2 – Screen Brightness"/>
-        <Slider Minimum="0" Maximum="100"
-                Value="{Binding Brightness}"
-                TickFrequency="1" IsSnapToTickEnabled="True"
-                IsEnabled="{Binding BrightnessAvailable}">
-            <ToolTip.Tip>
-                <TextBlock Text="{Binding BrightnessAvailable, Converter={StaticResource BoolToStringConverter}, ConverterParameter='brightnessctl is not found|Brightness control'}" />
-            </ToolTip.Tip>
-        </Slider>
-        <TextBox Text="{Binding BrightnessText}"
-                 HorizontalAlignment="Center"
-                 FontWeight="SemiBold"
-                 Foreground="#000000"
-                 Width="60"
-                 TextAlignment="Center"/>
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="12,12,12,12"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Top"
+                    MaxWidth="485">
+            
+            <!-- Header Card -->
+            <Border Classes="card">
+                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="⚡" FontSize="16"/>
+                    <TextBlock Text="Utilities Manager" 
+                               FontSize="16" 
+                               FontWeight="Bold" 
+                               Foreground="#1976D2"/>
+                    <TextBlock Text="v0.4.0" 
+                               FontSize="10" 
+                               Foreground="#757575"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+            </Border>
 
-                    <!-- Wi-Fi-->
-        <StackPanel Orientation="Horizontal"
-                    HorizontalAlignment="Center"
-                    Margin="0,12,0,0">
-            <Button Classes="clickable-label"
-                    Content="Open Wi-Fi Menu"
+            <!-- Sound Control Card -->
+            <Border Classes="card">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                        <TextBlock Text="🔊" FontSize="14" Margin="0,0,6,0"/>
+                        <TextBlock Text="Sound" FontWeight="Medium" FontSize="14"/>
+                    </StackPanel>
+                    <Slider Classes="material" Minimum="0" Maximum="100"
+                            Value="{Binding SoundLevel}"
+                            TickFrequency="1" IsSnapToTickEnabled="True"
+                            IsEnabled="{Binding SoundAvailable}">
+                        <ToolTip.Tip>
+                            <TextBlock Text="{Binding SoundAvailable, Converter={StaticResource BoolToStringConverter}, ConverterParameter='pactl is not found|Volume control'}" />
+                        </ToolTip.Tip>
+                    </Slider>
+                    <TextBox Classes="material" Text="{Binding SoundLevelText}"
+                             HorizontalAlignment="Center"
+                             FontWeight="SemiBold"
+                             Foreground="#C62828"
+                             Width="60"
+                             FontSize="12"
+                             TextAlignment="Center"
+                             IsReadOnly="True"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Brightness Control Card -->
+            <Border Classes="card">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                        <TextBlock Text="☀️" FontSize="14" Margin="0,0,6,0"/>
+                        <TextBlock Text="Brightness" FontWeight="Medium" FontSize="14"/>
+                    </StackPanel>
+                    <Slider Classes="material" Minimum="0" Maximum="100"
+                            Value="{Binding Brightness}"
+                            TickFrequency="1" IsSnapToTickEnabled="True"
+                            IsEnabled="{Binding BrightnessAvailable}">
+                        <ToolTip.Tip>
+                            <TextBlock Text="{Binding BrightnessAvailable, Converter={StaticResource BoolToStringConverter}, ConverterParameter='brightnessctl is not found|Brightness control'}" />
+                        </ToolTip.Tip>
+                    </Slider>
+                    <TextBox Classes="material" Text="{Binding BrightnessText}"
+                             HorizontalAlignment="Center"
+                             FontWeight="SemiBold"
+                             Foreground="#FF9800"
+                             Width="60"
+                             FontSize="12"
+                             TextAlignment="Center"
+                             IsReadOnly="True"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Quick Actions Card -->
+            <Border Classes="card">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                        <TextBlock Text="⚡" FontSize="14" Margin="0,0,6,0"/>
+                        <TextBlock Text="Quick Actions" FontWeight="Medium" FontSize="14"/>
+                    </StackPanel>
+                    
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                Spacing="12">
+                        <Button Classes="clickable-label"
+                    Content="📶 Wi-Fi"
                     Click="OpenWiFi_Click"
                     IsEnabled="{Binding WiFiAvailable}">
                 <ToolTip.Tip>
-                    <TextBlock Text="{Binding WiFiAvailable, Converter={StaticResource BoolToStringConverter}, ConverterParameter='nmcli is not found|Wi-Fi networks'}" />
+                    <TextBlock Text="{Binding WiFiAvailable, Converter={StaticResource BoolToStringConverter}, ConverterParameter='nmcli is not found|Manage Wi-Fi networks'}" />
                 </ToolTip.Tip>
             </Button>
 
             <Button Classes="clickable-label"
-                    Content="Open Battery Menu"
+                    Content="🔋 Battery"
                     Click="OpenBattery_Click"
                     IsEnabled="{Binding BatteryAvailable}">
                 <ToolTip.Tip>
-                    <TextBlock Text="{Binding BatteryAvailable, Converter={StaticResource BoolToStringConverter}, ConverterParameter='upower is not found|Battery status'}" />
+                    <TextBlock Text="{Binding BatteryAvailable, Converter={StaticResource BoolToStringConverter}, ConverterParameter='upower is not found|Check battery status'}" />
                 </ToolTip.Tip>
             </Button>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
         </StackPanel>
-    </StackPanel>
+    </ScrollViewer>
 </Window>

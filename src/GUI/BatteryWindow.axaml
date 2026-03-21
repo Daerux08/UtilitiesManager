@@ -2,26 +2,26 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="UtilitiesManager.BatteryWindow"
         Title="Battery Status"
-        Width="420" Height="420"
+        Width="360" Height="360"
         WindowStartupLocation="CenterOwner"
         CanResize="False">
 
-    <StackPanel Margin="24" Spacing="16">
+    <StackPanel Margin="16" Spacing="12">
         <TextBlock Text="Battery Status"
-                   FontSize="20"
+                   FontSize="18"
                    FontWeight="Bold"
                    HorizontalAlignment="Center"
                    Foreground="{DynamicResource AccentColor}" />
 
         <Border BorderBrush="{DynamicResource ThemeBorderMidBrush}"
                 BorderThickness="1"
-                CornerRadius="8"
-                Padding="16"
-                Margin="0,8,0,16">
-            <StackPanel Spacing="12">
+                CornerRadius="6"
+                Padding="12"
+                Margin="0,4,0,12">
+            <StackPanel Spacing="8">
                 <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
                     <TextBlock Grid.Row="0" Grid.Column="0" Text="Charge:" FontWeight="SemiBold" />
-                    <TextBlock Grid.Row="0" Grid.Column="1" x:Name="PercentageText" Text="??%" FontSize="18" FontWeight="Bold" />
+                    <TextBlock Grid.Row="0" Grid.Column="1" x:Name="PercentageText" Text="??%" FontSize="16" FontWeight="Bold" />
 
                     <TextBlock Grid.Row="1" Grid.Column="0" Text="State:" FontWeight="SemiBold" />
                     <TextBlock Grid.Row="1" Grid.Column="1" x:Name="StateText" Text="Unknown" />
@@ -39,38 +39,38 @@
         </Border>
 
         <TextBlock Text="Power Profiles"
-                   FontSize="16"
+                   FontSize="14"
                    FontWeight="SemiBold"
                    HorizontalAlignment="Center"
-                   Margin="0,8,0,12" />
+                   Margin="0,4,0,8" />
 
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
             <Button x:Name="PowerSaverButton"
                     Content="Power Saver"
-                    Width="120"
-                    Height="40"
+                    Width="100"
+                    Height="36"
                     Click="SetPowerSaver_Click"
                     ToolTip.Tip="Minimizes power consumption by reducing performance. Best for extending battery life." />
             <Button x:Name="BalancedButton"
                     Content="Balanced"
-                    Width="120"
-                    Height="40"
+                    Width="100"
+                    Height="36"
                     Click="SetBalanced_Click"
                     ToolTip.Tip="Balances performance and power consumption. Good for everyday use." />
             <Button x:Name="PerformanceButton"
                     Content="Performance"
-                    Width="120"
-                    Height="40"
+                    Width="90"
+                    Height="36"
                     Click="SetPerformance_Click"
                     ToolTip.Tip="Maximizes performance at the cost of higher power consumption. Best for demanding tasks." />
         </StackPanel>
 
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="16" Margin="0,16,0,0">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12" Margin="0,8,0,0">
             <Button Content="Refresh"
-                    Width="120"
+                    Width="100"
                     Click="Refresh_Click" />
             <Button Content="Close"
-                    Width="120"
+                    Width="100"
                     Click="OnCloseClick" />
         </StackPanel>
     </StackPanel>

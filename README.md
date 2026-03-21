@@ -69,7 +69,7 @@ UtilMan status
 
 ## Installation
 ```bash
-sudo dpkg -i UtilitiesManager_0.5.0_amd64-PreAlpha.deb
+sudo dpkg -i UtilitiesManager_0.6.0-prealpha6_amd64.deb
 sudo apt-get install -f
 ```
 
@@ -89,6 +89,12 @@ dotnet build
 - Advanced system monitoring
 - User account management
 - Backup & recovery tools
+
+## Recent Updates
+- **Improved Architecture**: Refactored codebase into modular service classes
+- **Enhanced Dependency System**: Simplified and robust dependency checking
+- **Better GUI**: Material design improvements with modern styling
+- **Bug Fixes**: WiFi parsing, service detection, and startup reliability improvements
 
 ## Known Bugs
   1. there are some CLI menus which are not with the arrowkey standard

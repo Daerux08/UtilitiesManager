@@ -32,7 +32,7 @@ The application automatically detects the appropriate mode:
 9. `CLI_UTILMAN.cs` - CLI interface routing and main menu coordination
 10. `MenuHelper.cs` - Arrow key navigation and menu system
 11. `DownloadScript.cs` - Package installation with sudo handling
-12. **Service Classes** - Modular service-based architecture:
+12. **Service Classes** - Refactored modular service-based architecture:
     - `BrightnessService.cs` - Screen brightness control
     - `VolumeService.cs` - Audio volume management
     - `BatteryService.cs` - Battery status and power profiles
@@ -54,10 +54,11 @@ The application automatically detects the appropriate mode:
 ## Shared Features
 Both GUI and CLI interfaces share:
 - **Command execution** via Terminal.cs
-- **Dependency checking** and error handling
+- **Dependency checking** with simplified array-based approach and clear boolean flags
 - **Linux command parsing** with multiple fallbacks
 - **Cross-distribution compatibility**
 - **Service-based architecture** for maintainable code (CLI)
+- **Enhanced GUI** with material design cards and modern styling
 
 ## What works now
 1. Brightness control - via brightnessctl

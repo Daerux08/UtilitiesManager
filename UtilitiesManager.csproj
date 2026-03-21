@@ -28,5 +28,6 @@
   <ItemGroup>
     <Compile Remove="UtilitiesManagerCLI/Program_CLI.cs" />
     <Compile Remove="Program_CLI.cs" />
+    <Compile Remove="Test/**" />
   </ItemGroup>
 </Project>

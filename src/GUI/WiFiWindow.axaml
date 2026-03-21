@@ -3,7 +3,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UtilitiesManager"
-        mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="400"
+        Width="810" Height="400"
         x:Class="UtilitiesManager.WiFiWindow"
         x:DataType="local:WiFiWindow"
         Title="Wi-Fi Networks"
@@ -15,95 +15,116 @@
     </Window.Resources>
 
     <Window.Styles>
+        <!-- Material Card Style -->
+        <Style Selector="Border.card">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="BoxShadow" Value="0 1 4 0 rgba(0,0,0,0.08)"/>
+            <Setter Property="Padding" Value="12"/>
+            <Setter Property="Margin" Value="8"/>
+        </Style>
+        
         <Style Selector="Button">
-            <Setter Property="Margin" Value="5"/>
-            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="Margin" Value="4"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="CornerRadius" Value="4"/>
         </Style>
         <Style Selector="DataGrid">
-            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Margin" Value="8"/>
             <Setter Property="AutoGenerateColumns" Value="False"/>
             <Setter Property="CanUserReorderColumns" Value="True"/>
             <Setter Property="CanUserResizeColumns" Value="True"/>
             <Setter Property="CanUserSortColumns" Value="True"/>
-            <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+            <Setter Property="GridLinesVisibility" Value="Horizontal,Vertical"/>
             <Setter Property="HeadersVisibility" Value="Column"/>
             <Setter Property="IsReadOnly" Value="True"/>
             <Setter Property="SelectionMode" Value="Single"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+            <Setter Property="Padding" Value="0"/>
+        </Style>
+        <Style Selector="DataGridCell">
+            <Setter Property="Padding" Value="0"/>
         </Style>
         <Style Selector="DataGridRow:selected /template/ Rectangle#BackgroundRectangle">
-            <Setter Property="Fill" Value="#FF007ACC"/>
+            <Setter Property="Fill" Value="#1976D2"/>
         </Style>
     </Window.Styles>
 
-    <Grid>
+    <Grid Margin="12">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Header -->
-        <TextBlock Grid.Row="0" 
-                   Text="Available Wi-Fi Networks" 
-                   FontSize="18" 
-                   FontWeight="Bold" 
-                   HorizontalAlignment="Center" 
-                   Margin="0,10,0,10"/>
+        <!-- Header Card -->
+        <Border Grid.Row="0" Classes="card">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
+                <TextBlock Text="📶" FontSize="16"/>
+                <TextBlock Text="Wi-Fi Networks" 
+                           FontSize="16" 
+                           FontWeight="Bold" 
+                           Foreground="#1976D2"/>
+            </StackPanel>
+        </Border>
 
         <!-- Data Grid -->
-        <DataGrid Grid.Row="1" 
-                  Name="WiFiDataGrid"
-                  ItemsSource="{Binding WiFiNetworks}"
-                  DoubleTapped="WiFiDataGrid_DoubleTapped">
-            <DataGrid.Columns>
-                <DataGridTextColumn Header="Status" 
-                                    x:DataType="local:WiFiInfo"
-                                    Binding="{Binding IsActive, Converter={StaticResource BoolToStatusConverter}}" 
-                                    Width="80"/>
-                <DataGridTextColumn Header="SSID" 
-                                    x:DataType="local:WiFiInfo"
-                                    Binding="{Binding SSID}" 
-                                    Width="*"/>
-                <DataGridTextColumn Header="Mode" 
-                                    x:DataType="local:WiFiInfo"
-                                    Binding="{Binding Mode}" 
-                                    Width="80"/>
-                <DataGridTextColumn Header="Channel" 
-                                    x:DataType="local:WiFiInfo"
-                                    Binding="{Binding Chan}" 
-                                    Width="70"/>
-                <DataGridTextColumn Header="Rate" 
-                                    x:DataType="local:WiFiInfo"
-                                    Binding="{Binding Rate}" 
-                                    Width="80"/>
-                <DataGridTextColumn Header="Signal" 
-                                    x:DataType="local:WiFiInfo"
-                                    Binding="{Binding Signal}" 
-                                    Width="70"/>
-                <DataGridTextColumn Header="Security" 
-                                    x:DataType="local:WiFiInfo"
-                                    Binding="{Binding Security}" 
-                                    Width="*"/>
-            </DataGrid.Columns>
-        </DataGrid>
+        <Border Grid.Row="1" Classes="card">
+            <DataGrid Name="WiFiDataGrid"
+                      ItemsSource="{Binding WiFiNetworks}"
+                      DoubleTapped="WiFiDataGrid_DoubleTapped">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Status" 
+                                        x:DataType="local:WiFiInfo"
+                                        Binding="{Binding IsActive, Converter={StaticResource BoolToStatusConverter}}" 
+                                        Width="100"/>
+                    <DataGridTextColumn Header="SSID" 
+                                        x:DataType="local:WiFiInfo"
+                                        Binding="{Binding SSID}" 
+                                        Width="200"/>
+                    <DataGridTextColumn Header="Mode" 
+                                        x:DataType="local:WiFiInfo"
+                                        Binding="{Binding Mode}" 
+                                        Width="100"/>
+                    <DataGridTextColumn Header="Channel" 
+                                        x:DataType="local:WiFiInfo"
+                                        Binding="{Binding Chan}" 
+                                        Width="80"/>
+                    <DataGridTextColumn Header="Rate" 
+                                        x:DataType="local:WiFiInfo"
+                                        Binding="{Binding Rate}" 
+                                        Width="100"/>
+                    <DataGridTextColumn Header="Signal" 
+                                        x:DataType="local:WiFiInfo"
+                                        Binding="{Binding Signal}" 
+                                        Width="80"/>
+                    <DataGridTextColumn Header="Security" 
+                                        x:DataType="local:WiFiInfo"
+                                        Binding="{Binding Security}" 
+                                        Width="150"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
 
-        <!-- Status Label -->
-        <TextBlock Grid.Row="2" 
-                   Text="{Binding StatusText}" 
-                   HorizontalAlignment="Center" 
-                   Margin="0,5,0,5" 
-                   FontSize="14"/>
-
-        <!-- Buttons -->
-        <StackPanel Grid.Row="3" 
-                    Orientation="Horizontal" 
-                    HorizontalAlignment="Center" 
-                    Margin="0,10,0,10">
-            <Button Content="Refresh" 
-                    Click="Refresh_Click"/>
-            <Button Content="Close" 
-                    Click="OnCloseClick"/>
+        <!-- Status and Buttons -->
+        <StackPanel Grid.Row="2" Spacing="8" Margin="0,8,0,0">
+            <!-- Status Label -->
+            <TextBlock Text="{Binding StatusText}" 
+                       HorizontalAlignment="Center" 
+                       FontSize="12"
+                       Foreground="#666666"/>
+            
+            <!-- Buttons -->
+            <StackPanel Orientation="Horizontal" 
+                        HorizontalAlignment="Center" 
+                        Spacing="8">
+                <Button Content="Refresh" 
+                        Click="Refresh_Click"/>
+                <Button Content="Close" 
+                        Click="OnCloseClick"/>
+            </StackPanel>
         </StackPanel>
     </Grid>
 </Window>
