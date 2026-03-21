@@ -20,6 +20,13 @@ Tested on Linux Mint 22.2, Linux Debian 13, Ubuntu 24.04, and headless servers.
 11. **Package Installation** - Auto-install all dependencies
 12. **Arrow Key Navigation** - Modern menu interface
 
+<img width="513" height="554" alt="image" src="https://github.com/user-attachments/assets/78e5ab19-095e-4c40-b873-21cb1361b3da" />  --main menu
+<img width="378" height="398" alt="image" src="https://github.com/user-attachments/assets/5f7f7de1-11ee-4f0c-9263-1701fba6f9f6" /> -- battery menu: Click on the buttons to select a power profile, click refresh to force another scan
+
+
+
+
+
 
 ## Usage
 
