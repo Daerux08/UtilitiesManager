@@ -9,10 +9,10 @@ namespace UtilitiesManager
         private static readonly (string Package, string Description)[] RequiredPackages = {
             // Core system utilities
             ("brightnessctl", "Screen brightness control for laptops and monitors"),
-            ("pactl", "PulseAudio command-line sound server control"), 
+            ("pulseaudio-utils", "PulseAudio command-line sound server control (provides pactl)"), 
             ("upower", "Power management and battery information"),
-            ("nmcli", "NetworkManager command-line interface for WiFi/network control"),
-            ("powerprofilesctl", "Power profile management for performance modes"),
+            ("network-manager", "NetworkManager command-line interface for WiFi/network control (provides nmcli)"),
+            ("power-profiles-daemon", "Power profile management for performance modes (provides powerprofilesctl)"),
             
             // System monitoring packages
             ("procps", "Process utilities (ps, free, top, who - usually pre-installed)"),
@@ -45,7 +45,7 @@ namespace UtilitiesManager
 
         private static readonly string[] PackageCommands = {
             "apt update",
-            "apt install -y brightnessctl pactl upower nmcli powerprofilesctl procps lm-sensors sysstat iotop nethogs ufw fail2ban bleachbit ncdu htop tree jq curl wget vim git unzip tar net-tools dnsutils man-db sudo"
+            "apt install -y brightnessctl pulseaudio-utils upower network-manager power-profiles-daemon procps lm-sensors sysstat iotop nethogs ufw fail2ban bleachbit ncdu htop tree jq curl wget vim git unzip tar net-tools dnsutils man-db sudo"
         };
 
         public static async Task<bool> RunPackageInstallationAsync()
