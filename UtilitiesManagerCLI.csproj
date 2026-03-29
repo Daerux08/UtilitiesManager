@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="HashtagChris.DotNetBlueZ" Version="1.3.1" />
+    <PackageReference Include="Spectre.Console" Version="0.49.1" />
     <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
   </ItemGroup>
 
@@ -29,6 +30,7 @@
 	  <Compile Include="src/CLI/PowerService.cs" />
     <Compile Include="src/CLI/Help.cs" />
     <Compile Include="src/CLI/MenuHelper.cs" />
+    <Compile Include="src/CLI/SpectreMenuHelper.cs" />
     <Compile Include="src/CLI/Terminal.cs" />
     <Compile Include="src/DownloadScript.cs" />
   </ItemGroup>
