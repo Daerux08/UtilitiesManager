@@ -104,4 +104,4 @@ dotnet build
 - **Bug Fixes**: WiFi parsing, service detection, and startup reliability improvements
 
 ## Known Bugs
-  1. there are some CLI menus which are not with the arrowkey standard
+- Currently no bugs are present
