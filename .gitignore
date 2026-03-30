@@ -139,8 +139,6 @@ FodyWeavers.xsd
 .~lock.*
 
 # Published applications
-publish/
-**/publish/
 
 # Package files
 *.deb

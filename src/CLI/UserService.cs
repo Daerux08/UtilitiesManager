@@ -27,46 +27,15 @@ namespace UtilitiesManager
 
         public static async Task UserManagementMenu()
         {
-            while (true)
+            var menuOptions = new List<(string, Func<Task>)>
             {
-                var menuOptions = new List<string>
-                {
-                    "👥 List users",
-                    "🔐 Show logged in users",
-                    "⬅ Back to main menu"
-                };
+                ("👥 List users", async () => { await HandleUsersCommand(new string[] { "users" }); MenuEngine.GeneralMessage("Press any key to continue..."); Console.ReadKey(true); }),
+                ("🔐 Show logged in users", async () => { var checker = new CheckDependencyCommand(); if (checker.IsProcpsAvailable) { var whoOutput = await TerminalCommands.RunCommandAsync("who"); MenuEngine.GeneralMessage(whoOutput); } else { MenuEngine.ErrorMessage("who command is not available on this system."); } MenuEngine.GeneralMessage("Press any key to continue..."); Console.ReadKey(true); }),
+                ("⬅ Back to main menu", () => { throw new GoBackException(); })
+            };
 
-                var choice = MenuHelper.ShowArrowMenu("USER MANAGEMENT", menuOptions);
-
-                switch (choice)
-                {
-                    case 0:
-                        await HandleUsersCommand(new string[] { "users" });
-                        Console.WriteLine();
-                        Console.WriteLine("Press any key to continue...");
-                        Console.ReadKey(true);
-                        break;
-                    case 1:
-                        var checker = new CheckDependencyCommand();
-                        if (checker.IsProcpsAvailable)
-                        {
-                            var whoOutput = await TerminalCommands.RunCommandAsync("who");
-                            MenuHelper.ShowMessage("Logged In Users", whoOutput);
-                        }
-                        else
-                        {
-                            MenuHelper.ShowError("User Management", "who command is not available on this system.");
-                        }
-                        Console.WriteLine();
-                        Console.WriteLine("Press any key to continue...");
-                        Console.ReadKey(true);
-                        break;
-                    case 2:
-                        return;
-                    case -1:
-                        return;
-                }
-            }
+            var menu = menuOptions.Select(x => (x.Item1, new Action(() => x.Item2().GetAwaiter().GetResult()))).ToList();
+            MenuEngine.DisplayMenu(menu);
         }
     }
 }

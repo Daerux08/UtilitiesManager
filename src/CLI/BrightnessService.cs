@@ -28,69 +28,45 @@ namespace UtilitiesManager
             var checker = new CheckDependencyCommand();
             if (!checker.IsBrightnessCtlAvailable)
             {
-                MenuHelper.ShowError("Brightness Control", "brightnessctl is not available on this system.");
+                MenuEngine.ErrorMessage("brightnessctl is not available on this system.");
                 return;
             }
 
             var currentBrightness = await checker.GetBrightnessPercentAsync();
 
-            while (true)
+            var menuOptions = new List<(string, Func<Task>)>
             {
-                var menuOptions = new List<string>
-                {
-                    $"Set brightness percentage (Current: {currentBrightness}%)",
-                    "Quick set (0%, 25%, 50%, 75%, 100%)",
-                    "Back to main menu"
-                };
+                ($"Set brightness percentage (Current: {currentBrightness}%)", async () => {
+                    var input = MenuEngine.TextInput($"Enter brightness percentage (0-100) [{currentBrightness}]");
+                    if (int.TryParse(input, out int brightness) && brightness >= 0 && brightness <= 100)
+                    {
+                        var changer = new ChangeValueCommand();
+                        await changer.SetBrightnessAsync(brightness);
+                        currentBrightness = brightness;
+                        MenuEngine.GeneralMessage($"Brightness set to {brightness}%");
+                    }
+                    else
+                    {
+                        MenuEngine.ErrorMessage("Please enter a number between 0 and 100.");
+                    }
+                }),
+                ("Quick set (0%, 25%, 50%, 75%, 100%)", async () => {
+                    var quickOptions = new List<(string, Func<Task>)>
+                    {
+                        ("0% (Off)", async () => { var changer = new ChangeValueCommand(); await changer.SetBrightnessAsync(0); currentBrightness = 0; MenuEngine.GeneralMessage("Brightness set to 0%"); }),
+                        ("25%", async () => { var changer = new ChangeValueCommand(); await changer.SetBrightnessAsync(25); currentBrightness = 25; MenuEngine.GeneralMessage("Brightness set to 25%"); }),
+                        ("50%", async () => { var changer = new ChangeValueCommand(); await changer.SetBrightnessAsync(50); currentBrightness = 50; MenuEngine.GeneralMessage("Brightness set to 50%"); }),
+                        ("75%", async () => { var changer = new ChangeValueCommand(); await changer.SetBrightnessAsync(75); currentBrightness = 75; MenuEngine.GeneralMessage("Brightness set to 75%"); }),
+                        ("100% (Maximum)", async () => { var changer = new ChangeValueCommand(); await changer.SetBrightnessAsync(100); currentBrightness = 100; MenuEngine.GeneralMessage("Brightness set to 100%"); }),
+                        ("Back", async () => { throw new GoBackException(); })
+                    };
+                    var quickMenu = quickOptions.Select(x => (x.Item1, new Action(() => x.Item2().GetAwaiter().GetResult()))).ToList();
+                    MenuEngine.DisplayMenu(quickMenu);
+                }),
+                ("Back to main menu", async () => { throw new GoBackException(); })
+            };
 
-                var choice = MenuHelper.ShowArrowMenu("BRIGHTNESS CONTROL", menuOptions);
-
-                switch (choice)
-                {
-                    case 0:
-                        var input = MenuHelper.GetUserInput("Enter brightness percentage (0-100)", currentBrightness.ToString());
-                        if (int.TryParse(input, out int brightness) && brightness >= 0 && brightness <= 100)
-                        {
-                            var changer = new ChangeValueCommand();
-                            await changer.SetBrightnessAsync(brightness);
-                            currentBrightness = brightness;
-                            MenuHelper.ShowMessage("Success", $"Brightness set to {brightness}%");
-                        }
-                        else
-                        {
-                            MenuHelper.ShowError("Invalid Input", "Please enter a number between 0 and 100.");
-                        }
-                        break;
-
-                    case 1:
-                        var quickOptions = new Dictionary<string, int>
-                        {
-                            ["0% (Off)"] = 0,
-                            ["25%"] = 25,
-                            ["50%"] = 50,
-                            ["75%"] = 75,
-                            ["100% (Maximum)"] = 100
-                        };
-
-                        var quickChoice = MenuHelper.ShowQuickSelectMenu("Quick brightness options", quickOptions);
-                        if (quickChoice >= 0)
-                        {
-                            var selectedOption = quickOptions.ElementAt(quickChoice);
-                            var quickBrightness = selectedOption.Value;
-
-                            var changer = new ChangeValueCommand();
-                            await changer.SetBrightnessAsync(quickBrightness);
-                            currentBrightness = quickBrightness;
-                            MenuHelper.ShowMessage("Success", $"Brightness set to {quickBrightness}%");
-                        }
-                        break;
-
-                    case 2:
-                        return;
-                    case -1:
-                        return;
-                }
-            }
+            MenuEngine.DisplayMenu(menuOptions);
         }
     }
 }

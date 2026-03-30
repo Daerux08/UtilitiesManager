@@ -37,30 +37,14 @@ namespace UtilitiesManager
 
         public static async Task FirewallManagementMenu()
         {
-            while (true)
+            var menuOptions = new List<(string, Func<Task>)>
             {
-                var menuOptions = new List<string>
-                {
-                    "🛡️ Show firewall status",
-                    "⬅ Back to main menu"
-                };
+                ("🛡️ Show firewall status", async () => { await HandleFirewallCommand(new string[] { "firewall" }); MenuEngine.GeneralMessage("Press any key to continue..."); Console.ReadKey(true); }),
+                ("⬅ Back to main menu", () => { throw new GoBackException(); })
+            };
 
-                var choice = MenuHelper.ShowArrowMenu("FIREWALL MANAGEMENT", menuOptions);
-
-                switch (choice)
-                {
-                    case 0:
-                        await HandleFirewallCommand(new string[] { "firewall" });
-                        Console.WriteLine();
-                        Console.WriteLine("Press any key to continue...");
-                        Console.ReadKey(true);
-                        break;
-                    case 1:
-                        return;
-                    case -1:
-                        return;
-                }
-            }
+            var menu = menuOptions.Select(x => (x.Item1, new Action(() => x.Item2().GetAwaiter().GetResult()))).ToList();
+            MenuEngine.DisplayMenu(menu);
         }
     }
 }

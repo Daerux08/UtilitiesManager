@@ -1,8 +1,8 @@
 using System;
+using UtilitiesManager;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using UtilitiesManager;
 
 namespace UtilitiesManager
 {
@@ -82,79 +82,26 @@ namespace UtilitiesManager
         {
             while (true)
             {
-                var menuOptions = new List<string>
+                var menuOptions = new List<(string, Func<Task>)>
                 {
-                    "Brightness Control",
-                    "Volume Control",
-                    "Battery Status",
-                    "WiFi Networks",
-                    "Power Profiles",
-                    "System Monitoring",
-                    "Service Management",
-                    "User Management",
-                    "Log Management",
-                    "Firewall Management",
-                    "Package Installation",
-                    "Help & Documentation",
-                    "Refresh Status",
-                    "Quit"
+                    ("Brightness Control", async () => await BrightnessService.BrightnessMenu()),
+                    ("Volume Control", async () => await VolumeService.VolumeMenu()),
+                    ("Battery Status", async () => await BatteryService.BatteryMenu()),
+                    ("WiFi Networks", async () => await WifiService.WiFiMenu()),
+                    ("Power Profiles", async () => await PowerService.PowerMenu()),
+                    ("System Monitoring", async () => await SystemMonitoringService.SystemMonitoringMenu()),
+                    ("Service Management", async () => await ServicesService.ServiceManagementMenu()),
+                    ("User Management", async () => await UserService.UserManagementMenu()),
+                    ("Log Management", async () => await LogService.LogManagementMenu()),
+                    ("Firewall Management", async () => await FirewallService.FirewallManagementMenu()),
+                    ("Package Installation", async () => await PackageService.PackageInstallationMenu()),
+                    ("Help & Documentation", async () => { Help.ShowAllHelp(); await Task.Delay(1); }),
+                    ("Refresh Status", async () => { await Task.Delay(1); }),
+                    ("Quit", async () => { MenuEngine.GeneralMessage("Goodbye! Thank you for using Utilities Manager!"); Environment.Exit(0); })
                 };
 
-                var choice = MenuHelper.ShowArrowMenu("UTILITIES MANAGER - INTERACTIVE MODE", menuOptions);
-
-                switch (choice)
-                {
-                    case 0:
-                        await BrightnessService.BrightnessMenu();
-                        break;
-                    case 1:
-                        await VolumeService.VolumeMenu();
-                        break;
-                    case 2:
-                        await BatteryService.BatteryMenu();
-                        break;
-                    case 3:
-                        await WifiService.WiFiMenu();
-                        break;
-                    case 4:
-                        await PowerService.PowerMenu();
-                        break;
-                    case 5:
-                        await SystemMonitoringService.SystemMonitoringMenu();
-                        break;
-                    case 6:
-                        await ServicesService.ServiceManagementMenu();
-                        break;
-                    case 7:
-                        await UserService.UserManagementMenu();
-                        break;
-                    case 8:
-                        await LogService.LogManagementMenu();
-                        break;
-                    case 9:
-                        await FirewallService.FirewallManagementMenu();
-                        break;
-                    case 10:
-                        await PackageService.PackageInstallationMenu();
-                        break;
-                    case 11:
-                        Help.ShowAllHelp();
-                        Console.WriteLine("\nPress any key to continue...");
-                        Console.ReadKey(true);
-                        break;
-                    case 12:
-                        continue; // Refresh status
-                    case 13:
-                        MenuHelper.ShowMessage("Goodbye!", "Thank you for using Utilities Manager!");
-                        return;
-                    case -1:
-                        MenuHelper.ShowMessage("Goodbye!", "Thank you for using Utilities Manager!");
-                        return;
-                }
+                MenuEngine.DisplayMenu(menuOptions);
             }
         }
     }
 }
-
-       
-

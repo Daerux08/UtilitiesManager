@@ -35,48 +35,20 @@ namespace UtilitiesManager
             var checker = new CheckDependencyCommand();
             if (!checker.IsJournalctlAvailable)
             {
-                MenuHelper.ShowError("Log Management", "journalctl is not available on this system.");
+                MenuEngine.ErrorMessage("journalctl is not available on this system.");
                 return;
             }
 
-            while (true)
+            var menuOptions = new List<(string, Func<Task>)>
             {
-                var menuOptions = new List<string>
-                {
-                    "📄 System logs",
-                    "🔧 Kernel logs",
-                    "🚀 Boot logs",
-                    "⬅ Back to main menu"
-                };
+                ("📄 System logs", async () => { await HandleLogsCommand(new string[] { "logs", "system" }); MenuEngine.GeneralMessage("Press any key to continue..."); Console.ReadKey(true); }),
+                ("🔧 Kernel logs", async () => { await HandleLogsCommand(new string[] { "logs", "kernel" }); MenuEngine.GeneralMessage("Press any key to continue..."); Console.ReadKey(true); }),
+                ("🚀 Boot logs", async () => { await HandleLogsCommand(new string[] { "logs", "boot" }); MenuEngine.GeneralMessage("Press any key to continue..."); Console.ReadKey(true); }),
+                ("⬅ Back to main menu", () => { throw new GoBackException(); })
+            };
 
-                var choice = MenuHelper.ShowArrowMenu("LOG MANAGEMENT", menuOptions);
-
-                switch (choice)
-                {
-                    case 0:
-                        await HandleLogsCommand(new string[] { "logs", "system" });
-                        Console.WriteLine();
-                        Console.WriteLine("Press any key to continue...");
-                        Console.ReadKey(true);
-                        break;
-                    case 1:
-                        await HandleLogsCommand(new string[] { "logs", "kernel" });
-                        Console.WriteLine();
-                        Console.WriteLine("Press any key to continue...");
-                        Console.ReadKey(true);
-                        break;
-                    case 2:
-                        await HandleLogsCommand(new string[] { "logs", "boot" });
-                        Console.WriteLine();
-                        Console.WriteLine("Press any key to continue...");
-                        Console.ReadKey(true);
-                        break;
-                    case 3:
-                        return;
-                    case -1:
-                        return;
-                }
-            }
+            var menu = menuOptions.Select(x => (x.Item1, new Action(() => x.Item2().GetAwaiter().GetResult()))).ToList();
+            MenuEngine.DisplayMenu(menu);
         }
     }
 }

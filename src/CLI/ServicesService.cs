@@ -18,112 +18,23 @@ namespace UtilitiesManager
 
             if (!checker.IsSystemctlAvailable)
             {
-                MenuHelper.ShowError("Service Management", "systemctl is not available on this system.");
+                MenuEngine.ErrorMessage("systemctl is not available on this system.");
                 return;
             }
 
-            while (true)
+            var menuOptions = new List<(string, Func<Task>)>
             {
-                var menuOptions = new List<string>
-                {
-                    "📋 List all services",
-                    "🔍 Check specific service status",
-                    "▶️ Start a service",
-                    "⏹️ Stop a service",
-                    "🔄 Restart a service",
-                    "ℹ️ What are services?",
-                    "⬅ Back to main menu"
-                };
+                ("📋 List all services", async () => { await ServicesService.HandleServicesCommand(new string[] { "services" }); MenuEngine.GeneralMessage("Press any key to continue..."); Console.ReadKey(true); }),
+                ("🔍 Check specific service status", async () => { var serviceName = MenuEngine.TextInput("Enter service name"); if (!string.IsNullOrEmpty(serviceName)) { await ServicesService.HandleServicesCommand(new string[] { "services", "status", serviceName }); } MenuEngine.GeneralMessage("Press any key to continue..."); Console.ReadKey(true); }),
+                ("▶️ Start a service", async () => { var startService = MenuEngine.TextInput("Enter service name to start"); if (!string.IsNullOrEmpty(startService)) { await ServicesService.HandleServicesCommand(new string[] { "services", "start", startService }); } MenuEngine.GeneralMessage("Press any key to continue..."); Console.ReadKey(true); }),
+                ("⏹️ Stop a service", async () => { var stopService = MenuEngine.TextInput("Enter service name to stop"); if (!string.IsNullOrEmpty(stopService)) { await ServicesService.HandleServicesCommand(new string[] { "services", "stop", stopService }); } MenuEngine.GeneralMessage("Press any key to continue..."); Console.ReadKey(true); }),
+                ("🔄 Restart a service", async () => { var restartService = MenuEngine.TextInput("Enter service name to restart"); if (!string.IsNullOrEmpty(restartService)) { await ServicesService.HandleServicesCommand(new string[] { "services", "restart", restartService }); } MenuEngine.GeneralMessage("Press any key to continue..."); Console.ReadKey(true); }),
+                ("ℹ️ What are services?", () => { MenuEngine.GeneralMessage("Services are background programs that run on your system. Use systemctl to manage them."); return Task.CompletedTask; }),
+                ("⬅ Back to main menu", () => { throw new GoBackException(); })
+            };
 
-                var choice = MenuHelper.ShowArrowMenu("SERVICE MANAGEMENT", menuOptions);
-
-                switch (choice)
-                {
-                    case 0:
-                        await ServicesService.HandleServicesCommand(new string[] { "services" });
-                        Console.WriteLine();
-                        Console.WriteLine("Press any key to continue...");
-                        Console.ReadKey(true);
-                        break;
-                    case 1:
-                        var serviceName = MenuHelper.GetUserInput("Enter service name");
-                        if (!string.IsNullOrEmpty(serviceName))
-                        {
-                            await ServicesService.HandleServicesCommand(new string[] { "services", "status", serviceName });
-                        }
-                        Console.WriteLine();
-                        Console.WriteLine("Press any key to continue...");
-                        Console.ReadKey(true);
-                        break;
-                    case 2:
-                        var startService = MenuHelper.GetUserInput("Enter service name to start");
-                        if (!string.IsNullOrEmpty(startService))
-                        {
-                            await ServicesService.HandleServicesCommand(new string[] { "services", "start", startService });
-                        }
-                        Console.WriteLine();
-                        Console.WriteLine("Press any key to continue...");
-                        Console.ReadKey(true);
-                        break;
-                    case 3:
-                        var stopService = MenuHelper.GetUserInput("Enter service name to stop");
-                        if (!string.IsNullOrEmpty(stopService))
-                        {
-                            await ServicesService.HandleServicesCommand(new string[] { "services", "stop", stopService });
-                        }
-                        Console.WriteLine();
-                        Console.WriteLine("Press any key to continue...");
-                        Console.ReadKey(true);
-                        break;
-                    case 4:
-                        var restartService = MenuHelper.GetUserInput("Enter service name to restart");
-                        if (!string.IsNullOrEmpty(restartService))
-                        {
-                            await ServicesService.HandleServicesCommand(new string[] { "services", "restart", restartService });
-                        }
-                        Console.WriteLine();
-                        Console.WriteLine("Press any key to continue...");
-                        Console.ReadKey(true);
-                        break;
-                    case 5:
-                        var helpText = @"=== WHAT ARE SYSTEMD SERVICES? ===
-
-                            Services (systemd services) are background programs that run on your Linux system.
-                            They manage core system functionality and applications.
-
-                            COMMON SERVICES:
-                            • sshd - Secure Shell server for remote access
-                            • nginx - Web server
-                            • docker - Container management
-                            • ufw - Firewall management
-                            • NetworkManager - Network connections
-                            • cron - Scheduled tasks
-
-                            SERVICE STATES:
-                            • active (running) - Service is currently running
-                            • inactive (dead) - Service is stopped
-                            • enabled - Service starts automatically on boot
-                            • disabled - Service must be started manually
-
-                            WHY MANAGE SERVICES?
-                            • Fix problems by restarting problematic services
-                            • Improve security by stopping unused services  
-                            • Save resources by disabling unnecessary services
-                            • Debug system issues by checking service status
-
-                            TIPS:
-                            • Be careful when stopping system-critical services
-                            • Use 'status' first before making changes
-                            • Some services require sudo privileges to control";
-
-                        MenuHelper.ShowMessage("About Services", helpText);
-                        break;
-                    case 6:
-                        return;
-                    case -1:
-                        return;
-                }
-            }
+            var menu = menuOptions.Select(x => (x.Item1, new Action(() => x.Item2().GetAwaiter().GetResult()))).ToList();
+            MenuEngine.DisplayMenu(menu);
         }
 
 

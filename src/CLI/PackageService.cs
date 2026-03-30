@@ -44,58 +44,18 @@ namespace UtilitiesManager
 
         public static async Task PackageInstallationMenu()
         {
-            while (true)
+            var menuOptions = new List<(string, Func<Task>)>
             {
-                var menuOptions = new List<string>
-                {
-                    "📦 Install all packages",
-                    "📋 Install packages individually",
-                    "📊 Show package status",
-                    "🔧 Setup hardware sensors",
-                    "🛡️ Configure firewall",
-                    "⬅ Back to main menu"
-                };
+                ("📦 Install all packages", async () => { await DownloadScript.RunPackageInstallationAsync(); MenuEngine.GeneralMessage("Press any key to continue..."); Console.ReadKey(true); }),
+                ("📋 Install packages individually", async () => { await DownloadScript.InstallIndividualPackagesAsync(); MenuEngine.GeneralMessage("Press any key to continue..."); Console.ReadKey(true); }),
+                ("📊 Show package status", async () => { await DownloadScript.ShowPackageStatusAsync(); MenuEngine.GeneralMessage("Press any key to continue..."); Console.ReadKey(true); }),
+                ("🔧 Setup hardware sensors", async () => { await DownloadScript.SetupSensorsAsync(); MenuEngine.GeneralMessage("Press any key to continue..."); Console.ReadKey(true); }),
+                ("🛡️ Configure firewall", async () => { await DownloadScript.ConfigureFirewallAsync(); MenuEngine.GeneralMessage("Press any key to continue..."); Console.ReadKey(true); }),
+                ("⬅ Back to main menu", () => { throw new GoBackException(); })
+            };
 
-                var choice = MenuHelper.ShowArrowMenu("PACKAGE INSTALLATION", menuOptions);
-
-                switch (choice)
-                {
-                    case 0:
-                        await DownloadScript.RunPackageInstallationAsync();
-                        Console.WriteLine();
-                        Console.WriteLine("Press any key to continue...");
-                        Console.ReadKey(true);
-                        break;
-                    case 1:
-                        await DownloadScript.InstallIndividualPackagesAsync();
-                        Console.WriteLine();
-                        Console.WriteLine("Press any key to continue...");
-                        Console.ReadKey(true);
-                        break;
-                    case 2:
-                        await DownloadScript.ShowPackageStatusAsync();
-                        Console.WriteLine();
-                        Console.WriteLine("Press any key to continue...");
-                        Console.ReadKey(true);
-                        break;
-                    case 3:
-                        await DownloadScript.SetupSensorsAsync();
-                        Console.WriteLine();
-                        Console.WriteLine("Press any key to continue...");
-                        Console.ReadKey(true);
-                        break;
-                    case 4:
-                        await DownloadScript.ConfigureFirewallAsync();
-                        Console.WriteLine();
-                        Console.WriteLine("Press any key to continue...");
-                        Console.ReadKey(true);
-                        break;
-                    case 5:
-                        return;
-                    case -1:
-                        return;
-                }
-            }
+            var menu = menuOptions.Select(x => (x.Item1, new Action(() => x.Item2().GetAwaiter().GetResult()))).ToList();
+            MenuEngine.DisplayMenu(menu);
         }
     }
 }
