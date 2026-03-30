@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.7.0-prealpha6] - 2026-03-30
+- **Remade the CLI interface**: Completely redesigned the CLI interface using Spectre.Console for improved usability and aesthetics
+- **Reduced the overall size and bloat of the CLI menu, currently using a simple engine**
+
 ## [0.6.0-prealpha6] - 2026-03-21
 
 ### Major Changes
