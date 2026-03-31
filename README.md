@@ -101,6 +101,7 @@ dotnet build
 - **Improved Architecture**: Refactored codebase into modular service classes
 - **Enhanced Dependency System**: Simplified and robust dependency checking
 - **Better GUI**: Material design improvements with modern styling
+- **Better CLI**: Spectre Console based menus and functions
 - **Bug Fixes**: WiFi parsing, service detection, and startup reliability improvements
 
 ## Known Bugs
