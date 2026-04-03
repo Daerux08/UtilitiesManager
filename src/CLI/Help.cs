@@ -1,3 +1,4 @@
+using Spectre.Console;
 using System;
 
 namespace UtilitiesManager
@@ -6,21 +7,42 @@ namespace UtilitiesManager
     {
         public static void ShowAllHelp()
         {
-            Console.WriteLine("=== UTILITIES MANAGER - CLI HELP ===");
-            Console.WriteLine();
-            Console.WriteLine("A Linux system utility manager for controlling brightness, volume, battery, WiFi, and power profiles.");
-            Console.WriteLine();
-            Console.WriteLine("USAGE:");
-            Console.WriteLine("  UtilitiesManager [command] [options]");
-            Console.WriteLine("  UtilitiesManager --cli [command] [options]  (Force CLI mode)");
-            Console.WriteLine();
-            Console.WriteLine("ENVIRONMENT DETECTION:");
-            Console.WriteLine("  - Automatically detects headless environments (no DISPLAY/WAYLAND_DISPLAY)");
-            Console.WriteLine("  - Falls back to CLI mode when GUI is unavailable");
-            Console.WriteLine("  - Use --cli flag to force CLI mode even with GUI available");
-            Console.WriteLine();
-            Console.WriteLine("=== COMMANDS ===");
-            Console.WriteLine();
+            AnsiConsole.Clear();
+            
+            // Main title
+            AnsiConsole.Write(new FigletText("UTILITIES MANAGER")
+                .Centered()
+                .Color(Color.Cyan1));
+            
+            AnsiConsole.MarkupLine("[bold yellow]CLI HELP[/]");
+            AnsiConsole.WriteLine();
+            
+            // Description panel
+            var descriptionPanel = new Panel("[italic]A Linux system utility manager for controlling brightness, volume, battery, WiFi, and power profiles.[/]")
+            {
+                Border = BoxBorder.Rounded,
+                BorderStyle = new Style(Color.Blue),
+                Header = new PanelHeader("[bold]Description[/]")
+            };
+            AnsiConsole.Write(descriptionPanel);
+            AnsiConsole.WriteLine();
+
+            // Usage section
+            AnsiConsole.MarkupLine("[bold green]USAGE:[/]");
+            var usageTable = new Table()
+                .BorderColor(Color.Grey)
+                .Border(TableBorder.Rounded)
+                .AddColumn("[bold]Command[/]", c => c.NoWrap())
+                .AddColumn("[bold]Description[/]");
+            
+            usageTable.AddRow("[cyan]UtilitiesManager [command] [options][/]", "Run utilities manager");
+            usageTable.AddRow("[cyan]UtilitiesManager --cli [command] [options][/]", "[yellow]Force CLI mode[/]");
+            AnsiConsole.Write(usageTable);
+            AnsiConsole.WriteLine();
+
+            // Commands section
+            AnsiConsole.MarkupLine("[bold underline cyan]COMMANDS[/]");
+            AnsiConsole.WriteLine();
 
             ShowBrightnessHelp();
             ShowVolumeHelp();
@@ -33,260 +55,571 @@ namespace UtilitiesManager
 
         private static void ShowBrightnessHelp()
         {
-            Console.WriteLine("BRIGHTNESS:");
-            Console.WriteLine("  brightness <percentage>     Set screen brightness (0-100)");
-            Console.WriteLine();
-            Console.WriteLine("  Examples:");
-            Console.WriteLine("    brightness 75            Set brightness to 75%");
-            Console.WriteLine("    brightness 0             Turn off screen");
-            Console.WriteLine("    brightness 100           Maximum brightness");
-            Console.WriteLine();
-            Console.WriteLine("  System Requirements:");
-            Console.WriteLine("    - brightnessctl package must be installed");
-            Console.WriteLine("    - User must have permission to control backlight");
-            Console.WriteLine();
-            Console.WriteLine("  Linux Commands Used:");
-            Console.WriteLine("    - brightnessctl get       Get current brightness value");
-            Console.WriteLine("    - brightnessctl max       Get maximum brightness value");
-            Console.WriteLine("    - brightnessctl set X%    Set brightness to X percent");
-            Console.WriteLine();
-            Console.WriteLine("  Dependencies:");
-            Console.WriteLine("    - brightnessctl (usually in brightnessctl package)");
-            Console.WriteLine("    - Linux kernel backlight support");
-            Console.WriteLine();
-            Console.WriteLine("  Notes:");
-            Console.WriteLine("    - Only works on systems with controllable backlight");
-            Console.WriteLine("    - May require udev rules for user permissions");
-            Console.WriteLine("    - Some laptops have multiple backlight devices");
-            Console.WriteLine();
+            var brightnessPanel = new Panel(
+                "[bold cyan]brightness <percentage>[/]     Set screen brightness (0-100)")
+            {
+                Border = BoxBorder.Double,
+                BorderStyle = new Style(Color.Yellow),
+                Header = new PanelHeader("[bold yellow]BRIGHTNESS[/]")
+            };
+            AnsiConsole.Write(brightnessPanel);
+            AnsiConsole.WriteLine();
+
+            // Examples section
+            AnsiConsole.MarkupLine("[bold green]Examples:[/]");
+            var examplesTable = new Table()
+                .Border(TableBorder.Simple)
+                .AddColumn("[bold]Command[/]")
+                .AddColumn("[bold]Result[/]");
+            
+            examplesTable.AddRow("[cyan]brightness 75[/]", "Set brightness to 75%");
+            examplesTable.AddRow("[cyan]brightness 0[/]", "Turn off screen");
+            examplesTable.AddRow("[cyan]brightness 100[/]", "Maximum brightness");
+            AnsiConsole.Write(examplesTable);
+            AnsiConsole.WriteLine();
+
+            // Requirements
+            var reqPanel = new Panel(
+                "[red]•[/] brightnessctl package must be installed\n" +
+                "[red]•[/] User must have permission to control backlight")
+            {
+                Border = BoxBorder.Rounded,
+                BorderStyle = new Style(Color.Red),
+                Header = new PanelHeader("[bold]System Requirements[/]")
+            };
+            AnsiConsole.Write(reqPanel);
+            AnsiConsole.WriteLine();
+
+            // Linux commands
+            AnsiConsole.MarkupLine("[bold blue]Linux Commands Used:[/]");
+            var commandsTable = new Table()
+                .Border(TableBorder.Simple)
+                .AddColumn("[bold]Command[/]")
+                .AddColumn("[bold]Purpose[/]");
+            
+            commandsTable.AddRow("[cyan]brightnessctl get[/]", "Get current brightness value");
+            commandsTable.AddRow("[cyan]brightnessctl max[/]", "Get maximum brightness value");
+            commandsTable.AddRow("[cyan]brightnessctl set X%[/]", "Set brightness to X percent");
+            AnsiConsole.Write(commandsTable);
+            AnsiConsole.WriteLine();
+
+            // Dependencies
+            var depPanel = new Panel(
+                "[yellow]•[/] brightnessctl (usually in brightnessctl package)\n" +
+                "[yellow]•[/] Linux kernel backlight support")
+            {
+                Border = BoxBorder.Rounded,
+                BorderStyle = new Style(Color.Orange1),
+                Header = new PanelHeader("[bold]Dependencies[/]")
+            };
+            AnsiConsole.Write(depPanel);
+            AnsiConsole.WriteLine();
+
+            // Notes
+            var notesPanel = new Panel(
+                "[italic]• Only works on systems with controllable backlight\n" +
+                "• May require udev rules for user permissions\n" +
+                "• Some laptops have multiple backlight devices[/]")
+            {
+                Border = BoxBorder.Rounded,
+                BorderStyle = new Style(Color.Grey),
+                Header = new PanelHeader("[bold]Notes[/]")
+            };
+            AnsiConsole.Write(notesPanel);
+            AnsiConsole.WriteLine();
         }
 
         private static void ShowVolumeHelp()
         {
-            Console.WriteLine("VOLUME:");
-            Console.WriteLine("  volume <percentage>         Set audio volume (0-100)");
-            Console.WriteLine();
-            Console.WriteLine("  Examples:");
-            Console.WriteLine("    volume 50                 Set volume to 50%");
-            Console.WriteLine("    volume 0                  Mute audio");
-            Console.WriteLine("    volume 100                Maximum volume");
-            Console.WriteLine();
-            Console.WriteLine("  System Requirements:");
-            Console.WriteLine("    - PulseAudio must be running");
-            Console.WriteLine("    - pactl package must be installed");
-            Console.WriteLine("    - User must be in audio group");
-            Console.WriteLine();
-            Console.WriteLine("  Linux Commands Used:");
-            Console.WriteLine("    - pactl get-sink-volume @DEFAULT_SINK@    Get current volume");
-            Console.WriteLine("    - pactl set-sink-volume @DEFAULT_SINK@ X%  Set volume to X percent");
-            Console.WriteLine();
-            Console.WriteLine("  Dependencies:");
-            Console.WriteLine("    - pulseaudio (PulseAudio sound server)");
-            Console.WriteLine("    - pactl (PulseAudio command-line tool)");
-            Console.WriteLine("    - libpulse (PulseAudio libraries)");
-            Console.WriteLine();
-            Console.WriteLine("  Notes:");
-            Console.WriteLine("    - Controls the default audio sink (output device)");
-            Console.WriteLine("    - Works with most modern Linux desktop environments");
-            Console.WriteLine("    - Volume is applied system-wide, not per-application");
-            Console.WriteLine();
+            var volumePanel = new Panel(
+                "[bold cyan]volume <percentage>[/]         Set audio volume (0-100)")
+            {
+                Border = BoxBorder.Double,
+                BorderStyle = new Style(Color.Yellow),
+                Header = new PanelHeader("[bold yellow]VOLUME[/]")
+            };
+            AnsiConsole.Write(volumePanel);
+            AnsiConsole.WriteLine();
+
+            // Examples section
+            AnsiConsole.MarkupLine("[bold green]Examples:[/]");
+            var examplesTable = new Table()
+                .Border(TableBorder.Simple)
+                .AddColumn("[bold]Command[/]")
+                .AddColumn("[bold]Result[/]");
+            
+            examplesTable.AddRow("[cyan]volume 50[/]", "Set volume to 50%");
+            examplesTable.AddRow("[cyan]volume 0[/]", "Mute audio");
+            examplesTable.AddRow("[cyan]volume 100[/]", "Maximum volume");
+            AnsiConsole.Write(examplesTable);
+            AnsiConsole.WriteLine();
+
+            // Requirements
+            var reqPanel = new Panel(
+                "[red]•[/] PulseAudio must be running\n" +
+                "[red]•[/] pactl package must be installed\n" +
+                "[red]•[/] User must be in audio group")
+            {
+                Border = BoxBorder.Rounded,
+                BorderStyle = new Style(Color.Red),
+                Header = new PanelHeader("[bold]System Requirements[/]")
+            };
+            AnsiConsole.Write(reqPanel);
+            AnsiConsole.WriteLine();
+
+            // Linux commands
+            AnsiConsole.MarkupLine("[bold blue]Linux Commands Used:[/]");
+            var commandsTable = new Table()
+                .Border(TableBorder.Simple)
+                .AddColumn("[bold]Command[/]")
+                .AddColumn("[bold]Purpose[/]");
+            
+            commandsTable.AddRow("[cyan]pactl get-sink-volume @DEFAULT_SINK@[/]", "Get current volume");
+            commandsTable.AddRow("[cyan]pactl set-sink-volume @DEFAULT_SINK@ X%[/]", "Set volume to X percent");
+            AnsiConsole.Write(commandsTable);
+            AnsiConsole.WriteLine();
+
+            // Dependencies
+            var depPanel = new Panel(
+                "[yellow]•[/] pulseaudio (PulseAudio sound server)\n" +
+                "[yellow]•[/] pactl (PulseAudio command-line tool)\n" +
+                "[yellow]•[/] libpulse (PulseAudio libraries)")
+            {
+                Border = BoxBorder.Rounded,
+                BorderStyle = new Style(Color.Orange1),
+                Header = new PanelHeader("[bold]Dependencies[/]")
+            };
+            AnsiConsole.Write(depPanel);
+            AnsiConsole.WriteLine();
+
+            // Notes
+            var notesPanel = new Panel(
+                "[italic]• Controls the default audio sink (output device)\n" +
+                "• Works with most modern Linux desktop environments\n" +
+                "• Volume is applied system-wide, not per-application[/]")
+            {
+                Border = BoxBorder.Rounded,
+                BorderStyle = new Style(Color.Grey),
+                Header = new PanelHeader("[bold]Notes[/]")
+            };
+            AnsiConsole.Write(notesPanel);
+            AnsiConsole.WriteLine();
         }
 
         private static void ShowBatteryHelp()
         {
-            Console.WriteLine("BATTERY:");
-            Console.WriteLine("  battery                      Show detailed battery status");
-            Console.WriteLine();
-            Console.WriteLine("  Examples:");
-            Console.WriteLine("    battery                    Show current battery information");
-            Console.WriteLine();
-            Console.WriteLine("  Information Displayed:");
-            Console.WriteLine("    - State: charging/discharging/fully-charged/unknown");
-            Console.WriteLine("    - Percentage: Current charge level");
-            Console.WriteLine("    - Time to Empty: Estimated remaining time");
-            Console.WriteLine("    - Time to Full: Time until fully charged");
-            Console.WriteLine("    - Energy Rate: Current power draw in watts");
-            Console.WriteLine("    - Present: Whether battery is detected");
-            Console.WriteLine();
-            Console.WriteLine("  System Requirements:");
-            Console.WriteLine("    - upower package must be installed");
-            Console.WriteLine("    - UPower service must be running");
-            Console.WriteLine();
-            Console.WriteLine("  Linux Commands Used:");
-            Console.WriteLine("    - upower -e | grep battery    Find battery device path");
-            Console.WriteLine("    - upower -i {device}          Get battery information");
-            Console.WriteLine();
-            Console.WriteLine("  Dependencies:");
-            Console.WriteLine("    - upower (power management service)");
-            Console.WriteLine("    - libupower (UPower libraries)");
-            Console.WriteLine("    - Linux kernel power management");
-            Console.WriteLine();
-            Console.WriteLine("  Notes:");
-            Console.WriteLine("    - Works with most laptop batteries");
-            Console.WriteLine("    - UPS devices may also be detected");
-            Console.WriteLine("    - Some systems report battery information differently");
-            Console.WriteLine();
+            var batteryPanel = new Panel(
+                "[bold cyan]battery[/]                      Show detailed battery status")
+            {
+                Border = BoxBorder.Double,
+                BorderStyle = new Style(Color.Yellow),
+                Header = new PanelHeader("[bold yellow]BATTERY[/]")
+            };
+            AnsiConsole.Write(batteryPanel);
+            AnsiConsole.WriteLine();
+
+            // Examples section
+            AnsiConsole.MarkupLine("[bold green]Examples:[/]");
+            var examplesTable = new Table()
+                .Border(TableBorder.Simple)
+                .AddColumn("[bold]Command[/]")
+                .AddColumn("[bold]Result[/]");
+            
+            examplesTable.AddRow("[cyan]battery[/]", "Show current battery information");
+            AnsiConsole.Write(examplesTable);
+            AnsiConsole.WriteLine();
+
+            // Information displayed
+            var infoPanel = new Panel(
+                "[blue]•[/] State: charging/discharging/fully-charged/unknown\n" +
+                "[blue]•[/] Percentage: Current charge level\n" +
+                "[blue]•[/] Time to Empty: Estimated remaining time\n" +
+                "[blue]•[/] Time to Full: Time until fully charged\n" +
+                "[blue]•[/] Energy Rate: Current power draw in watts\n" +
+                "[blue]•[/] Present: Whether battery is detected")
+            {
+                Border = BoxBorder.Rounded,
+                BorderStyle = new Style(Color.Blue),
+                Header = new PanelHeader("[bold]Information Displayed[/]")
+            };
+            AnsiConsole.Write(infoPanel);
+            AnsiConsole.WriteLine();
+
+            // Requirements
+            var reqPanel = new Panel(
+                "[red]•[/] upower package must be installed\n" +
+                "[red]•[/] UPower service must be running")
+            {
+                Border = BoxBorder.Rounded,
+                BorderStyle = new Style(Color.Red),
+                Header = new PanelHeader("[bold]System Requirements[/]")
+            };
+            AnsiConsole.Write(reqPanel);
+            AnsiConsole.WriteLine();
+
+            // Linux commands
+            AnsiConsole.MarkupLine("[bold blue]Linux Commands Used:[/]");
+            var commandsTable = new Table()
+                .Border(TableBorder.Simple)
+                .AddColumn("[bold]Command[/]")
+                .AddColumn("[bold]Purpose[/]");
+            
+            commandsTable.AddRow("[cyan]upower -e | grep battery[/]", "Find battery device path");
+            commandsTable.AddRow("[cyan]upower -i {device}[/]", "Get battery information");
+            AnsiConsole.Write(commandsTable);
+            AnsiConsole.WriteLine();
+
+            // Dependencies
+            var depPanel = new Panel(
+                "[yellow]•[/] upower (power management service)\n" +
+                "[yellow]•[/] libupower (UPower libraries)\n" +
+                "[yellow]•[/] Linux kernel power management")
+            {
+                Border = BoxBorder.Rounded,
+                BorderStyle = new Style(Color.Orange1),
+                Header = new PanelHeader("[bold]Dependencies[/]")
+            };
+            AnsiConsole.Write(depPanel);
+            AnsiConsole.WriteLine();
+
+            // Notes
+            var notesPanel = new Panel(
+                "[italic]• Works with most laptop batteries\n" +
+                "• UPS devices may also be detected\n" +
+                "• Some systems report battery information differently[/]")
+            {
+                Border = BoxBorder.Rounded,
+                BorderStyle = new Style(Color.Grey),
+                Header = new PanelHeader("[bold]Notes[/]")
+            };
+            AnsiConsole.Write(notesPanel);
+            AnsiConsole.WriteLine();
         }
 
         private static void ShowWiFiHelp()
         {
-            Console.WriteLine("WIFI:");
-            Console.WriteLine("  wifi list                    List available WiFi networks");
-            Console.WriteLine();
-            Console.WriteLine("  Examples:");
-            Console.WriteLine("    wifi list                  Show all available networks");
-            Console.WriteLine();
-            Console.WriteLine("  Information Displayed:");
-            Console.WriteLine("    - SSID: Network name");
-            Console.WriteLine("    - Mode: Infrastructure/Ad-Hoc/AP");
-            Console.WriteLine("    - Chan: WiFi channel number");
-            Console.WriteLine("    - Rate: Connection speed (Mbit/s or Gbit/s)");
-            Console.WriteLine("    - Signal: Signal strength (dBm or percentage)");
-            Console.WriteLine("    - Security: Encryption type (WPA2, WEP, Open, etc.)");
-            Console.WriteLine("    - * marks currently connected network");
-            Console.WriteLine();
-            Console.WriteLine("  System Requirements:");
-            Console.WriteLine("    - NetworkManager must be running");
-            Console.WriteLine("    - nmcli package must be installed");
-            Console.WriteLine("    - WiFi adapter must be enabled");
-            Console.WriteLine();
-            Console.WriteLine("  Linux Commands Used:");
-            Console.WriteLine("    - nmcli device wifi rescan     Trigger fresh network scan");
-            Console.WriteLine("    - nmcli device wifi list       List available networks");
-            Console.WriteLine("    - nmcli device wifi connect   Connect to network");
-            Console.WriteLine();
-            Console.WriteLine("  Dependencies:");
-            Console.WriteLine("    - NetworkManager (network connection manager)");
-            Console.WriteLine("    - nmcli (NetworkManager CLI tool)");
-            Console.WriteLine("    - wpa_supplicant (WiFi authentication)");
-            Console.WriteLine("    - Linux kernel WiFi drivers");
-            Console.WriteLine();
-            Console.WriteLine("  Notes:");
-            Console.WriteLine("    - Only lists networks, doesn't connect (GUI feature)");
-            Console.WriteLine("    - Uses multiple parsing strategies for compatibility");
-            Console.WriteLine("    - Works across different Linux distributions");
-            Console.WriteLine("    - May need sudo for some network operations");
-            Console.WriteLine();
+            var wifiPanel = new Panel(
+                "[bold cyan]wifi list[/]                    List available WiFi networks")
+            {
+                Border = BoxBorder.Double,
+                BorderStyle = new Style(Color.Yellow),
+                Header = new PanelHeader("[bold yellow]WIFI[/]")
+            };
+            AnsiConsole.Write(wifiPanel);
+            AnsiConsole.WriteLine();
+
+            // Examples section
+            AnsiConsole.MarkupLine("[bold green]Examples:[/]");
+            var examplesTable = new Table()
+                .Border(TableBorder.Simple)
+                .AddColumn("[bold]Command[/]")
+                .AddColumn("[bold]Result[/]");
+            
+            examplesTable.AddRow("[cyan]wifi list[/]", "Show all available networks");
+            AnsiConsole.Write(examplesTable);
+            AnsiConsole.WriteLine();
+
+            // Information displayed
+            var infoPanel = new Panel(
+                "[blue]•[/] SSID: Network name\n" +
+                "[blue]•[/] Mode: Infrastructure/Ad-Hoc/AP\n" +
+                "[blue]•[/] Chan: WiFi channel number\n" +
+                "[blue]•[/] Rate: Connection speed (Mbit/s or Gbit/s)\n" +
+                "[blue]•[/] Signal: Signal strength (dBm or percentage)\n" +
+                "[blue]•[/] Security: Encryption type (WPA2, WEP, Open, etc.)\n" +
+                "[blue]•[/] * marks currently connected network")
+            {
+                Border = BoxBorder.Rounded,
+                BorderStyle = new Style(Color.Blue),
+                Header = new PanelHeader("[bold]Information Displayed[/]")
+            };
+            AnsiConsole.Write(infoPanel);
+            AnsiConsole.WriteLine();
+
+            // Requirements
+            var reqPanel = new Panel(
+                "[red]•[/] NetworkManager must be running\n" +
+                "[red]•[/] nmcli package must be installed\n" +
+                "[red]•[/] WiFi adapter must be enabled")
+            {
+                Border = BoxBorder.Rounded,
+                BorderStyle = new Style(Color.Red),
+                Header = new PanelHeader("[bold]System Requirements[/]")
+            };
+            AnsiConsole.Write(reqPanel);
+            AnsiConsole.WriteLine();
+
+            // Linux commands
+            AnsiConsole.MarkupLine("[bold blue]Linux Commands Used:[/]");
+            var commandsTable = new Table()
+                .Border(TableBorder.Simple)
+                .AddColumn("[bold]Command[/]")
+                .AddColumn("[bold]Purpose[/]");
+            
+            commandsTable.AddRow("[cyan]nmcli device wifi rescan[/]", "Trigger fresh network scan");
+            commandsTable.AddRow("[cyan]nmcli device wifi list[/]", "List available networks");
+            commandsTable.AddRow("[cyan]nmcli device wifi connect[/]", "Connect to network");
+            AnsiConsole.Write(commandsTable);
+            AnsiConsole.WriteLine();
+
+            // Dependencies
+            var depPanel = new Panel(
+                "[yellow]•[/] NetworkManager (network connection manager)\n" +
+                "[yellow]•[/] nmcli (NetworkManager CLI tool)\n" +
+                "[yellow]•[/] wpa_supplicant (WiFi authentication)\n" +
+                "[yellow]•[/] Linux kernel WiFi drivers")
+            {
+                Border = BoxBorder.Rounded,
+                BorderStyle = new Style(Color.Orange1),
+                Header = new PanelHeader("[bold]Dependencies[/]")
+            };
+            AnsiConsole.Write(depPanel);
+            AnsiConsole.WriteLine();
+
+            // Notes
+            var notesPanel = new Panel(
+                "[italic]• Only lists networks, doesn't connect (GUI feature)\n" +
+                "• Uses multiple parsing strategies for compatibility\n" +
+                "• Works across different Linux distributions\n" +
+                "• May need sudo for some network operations[/]")
+            {
+                Border = BoxBorder.Rounded,
+                BorderStyle = new Style(Color.Grey),
+                Header = new PanelHeader("[bold]Notes[/]")
+            };
+            AnsiConsole.Write(notesPanel);
+            AnsiConsole.WriteLine();
         }
 
         private static void ShowPowerHelp()
         {
-            Console.WriteLine("POWER:");
-            Console.WriteLine("  power get                    Get current power profile");
-            Console.WriteLine("  power set <profile>          Set power profile");
-            Console.WriteLine();
-            Console.WriteLine("  Examples:");
-            Console.WriteLine("    power get                  Show current power profile");
-            Console.WriteLine("    power set performance      Set performance mode");
-            Console.WriteLine("    power set balanced         Set balanced mode");
-            Console.WriteLine("    power set power-saver      Set power-saver mode");
-            Console.WriteLine();
-            Console.WriteLine("  Available Profiles:");
-            Console.WriteLine("    - performance: Maximum performance, higher power usage");
-            Console.WriteLine("    - balanced: Balance between performance and power");
-            Console.WriteLine("    - power-saver: Minimum power usage, reduced performance");
-            Console.WriteLine();
-            Console.WriteLine("  System Requirements:");
-            Console.WriteLine("    - powerprofilesctl package must be installed");
-            Console.WriteLine("    - power-profiles-daemon service must be running");
-            Console.WriteLine("    - System must support power profiling");
-            Console.WriteLine();
-            Console.WriteLine("  Linux Commands Used:");
-            Console.WriteLine("    - powerprofilesctl get      Get current power profile");
-            Console.WriteLine("    - powerprofilesctl set X   Set power profile to X");
-            Console.WriteLine();
-            Console.WriteLine("  Dependencies:");
-            Console.WriteLine("    - power-profiles-daemon (power management daemon)");
-            Console.WriteLine("    - powerprofilesctl (CLI tool)");
-            Console.WriteLine("    - Linux kernel power management features");
-            Console.WriteLine();
-            Console.WriteLine("  Notes:");
-            Console.WriteLine("    - Only available on systems with power profile support");
-            Console.WriteLine("    - Modern laptops with Intel/AMD processors typically support this");
-            Console.WriteLine("    - Profiles affect CPU frequency, GPU performance, etc.");
-            Console.WriteLine();
+            var powerPanel = new Panel(
+                "[bold cyan]power get[/]                    Get current power profile\n" +
+                "[bold cyan]power set <profile>[/]          Set power profile")
+            {
+                Border = BoxBorder.Double,
+                BorderStyle = new Style(Color.Yellow),
+                Header = new PanelHeader("[bold yellow]POWER[/]")
+            };
+            AnsiConsole.Write(powerPanel);
+            AnsiConsole.WriteLine();
+
+            // Examples section
+            AnsiConsole.MarkupLine("[bold green]Examples:[/]");
+            var examplesTable = new Table()
+                .Border(TableBorder.Simple)
+                .AddColumn("[bold]Command[/]")
+                .AddColumn("[bold]Result[/]");
+            
+            examplesTable.AddRow("[cyan]power get[/]", "Show current power profile");
+            examplesTable.AddRow("[cyan]power set performance[/]", "Set performance mode");
+            examplesTable.AddRow("[cyan]power set balanced[/]", "Set balanced mode");
+            examplesTable.AddRow("[cyan]power set power-saver[/]", "Set power-saver mode");
+            AnsiConsole.Write(examplesTable);
+            AnsiConsole.WriteLine();
+
+            // Available profiles
+            var profilesPanel = new Panel(
+                "[green]•[/] [bold]performance[/]: Maximum performance, higher power usage\n" +
+                "[green]•[/] [bold]balanced[/]: Balance between performance and power\n" +
+                "[green]•[/] [bold]power-saver[/]: Minimum power usage, reduced performance")
+            {
+                Border = BoxBorder.Rounded,
+                BorderStyle = new Style(Color.Green),
+                Header = new PanelHeader("[bold]Available Profiles[/]")
+            };
+            AnsiConsole.Write(profilesPanel);
+            AnsiConsole.WriteLine();
+
+            // Requirements
+            var reqPanel = new Panel(
+                "[red]•[/] powerprofilesctl package must be installed\n" +
+                "[red]•[/] power-profiles-daemon service must be running\n" +
+                "[red]•[/] System must support power profiling")
+            {
+                Border = BoxBorder.Rounded,
+                BorderStyle = new Style(Color.Red),
+                Header = new PanelHeader("[bold]System Requirements[/]")
+            };
+            AnsiConsole.Write(reqPanel);
+            AnsiConsole.WriteLine();
+
+            // Linux commands
+            AnsiConsole.MarkupLine("[bold blue]Linux Commands Used:[/]");
+            var commandsTable = new Table()
+                .Border(TableBorder.Simple)
+                .AddColumn("[bold]Command[/]")
+                .AddColumn("[bold]Purpose[/]");
+            
+            commandsTable.AddRow("[cyan]powerprofilesctl get[/]", "Get current power profile");
+            commandsTable.AddRow("[cyan]powerprofilesctl set X[/]", "Set power profile to X");
+            AnsiConsole.Write(commandsTable);
+            AnsiConsole.WriteLine();
+
+            // Dependencies
+            var depPanel = new Panel(
+                "[yellow]•[/] power-profiles-daemon (power management daemon)\n" +
+                "[yellow]•[/] powerprofilesctl (CLI tool)\n" +
+                "[yellow]•[/] Linux kernel power management features")
+            {
+                Border = BoxBorder.Rounded,
+                BorderStyle = new Style(Color.Orange1),
+                Header = new PanelHeader("[bold]Dependencies[/]")
+            };
+            AnsiConsole.Write(depPanel);
+            AnsiConsole.WriteLine();
+
+            // Notes
+            var notesPanel = new Panel(
+                "[italic]• Only available on systems with power profile support\n" +
+                "• Modern laptops with Intel/AMD processors typically support this\n" +
+                "• Profiles affect CPU frequency, GPU performance, etc.[/]")
+            {
+                Border = BoxBorder.Rounded,
+                BorderStyle = new Style(Color.Grey),
+                Header = new PanelHeader("[bold]Notes[/]")
+            };
+            AnsiConsole.Write(notesPanel);
+            AnsiConsole.WriteLine();
         }
 
         private static void ShowStatusHelp()
         {
-            Console.WriteLine("STATUS:");
-            Console.WriteLine("  status                       Show all system status");
-            Console.WriteLine();
-            Console.WriteLine("  Examples:");
-            Console.WriteLine("    status                     Show complete system overview");
-            Console.WriteLine();
-            Console.WriteLine("  Information Displayed:");
-            Console.WriteLine("    - Battery: Current charge and state");
-            Console.WriteLine("    - Brightness: Current brightness level");
-            Console.WriteLine("    - Volume: Current audio volume");
-            Console.WriteLine("    - Power Profile: Current power management mode");
-            Console.WriteLine("    - Dependencies: Availability of required tools");
-            Console.WriteLine();
-            Console.WriteLine("  System Requirements:");
-            Console.WriteLine("    - Any combination of supported dependencies");
-            Console.WriteLine("    - Gracefully handles missing tools");
-            Console.WriteLine();
-            Console.WriteLine("  Dependencies Checked:");
-            Console.WriteLine("    - brightnessctl: For brightness control");
-            Console.WriteLine("    - pactl: For audio volume control");
-            Console.WriteLine("    - upower: For battery monitoring");
-            Console.WriteLine("    - nmcli: For WiFi management");
-            Console.WriteLine("    - powerprofilesctl: For power profile management");
-            Console.WriteLine();
-            Console.WriteLine("  Notes:");
-            Console.WriteLine("    - Shows \"Not available\" for missing dependencies");
-            Console.WriteLine("    - Useful for troubleshooting and system validation");
-            Console.WriteLine("    - Works even when some features are unavailable");
-            Console.WriteLine();
+            var statusPanel = new Panel(
+                "[bold cyan]status[/]                       Show all system status")
+            {
+                Border = BoxBorder.Double,
+                BorderStyle = new Style(Color.Yellow),
+                Header = new PanelHeader("[bold yellow]STATUS[/]")
+            };
+            AnsiConsole.Write(statusPanel);
+            AnsiConsole.WriteLine();
+
+            // Examples section
+            AnsiConsole.MarkupLine("[bold green]Examples:[/]");
+            var examplesTable = new Table()
+                .Border(TableBorder.Simple)
+                .AddColumn("[bold]Command[/]")
+                .AddColumn("[bold]Result[/]");
+            
+            examplesTable.AddRow("[cyan]status[/]", "Show complete system overview");
+            AnsiConsole.Write(examplesTable);
+            AnsiConsole.WriteLine();
+
+            // Information displayed
+            var infoPanel = new Panel(
+                "[blue]•[/] Battery: Current charge and state\n" +
+                "[blue]•[/] Brightness: Current brightness level\n" +
+                "[blue]•[/] Volume: Current audio volume\n" +
+                "[blue]•[/] Power Profile: Current power management mode\n" +
+                "[blue]•[/] Dependencies: Availability of required tools")
+            {
+                Border = BoxBorder.Rounded,
+                BorderStyle = new Style(Color.Blue),
+                Header = new PanelHeader("[bold]Information Displayed[/]")
+            };
+            AnsiConsole.Write(infoPanel);
+            AnsiConsole.WriteLine();
+
+            // Requirements
+            var reqPanel = new Panel(
+                "[red]•[/] Any combination of supported dependencies\n" +
+                "[red]•[/] Gracefully handles missing tools")
+            {
+                Border = BoxBorder.Rounded,
+                BorderStyle = new Style(Color.Red),
+                Header = new PanelHeader("[bold]System Requirements[/]")
+            };
+            AnsiConsole.Write(reqPanel);
+            AnsiConsole.WriteLine();
+
+            // Dependencies checked
+            var depPanel = new Panel(
+                "[yellow]•[/] brightnessctl: For brightness control\n" +
+                "[yellow]•[/] pactl: For audio volume control\n" +
+                "[yellow]•[/] upower: For battery monitoring\n" +
+                "[yellow]•[/] nmcli: For WiFi management\n" +
+                "[yellow]•[/] powerprofilesctl: For power profile management")
+            {
+                Border = BoxBorder.Rounded,
+                BorderStyle = new Style(Color.Orange1),
+                Header = new PanelHeader("[bold]Dependencies Checked[/]")
+            };
+            AnsiConsole.Write(depPanel);
+            AnsiConsole.WriteLine();
+
+            // Notes
+            var notesPanel = new Panel(
+                "[italic]• Shows \"Not available\" for missing dependencies\n" +
+                "• Useful for troubleshooting and system validation\n" +
+                "• Works even when some features are unavailable[/]")
+            {
+                Border = BoxBorder.Rounded,
+                BorderStyle = new Style(Color.Grey),
+                Header = new PanelHeader("[bold]Notes[/]")
+            };
+            AnsiConsole.Write(notesPanel);
+            AnsiConsole.WriteLine();
         }
 
         private static void ShowGeneralHelp()
         {
-            Console.WriteLine("=== GENERAL INFORMATION ===");
-            Console.WriteLine();
-            Console.WriteLine("ABOUT:");
-            Console.WriteLine("  Utilities Manager is a Linux system utility manager that provides");
-            Console.WriteLine("  both GUI and CLI interfaces for controlling common system settings.");
-            Console.WriteLine();
-            Console.WriteLine("  Originally designed as an Avalonia GUI application, it now supports");
-            Console.WriteLine("  headless CLI operation for servers and automation.");
-            Console.WriteLine();
-            Console.WriteLine("COMPATIBILITY:");
-            Console.WriteLine("  - Tested on: Linux Mint 22.2, Debian 13, Ubuntu 24.04");
-            Console.WriteLine("  - Requires: NetworkManager and standard Linux tools");
-            Console.WriteLine("  - Architecture: Supports x86_64, ARM64 (with appropriate .NET runtime)");
-            Console.WriteLine();
-            Console.WriteLine("BUILDING:");
-            Console.WriteLine("  - Development: dotnet build");
-            Console.WriteLine("  - Release: dotnet publish -c Release -r linux-x64 --self-contained");
-            Console.WriteLine("  - Debian package: ./build-deb.sh");
-            Console.WriteLine("  - Includes: .NET 8.0 runtime (no separate install needed)");
-            Console.WriteLine();
-            Console.WriteLine("TECHNICAL DETAILS:");
-            Console.WriteLine("  - Framework: .NET 8.0 with Avalonia UI");
-            Console.WriteLine("  - CLI Library: System.CommandLine");
-            Console.WriteLine("  - Architecture: MVVM pattern with shared backend logic");
-            Console.WriteLine("  - Error Handling: Graceful degradation for missing dependencies");
-            Console.WriteLine();
-            Console.WriteLine("SECURITY:");
-            Console.WriteLine("  - No external dependencies beyond system packages");
-            Console.WriteLine("  - Commands executed with current user permissions");
-            Console.WriteLine("  - No network connections or data collection");
-            Console.WriteLine("  - Open source with full code transparency");
-            Console.WriteLine();
-            Console.WriteLine("TROUBLESHOOTING:");
-            Console.WriteLine("  - Use 'status' command to check dependency availability");
-            Console.WriteLine("  - Some features may require udev rules or group membership");
-            Console.WriteLine("  - Check system logs for permission-related errors");
-            Console.WriteLine("  - Ensure NetworkManager is running for WiFi features");
-            Console.WriteLine();
-            Console.WriteLine("FUTURE FEATURES:");
-            Console.WriteLine("  - Bluetooth management");
-            Console.WriteLine("  - User account management");
-            Console.WriteLine("  - Package manager integration");
-            Console.WriteLine("  - System monitoring (CPU, memory, disk)");
-            Console.WriteLine("  - Network statistics and monitoring");
-            Console.WriteLine();
+            // General Information header
+            var generalHeader = new Rule("[bold yellow]GENERAL INFORMATION[/]");
+            AnsiConsole.Write(generalHeader);
+            AnsiConsole.WriteLine();
+
+            // About section
+            var aboutPanel = new Panel(
+                "[italic]Utilities Manager is a Linux system utility manager for controlling brightness, volume, battery, WiFi, and power profiles via command line.[/]")
+            {
+                Border = BoxBorder.Double,
+                BorderStyle = new Style(Color.Blue),
+                Header = new PanelHeader("[bold]ABOUT[/]")
+            };
+            AnsiConsole.Write(aboutPanel);
+            AnsiConsole.WriteLine();
+
+            // Compatibility
+            var compatPanel = new Panel(
+                "[green]•[/] Tested on: Linux Mint 22.2, Debian 13, Ubuntu 24.04\n" +
+                "[green]•[/] Requires: NetworkManager and standard Linux tools\n" +
+                "[green]•[/] Architecture: Supports x86_64, ARM64")
+            {
+                Border = BoxBorder.Rounded,
+                BorderStyle = new Style(Color.Green),
+                Header = new PanelHeader("[bold]COMPATIBILITY[/]")
+            };
+            AnsiConsole.Write(compatPanel);
+            AnsiConsole.WriteLine();
+
+            // Security
+            var securityPanel = new Panel(
+                "[green]•[/] No external dependencies beyond system packages\n" +
+                "[green]•[/] Commands executed with current user permissions\n" +
+                "[green]•[/] No network connections or data collection\n" +
+                "[green]•[/] Open source with full code transparency")
+            {
+                Border = BoxBorder.Rounded,
+                BorderStyle = new Style(Color.Green),
+                Header = new PanelHeader("[bold]SECURITY[/]")
+            };
+            AnsiConsole.Write(securityPanel);
+            AnsiConsole.WriteLine();
+
+            // Troubleshooting
+            var troublePanel = new Panel(
+                "[red]•[/] Use 'status' command to check dependency availability\n" +
+                "[red]•[/] Some features may require udev rules or group membership\n" +
+                "[red]•[/] Check system logs for permission-related errors\n" +
+                "[red]•[/] Ensure NetworkManager is running for WiFi features")
+            {
+                Border = BoxBorder.Rounded,
+                BorderStyle = new Style(Color.Red),
+                Header = new PanelHeader("[bold]TROUBLESHOOTING[/]")
+            };
+            AnsiConsole.Write(troublePanel);
+            AnsiConsole.WriteLine();
         }
     }
 }

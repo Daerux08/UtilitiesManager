@@ -90,7 +90,7 @@ namespace UtilitiesManager
                     "⬅ Back to main menu"
                 };
 
-                var choice = MenuHelper.ShowArrowMenu("SYSTEM MONITORING", menuOptions);
+                var choice = MenuEngine.ShowArrowMenu("SYSTEM MONITORING", menuOptions);
 
                 switch (choice)
                 {

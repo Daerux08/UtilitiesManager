@@ -41,7 +41,7 @@ namespace UtilitiesManager
 
                 if (!checker.IsNmcliAvailable)
                 {
-                    MenuHelper.ShowError("WiFi Networks", "nmcli (NetworkManager) is not available on this system.");
+                    MenuEngine.ShowError("WiFi Networks", "nmcli (NetworkManager) is not available on this system.");
                     return;
                 }
 
@@ -49,7 +49,7 @@ namespace UtilitiesManager
 
                 if (networks.Count == 0)
                 {
-                    MenuHelper.ShowMessage("WiFi Networks", "No WiFi networks found. Please check your WiFi adapter.", false);
+                    MenuEngine.ShowMessage("WiFi Networks", "No WiFi networks found. Please check your WiFi adapter.", false);
                     Console.WriteLine("\nPress any key to refresh or 'Q' to go back...");
                     var key = Console.ReadKey(true);
                     if (key.Key == ConsoleKey.Q || key.Key == ConsoleKey.Escape)
@@ -70,7 +70,7 @@ namespace UtilitiesManager
                 menuOptions.Add("🔄 Refresh networks");
                 menuOptions.Add("⬅ Back to main menu");
 
-                var choice = MenuHelper.ShowArrowMenu("WiFi Networks", menuOptions);
+                var choice = MenuEngine.ShowArrowMenu("WiFi Networks", menuOptions);
 
                 if (choice == -1 || choice == menuOptions.Count - 1)
                 {
@@ -103,7 +103,7 @@ namespace UtilitiesManager
                     "Back to network list"
                 };
 
-                var choice = MenuHelper.ShowArrowMenu("WiFi Connection", options);
+                var choice = MenuEngine.ShowArrowMenu("WiFi Connection", options);
 
                 if (choice == 1)
                 {
@@ -133,7 +133,7 @@ namespace UtilitiesManager
 
                 if (result.IsSuccess)
                 {
-                    MenuHelper.ShowMessage("Connection Successful", $"Successfully connected to {network.SSID}");
+                    MenuEngine.ShowMessage("Connection Successful", $"Successfully connected to {network.SSID}");
                     return;
                 }
 
@@ -144,7 +144,7 @@ namespace UtilitiesManager
                     result.ExitCode == 7)
                 {
                     // Prompt for password
-                    var password = MenuHelper.GetUserInput($"Enter password for {network.SSID}");
+                    var password = MenuEngine.GetUserInput($"Enter password for {network.SSID}");
 
                     if (!string.IsNullOrEmpty(password))
                     {
@@ -154,26 +154,26 @@ namespace UtilitiesManager
 
                         if (resultWithPassword.IsSuccess)
                         {
-                            MenuHelper.ShowMessage("Connection Successful", $"Successfully connected to {network.SSID}");
+                            MenuEngine.ShowMessage("Connection Successful", $"Successfully connected to {network.SSID}");
                         }
                         else
                         {
-                            MenuHelper.ShowError("Connection Failed", $"Failed to connect to {network.SSID}:\n{resultWithPassword.CombinedOutput}");
+                            MenuEngine.ShowError("Connection Failed", $"Failed to connect to {network.SSID}:\n{resultWithPassword.CombinedOutput}");
                         }
                     }
                     else
                     {
-                        MenuHelper.ShowMessage("Connection Cancelled", "No password provided.");
+                        MenuEngine.ShowMessage("Connection Cancelled", "No password provided.");
                     }
                 }
                 else
                 {
-                    MenuHelper.ShowError("Connection Failed", $"Failed to connect to {network.SSID}:\n{result.CombinedOutput}");
+                    MenuEngine.ShowError("Connection Failed", $"Failed to connect to {network.SSID}:\n{result.CombinedOutput}");
                 }
             }
             catch (Exception ex)
             {
-                MenuHelper.ShowError("Connection Error", $"Error connecting to {network.SSID}: {ex.Message}");
+                MenuEngine.ShowError("Connection Error", $"Error connecting to {network.SSID}: {ex.Message}");
             }
         }
 
@@ -191,16 +191,16 @@ namespace UtilitiesManager
 
                 if (result.IsSuccess)
                 {
-                    MenuHelper.ShowMessage("Disconnection Successful", $"Successfully disconnected from {ssid}");
+                    MenuEngine.ShowMessage("Disconnection Successful", $"Successfully disconnected from {ssid}");
                 }
                 else
                 {
-                    MenuHelper.ShowError("Disconnection Failed", $"Failed to disconnect from {ssid}:\n{result.CombinedOutput}");
+                    MenuEngine.ShowError("Disconnection Failed", $"Failed to disconnect from {ssid}:\n{result.CombinedOutput}");
                 }
             }
             catch (Exception ex)
             {
-                MenuHelper.ShowError("Disconnection Error", $"Error disconnecting from {ssid}: {ex.Message}");
+                MenuEngine.ShowError("Disconnection Error", $"Error disconnecting from {ssid}: {ex.Message}");
             }
         }
     }

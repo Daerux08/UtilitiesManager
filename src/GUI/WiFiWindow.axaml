@@ -3,15 +3,17 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UtilitiesManager"
+        xmlns:vm="clr-namespace:UtilitiesManager.ViewModels"
+        xmlns:vc="clr-namespace:UtilitiesManager.ViewModels.Converters"
         Width="810" Height="400"
         x:Class="UtilitiesManager.WiFiWindow"
-        x:DataType="local:WiFiWindow"
+        x:DataType="vm:WiFiWindowViewModel"
         Title="Wi-Fi Networks"
         WindowStartupLocation="CenterScreen"
         Icon="avares://UtilitiesManager/Assets/UtilManagerV3.png">
 
     <Window.Resources>
-        <local:BoolToStatusConverter x:Key="BoolToStatusConverter" />
+        <vc:BoolToStatusConverter x:Key="BoolToStatusConverter" />
     </Window.Resources>
 
     <Window.Styles>
@@ -74,7 +76,7 @@
         <Border Grid.Row="1" Classes="card">
             <DataGrid Name="WiFiDataGrid"
                       ItemsSource="{Binding WiFiNetworks}"
-                      DoubleTapped="WiFiDataGrid_DoubleTapped">
+                      SelectedItem="{Binding SelectedNetwork}">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Status" 
                                         x:DataType="local:WiFiInfo"
@@ -121,9 +123,11 @@
                         HorizontalAlignment="Center" 
                         Spacing="8">
                 <Button Content="Refresh" 
-                        Click="Refresh_Click"/>
+                        Command="{Binding RefreshCommand}"/>
+                <Button Content="Connect" 
+                        Command="{Binding ConnectCommand}"/>
                 <Button Content="Close" 
-                        Click="OnCloseClick"/>
+                        Command="{Binding CloseCommand}"/>
             </StackPanel>
         </StackPanel>
     </Grid>

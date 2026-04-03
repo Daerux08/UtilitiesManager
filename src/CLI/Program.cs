@@ -14,6 +14,10 @@ namespace UtilitiesManager
             bool hasGui = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DISPLAY")) || 
                          !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WAYLAND_DISPLAY"));
 
+            // Force GUI mode for testing on Windows
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+                hasGui = true;
+
             if (args.Length > 0)
             {
                 await CliUtilMan.RunCliMode(args);

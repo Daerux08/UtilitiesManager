@@ -28,7 +28,7 @@ namespace UtilitiesManager
             var checker = new CheckDependencyCommand();
             if (!checker.IsPactlAvailable)
             {
-                MenuHelper.ShowError("Volume Control", "pactl (PulseAudio) is not available on this system.");
+                MenuEngine.ShowError("Volume Control", "pactl (PulseAudio) is not available on this system.");
                 return;
             }
 
@@ -44,22 +44,22 @@ namespace UtilitiesManager
                     "Back to main menu"
                 };
 
-                var choice = MenuHelper.ShowArrowMenu("VOLUME CONTROL", menuOptions);
+                var choice = MenuEngine.ShowArrowMenu("VOLUME CONTROL", menuOptions);
 
                 switch (choice)
                 {
                     case 0:
-                        var input = MenuHelper.GetUserInput("Enter volume percentage (0-100)", currentVolume.ToString());
+                        var input = MenuEngine.GetUserInput("Enter volume percentage (0-100)", currentVolume.ToString());
                         if (int.TryParse(input, out int volume) && volume >= 0 && volume <= 100)
                         {
                             var changer = new ChangeValueCommand();
                             await changer.SetVolumeAsync(volume);
                             currentVolume = volume;
-                            MenuHelper.ShowMessage("Success", $"Volume set to {volume}%");
+                            MenuEngine.ShowMessage("Success", $"Volume set to {volume}%");
                         }
                         else
                         {
-                            MenuHelper.ShowError("Invalid Input", "Please enter a number between 0 and 100.");
+                            MenuEngine.ShowError("Invalid Input", "Please enter a number between 0 and 100.");
                         }
                         break;
 
@@ -73,7 +73,7 @@ namespace UtilitiesManager
                             ["100% (Maximum)"] = 100
                         };
 
-                        var quickChoice = MenuHelper.ShowQuickSelectMenu("Quick volume options", quickOptions);
+                        var quickChoice = MenuEngine.ShowQuickSelectMenu("Quick volume options", quickOptions);
                         if (quickChoice >= 0)
                         {
                             var selectedOption = quickOptions.ElementAt(quickChoice);
@@ -82,7 +82,7 @@ namespace UtilitiesManager
                             var changer = new ChangeValueCommand();
                             await changer.SetVolumeAsync(quickVolume);
                             currentVolume = quickVolume;
-                            MenuHelper.ShowMessage("Success", $"Volume set to {quickVolume}%");
+                            MenuEngine.ShowMessage("Success", $"Volume set to {quickVolume}%");
                         }
                         break;
 
@@ -90,7 +90,7 @@ namespace UtilitiesManager
                         var volumeChanger = new ChangeValueCommand();
                         await volumeChanger.SetVolumeAsync(0);
                         currentVolume = 0;
-                        MenuHelper.ShowMessage("Success", "Volume muted (set to 0%)");
+                        MenuEngine.ShowMessage("Success", "Volume muted (set to 0%)");
                         break;
 
                     case 3:

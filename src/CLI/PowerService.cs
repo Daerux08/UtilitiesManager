@@ -40,7 +40,7 @@ namespace UtilitiesManager
             var checker = new CheckDependencyCommand();
             if (!checker.IsPowerProfilesCtlAvailable)
             {
-                MenuHelper.ShowError("Power Profiles", "powerprofilesctl is not available on this system.");
+                MenuEngine.ShowError("Power Profiles", "powerprofilesctl is not available on this system.");
                 return;
             }
 
@@ -57,31 +57,31 @@ namespace UtilitiesManager
                     $"⬅ Back to main menu"
                 };
 
-                var choice = MenuHelper.ShowArrowMenu("POWER PROFILES", menuOptions);
+                var choice = MenuEngine.ShowArrowMenu("POWER PROFILES", menuOptions);
 
                 switch (choice)
                 {
                     case 0:
                         var changer = new ChangeValueCommand();
                         await changer.SetPowerProfileAsync("performance");
-                        MenuHelper.ShowMessage("Success", "Power profile set to performance");
+                        MenuEngine.ShowMessage("Success", "Power profile set to performance");
                         break;
 
                     case 1:
                         changer = new ChangeValueCommand();
                         await changer.SetPowerProfileAsync("balanced");
-                        MenuHelper.ShowMessage("Success", "Power profile set to balanced");
+                        MenuEngine.ShowMessage("Success", "Power profile set to balanced");
                         break;
 
                     case 2:
                         changer = new ChangeValueCommand();
                         await changer.SetPowerProfileAsync("power-saver");
-                        MenuHelper.ShowMessage("Success", "Power profile set to power-saver");
+                        MenuEngine.ShowMessage("Success", "Power profile set to power-saver");
                         break;
 
                     case 3:
                         currentProfile = await checker.GetCurrentPowerProfileAsync();
-                        MenuHelper.ShowMessage("Current Profile", $"Current power profile: {currentProfile}");
+                        MenuEngine.ShowMessage("Current Profile", $"Current power profile: {currentProfile}");
                         break;
 
                     case 4:

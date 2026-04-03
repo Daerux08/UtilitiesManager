@@ -3,14 +3,16 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:UtilitiesManager"
+        xmlns:vm="clr-namespace:UtilitiesManager.ViewModels"
+        xmlns:vc="clr-namespace:UtilitiesManager.ViewModels.Converters"
         Width="505" Height="520"
         x:Class="UtilitiesManager.MainWindow"
-        x:DataType="local:MainWindow"
+        x:DataType="vm:MainWindowViewModel"
         Title="UtilitiesManager"
         WindowStartupLocation="CenterScreen"
         Icon="avares://UtilitiesManager/Assets/UtilManagerV3.png">
     <Window.Resources>
-        <local:BoolToStringConverter x:Key="BoolToStringConverter" />
+        <vc:BoolToStringConverter x:Key="BoolToStringConverter" />
     </Window.Resources>
 
     <Window.Styles>
@@ -162,8 +164,7 @@
                                 Spacing="12">
                         <Button Classes="clickable-label"
                     Content="📶 Wi-Fi"
-                    Click="OpenWiFi_Click"
-                    IsEnabled="{Binding WiFiAvailable}">
+                    Command="{Binding OpenWiFiCommand}">
                 <ToolTip.Tip>
                     <TextBlock Text="{Binding WiFiAvailable, Converter={StaticResource BoolToStringConverter}, ConverterParameter='nmcli is not found|Manage Wi-Fi networks'}" />
                 </ToolTip.Tip>
@@ -171,8 +172,7 @@
 
             <Button Classes="clickable-label"
                     Content="🔋 Battery"
-                    Click="OpenBattery_Click"
-                    IsEnabled="{Binding BatteryAvailable}">
+                    Command="{Binding OpenBatteryCommand}">
                 <ToolTip.Tip>
                     <TextBlock Text="{Binding BatteryAvailable, Converter={StaticResource BoolToStringConverter}, ConverterParameter='upower is not found|Check battery status'}" />
                 </ToolTip.Tip>
