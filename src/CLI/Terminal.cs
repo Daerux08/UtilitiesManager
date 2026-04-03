@@ -43,12 +43,21 @@ namespace UtilitiesManager
 
     public static class TerminalCommands
     {
+        /// <summary>
+        /// Safely escapes an argument for use in a bash command string.
+        /// Wraps the string in single quotes and handles internal single quotes.
+        /// </summary>
+        private static string EscapeBashArgument(string argument)
+        {
+            return "'" + argument.Replace("'", "'\\''") + "'";
+        }
+
         public static async Task<string> RunCommandAsync(string command, int timeoutMs = Timeout.Infinite)
         {
             var psi = new ProcessStartInfo
             {
                 FileName = "/bin/bash",
-                Arguments = $"-c \"{command.Replace("\"", "\\\"")}\"",
+                Arguments = $"-c {EscapeBashArgument(command)}",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
@@ -71,7 +80,7 @@ namespace UtilitiesManager
             var psi = new ProcessStartInfo
             {
                 FileName = "/bin/bash",
-                Arguments = $"-c \"{command.Replace("\"", "\\\"")}\"",
+                Arguments = $"-c {EscapeBashArgument(command)}",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
