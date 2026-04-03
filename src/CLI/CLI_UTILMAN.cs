@@ -100,7 +100,7 @@ namespace UtilitiesManager
                     ("Quit", async () => { MenuEngine.GeneralMessage("Goodbye! Thank you for using Utilities Manager!"); Environment.Exit(0); })
                 };
 
-                MenuEngine.DisplayMenu(menuOptions);
+                await MenuEngine.DisplayMenu(menuOptions);
             }
         }
     }

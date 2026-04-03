@@ -25,7 +25,15 @@ public partial class BatteryWindow : Window
 
     private async void BatteryWindow_Opened(object? sender, EventArgs e)
     {
-        await RefreshBatteryDataAsync();
+        try
+        {
+            await RefreshBatteryDataAsync();
+        }
+        catch (Exception ex)
+        {
+            // Handle error gracefully - could show error message in UI
+            System.Diagnostics.Debug.WriteLine($"Error loading battery data: {ex.Message}");
+        }
     }
 
     private async Task RefreshBatteryDataAsync()
@@ -78,9 +86,16 @@ public partial class BatteryWindow : Window
         }
     }
 
-    private void Refresh_Click(object? sender, RoutedEventArgs e)
+    private async void Refresh_Click(object? sender, RoutedEventArgs e)
     {
-        _ = RefreshBatteryDataAsync();  // Async call to refresh battery data
+        try
+        {
+            await RefreshBatteryDataAsync();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error refreshing battery data: {ex.Message}");
+        }
     }
 
     private void OnCloseClick(object? sender, RoutedEventArgs e)
@@ -90,28 +105,49 @@ public partial class BatteryWindow : Window
 
     private async void SetPowerSaver_Click(object? sender, RoutedEventArgs e)
     {
-        if (_checker.IsPowerProfilesCtlAvailable)
+        try
         {
-            await _changer.SetPowerProfileAsync("power-saver");
-            await RefreshBatteryDataAsync(); // Refresh to show updated profile
+            if (_checker.IsPowerProfilesCtlAvailable)
+            {
+                await _changer.SetPowerProfileAsync("power-saver");
+                await RefreshBatteryDataAsync(); // Refresh to show updated profile
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error setting power-saver profile: {ex.Message}");
         }
     }
 
     private async void SetBalanced_Click(object? sender, RoutedEventArgs e)
     {
-        if (_checker.IsPowerProfilesCtlAvailable)
+        try
         {
-            await _changer.SetPowerProfileAsync("balanced");
-            await RefreshBatteryDataAsync(); // Refresh to show updated profile
+            if (_checker.IsPowerProfilesCtlAvailable)
+            {
+                await _changer.SetPowerProfileAsync("balanced");
+                await RefreshBatteryDataAsync(); // Refresh to show updated profile
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error setting balanced profile: {ex.Message}");
         }
     }
 
     private async void SetPerformance_Click(object? sender, RoutedEventArgs e)
     {
-        if (_checker.IsPowerProfilesCtlAvailable)
+        try
         {
-            await _changer.SetPowerProfileAsync("performance");
-            await RefreshBatteryDataAsync(); // Refresh to show updated profile
+            if (_checker.IsPowerProfilesCtlAvailable)
+            {
+                await _changer.SetPowerProfileAsync("performance");
+                await RefreshBatteryDataAsync(); // Refresh to show updated profile
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error setting performance profile: {ex.Message}");
         }
     }
 }

@@ -66,7 +66,7 @@ namespace UtilitiesManager
                 ("Back to main menu", async () => { throw new GoBackException(); })
             };
 
-            MenuEngine.DisplayMenu(menuOptions);
+            await MenuEngine.DisplayMenuAsync(menuOptions);
         }
     }
 }

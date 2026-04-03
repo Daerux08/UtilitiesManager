@@ -44,11 +44,10 @@ namespace UtilitiesManager
                 ("📄 System logs", async () => { await HandleLogsCommand(new string[] { "logs", "system" }); MenuEngine.GeneralMessage("Press any key to continue..."); Console.ReadKey(true); }),
                 ("🔧 Kernel logs", async () => { await HandleLogsCommand(new string[] { "logs", "kernel" }); MenuEngine.GeneralMessage("Press any key to continue..."); Console.ReadKey(true); }),
                 ("🚀 Boot logs", async () => { await HandleLogsCommand(new string[] { "logs", "boot" }); MenuEngine.GeneralMessage("Press any key to continue..."); Console.ReadKey(true); }),
-                ("⬅ Back to main menu", () => { throw new GoBackException(); })
+                ("⬅ Back to main menu", async () => { throw new GoBackException(); })
             };
 
-            var menu = menuOptions.Select(x => (x.Item1, new Action(() => x.Item2().GetAwaiter().GetResult()))).ToList();
-            MenuEngine.DisplayMenu(menu);
+            await MenuEngine.DisplayMenuAsync(menuOptions);
         }
     }
 }

@@ -70,7 +70,14 @@ public partial class WiFiWindow : Window, INotifyPropertyChanged
 
     private async void WiFiWindow_Opened(object? sender, EventArgs e)
     {
-        await RefreshWiFiDataAsync();
+        try
+        {
+            await RefreshWiFiDataAsync();
+        }
+        catch (Exception ex)
+        {
+            StatusText = $"Error loading WiFi networks: {ex.Message}";
+        }
     }
 
     private async Task RefreshWiFiDataAsync()
@@ -112,17 +119,31 @@ public partial class WiFiWindow : Window, INotifyPropertyChanged
         }
     }
 
-    private void Refresh_Click(object? sender, RoutedEventArgs e)
+    private async void Refresh_Click(object? sender, RoutedEventArgs e)
     {
-        StatusText = "Refreshing...";
-        _ = RefreshWiFiDataAsync();
+        try
+        {
+            StatusText = "Refreshing...";
+            await RefreshWiFiDataAsync();
+        }
+        catch (Exception ex)
+        {
+            StatusText = $"Error refreshing WiFi networks: {ex.Message}";
+        }
     }
 
     private async void WiFiDataGrid_DoubleTapped(object? sender, RoutedEventArgs e)
     {
-        if (sender is DataGrid grid && grid.SelectedItem is WiFiInfo selectedNetwork)
+        try
         {
-            await AttemptWiFiConnectionAsync(selectedNetwork.SSID);
+            if (sender is DataGrid grid && grid.SelectedItem is WiFiInfo selectedNetwork)
+            {
+                await AttemptWiFiConnectionAsync(selectedNetwork.SSID);
+            }
+        }
+        catch (Exception ex)
+        {
+            StatusText = $"Error connecting to WiFi: {ex.Message}";
         }
     }
 

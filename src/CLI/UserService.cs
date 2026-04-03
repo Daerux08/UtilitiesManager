@@ -31,11 +31,10 @@ namespace UtilitiesManager
             {
                 ("👥 List users", async () => { await HandleUsersCommand(new string[] { "users" }); MenuEngine.GeneralMessage("Press any key to continue..."); Console.ReadKey(true); }),
                 ("🔐 Show logged in users", async () => { var checker = new CheckDependencyCommand(); if (checker.IsProcpsAvailable) { var whoOutput = await TerminalCommands.RunCommandAsync("who"); MenuEngine.GeneralMessage(whoOutput); } else { MenuEngine.ErrorMessage("who command is not available on this system."); } MenuEngine.GeneralMessage("Press any key to continue..."); Console.ReadKey(true); }),
-                ("⬅ Back to main menu", () => { throw new GoBackException(); })
+                ("⬅ Back to main menu", async () => { throw new GoBackException(); })
             };
 
-            var menu = menuOptions.Select(x => (x.Item1, new Action(() => x.Item2().GetAwaiter().GetResult()))).ToList();
-            MenuEngine.DisplayMenu(menu);
+            await MenuEngine.DisplayMenuAsync(menuOptions);
         }
     }
 }

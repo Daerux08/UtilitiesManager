@@ -29,12 +29,11 @@ namespace UtilitiesManager
                 ("▶️ Start a service", async () => { var startService = MenuEngine.TextInput("Enter service name to start"); if (!string.IsNullOrEmpty(startService)) { await ServicesService.HandleServicesCommand(new string[] { "services", "start", startService }); } MenuEngine.GeneralMessage("Press any key to continue..."); Console.ReadKey(true); }),
                 ("⏹️ Stop a service", async () => { var stopService = MenuEngine.TextInput("Enter service name to stop"); if (!string.IsNullOrEmpty(stopService)) { await ServicesService.HandleServicesCommand(new string[] { "services", "stop", stopService }); } MenuEngine.GeneralMessage("Press any key to continue..."); Console.ReadKey(true); }),
                 ("🔄 Restart a service", async () => { var restartService = MenuEngine.TextInput("Enter service name to restart"); if (!string.IsNullOrEmpty(restartService)) { await ServicesService.HandleServicesCommand(new string[] { "services", "restart", restartService }); } MenuEngine.GeneralMessage("Press any key to continue..."); Console.ReadKey(true); }),
-                ("ℹ️ What are services?", () => { MenuEngine.GeneralMessage("Services are background programs that run on your system. Use systemctl to manage them."); return Task.CompletedTask; }),
-                ("⬅ Back to main menu", () => { throw new GoBackException(); })
+                ("ℹ️ What are services?", async () => { MenuEngine.GeneralMessage("Services are background programs that run on your system. Use systemctl to manage them."); await Task.Delay(1); }),
+                ("⬅ Back to main menu", async () => { throw new GoBackException(); })
             };
 
-            var menu = menuOptions.Select(x => (x.Item1, new Action(() => x.Item2().GetAwaiter().GetResult()))).ToList();
-            MenuEngine.DisplayMenu(menu);
+            await MenuEngine.DisplayMenuAsync(menuOptions);
         }
 
 

@@ -40,11 +40,10 @@ namespace UtilitiesManager
             var menuOptions = new List<(string, Func<Task>)>
             {
                 ("🛡️ Show firewall status", async () => { await HandleFirewallCommand(new string[] { "firewall" }); MenuEngine.GeneralMessage("Press any key to continue..."); Console.ReadKey(true); }),
-                ("⬅ Back to main menu", () => { throw new GoBackException(); })
+                ("⬅ Back to main menu", async () => { throw new GoBackException(); })
             };
 
-            var menu = menuOptions.Select(x => (x.Item1, new Action(() => x.Item2().GetAwaiter().GetResult()))).ToList();
-            MenuEngine.DisplayMenu(menu);
+            await MenuEngine.DisplayMenuAsync(menuOptions);
         }
     }
 }

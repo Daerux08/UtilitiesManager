@@ -50,7 +50,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 _soundLevel = value;
                 SoundLevelText = value.ToString();
                 if (_soundAvailable)
-                    _ = _changer.SetVolumeAsync(value); // Sets the system volume
+                    Task.Run(async () => await _changer.SetVolumeAsync(value)); // Sets the system volume
                 OnPropertyChanged();
             }
         }
@@ -83,7 +83,7 @@ public partial class MainWindow : Window, INotifyPropertyChanged
                 _brightness = value;
                 BrightnessText = value.ToString();
                 if (_brightnessAvailable)
-                    _ = _changer.SetBrightnessAsync(value); // Sets the screen brightness
+                    Task.Run(async () => await _changer.SetBrightnessAsync(value)); // Sets the screen brightness
                 OnPropertyChanged();
             }
         }
@@ -158,15 +158,22 @@ public partial class MainWindow : Window, INotifyPropertyChanged
 
     private async void InitializeValues()
     {
-        await _checker.LoadOriginalValuesAsync();
-        SoundLevel = _checker.OriginalValueSound;
-        Brightness = _checker.OriginalValueLight;
-        SoundLevelText = SoundLevel.ToString();
-        BrightnessText = Brightness.ToString();
-        BrightnessAvailable = _checker.IsBrightnessCtlAvailable;
-        SoundAvailable = _checker.IsPactlAvailable;
-        BatteryAvailable = _checker.IsUpowerAvailable;
-        WiFiAvailable = _checker.IsNmcliAvailable;
+        try
+        {
+            await _checker.LoadOriginalValuesAsync();
+            SoundLevel = _checker.OriginalValueSound;
+            Brightness = _checker.OriginalValueLight;
+            SoundLevelText = SoundLevel.ToString();
+            BrightnessText = Brightness.ToString();
+            BrightnessAvailable = _checker.IsBrightnessCtlAvailable;
+            SoundAvailable = _checker.IsPactlAvailable;
+            BatteryAvailable = _checker.IsUpowerAvailable;
+            WiFiAvailable = _checker.IsNmcliAvailable;
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error initializing values: {ex.Message}");
+        }
     }
 
     public new event PropertyChangedEventHandler? PropertyChanged;
