@@ -45,11 +45,11 @@ namespace UtilitiesManager
     {
         /// <summary>
         /// Safely escapes an argument for use in a bash command string.
-        /// Wraps the string in single quotes and handles internal single quotes.
+        /// Uses double quotes and escapes internal double quotes.
         /// </summary>
         private static string EscapeBashArgument(string argument)
         {
-            return "'" + argument.Replace("'", "'\\''") + "'";
+            return "\"" + argument.Replace("\"", "\\\"") + "\"";
         }
 
         public static async Task<string> RunCommandAsync(string command, int timeoutMs = Timeout.Infinite)
@@ -496,10 +496,10 @@ namespace UtilitiesManager
                 info.Uptime = uptimeResult.Output.Trim();
                 
                 var loadAvgResult = await TerminalCommands.RunCommandWithResultAsync("cat /proc/loadavg");
-                var loadAvgParts = loadAvgResult.Output.Split(' ');
+                var loadAvgParts = loadAvgResult.Output.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 if (loadAvgParts.Length >= 3)
                 {
-                    info.LoadAverage = loadAvgParts[0..3];
+                    info.LoadAverage = new string[] { loadAvgParts[0], loadAvgParts[1], loadAvgParts[2] };
                 }
             }
             catch (Exception ex)
@@ -521,8 +521,18 @@ namespace UtilitiesManager
             {
                 var memResult = await TerminalCommands.RunCommandWithResultAsync("free -h");
                 info.MemoryInfo = ParseMemoryInfo(memResult.Output);
+                
+                // Debug: log memory parsing result
+                System.Diagnostics.Debug.WriteLine($"Memory info parsed: {info.MemoryInfo.Count} entries");
             }
-            catch { }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Memory parsing error: {ex.Message}");
+            }
+        }
+        else
+        {
+            System.Diagnostics.Debug.WriteLine("procps not available for memory info");
         }
 
         // CPU Temperature
@@ -541,16 +551,28 @@ namespace UtilitiesManager
         {
             var diskResult = await TerminalCommands.RunCommandWithResultAsync("df -h");
             info.DiskUsage = ParseDiskUsage(diskResult.Output);
+            
+            // Debug: log disk parsing result
+            System.Diagnostics.Debug.WriteLine($"Disk usage parsed: {info.DiskUsage.Count} entries");
         }
-        catch { }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Disk parsing error: {ex.Message}");
+        }
 
         // Network Interfaces
         try
         {
             var netResult = await TerminalCommands.RunCommandWithResultAsync("ip addr show");
             info.NetworkInterfaces = ParseNetworkInterfaces(netResult.Output);
+            
+            // Debug: log network parsing result
+            System.Diagnostics.Debug.WriteLine($"Network interfaces parsed: {info.NetworkInterfaces.Count} entries");
         }
-        catch { }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Network parsing error: {ex.Message}");
+        }
 
         return info;
     }
@@ -722,7 +744,7 @@ namespace UtilitiesManager
             if (line.StartsWith("Mem:"))
             {
                 var parts = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                if (parts.Length >= 3)
+                if (parts.Length >= 4)
                 {
                     info["Total"] = parts[1];
                     info["Used"] = parts[2];
@@ -732,7 +754,7 @@ namespace UtilitiesManager
             else if (line.StartsWith("Swap:"))
             {
                 var parts = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                if (parts.Length >= 3)
+                if (parts.Length >= 4)
                 {
                     info["SwapTotal"] = parts[1];
                     info["SwapUsed"] = parts[2];
@@ -771,7 +793,8 @@ namespace UtilitiesManager
         var disks = new List<DiskInfo>();
         var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
         
-        foreach (var line in lines.Skip(1)) // Skip header
+        // Skip header line and parse each disk entry
+        foreach (var line in lines.Skip(1))
         {
             var parts = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length >= 6)
@@ -795,18 +818,31 @@ namespace UtilitiesManager
     {
         var interfaces = new List<NetworkInterface>();
         var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        string currentInterface = "";
         
         foreach (var line in lines)
         {
-            if (line.TrimStart().StartsWith("inet "))
+            var trimmed = line.Trim();
+            
+            // Check for interface definition (starts with a number and has colon)
+            if (Regex.IsMatch(trimmed, @"^\d+:"))
             {
-                var parts = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                if (parts.Length >= 2)
+                var parts = trimmed.Split(':');
+                if (parts.Length > 1)
+                {
+                    currentInterface = parts[1].Trim();
+                }
+            }
+            // Check for IP address
+            else if (trimmed.StartsWith("inet "))
+            {
+                var parts = trimmed.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length >= 2 && !string.IsNullOrEmpty(currentInterface))
                 {
                     interfaces.Add(new NetworkInterface
                     {
                         IPAddress = parts[1],
-                        Interface = ExtractInterfaceName(output, line)
+                        Interface = currentInterface
                     });
                 }
             }

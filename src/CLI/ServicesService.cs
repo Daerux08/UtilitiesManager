@@ -9,14 +9,14 @@ namespace UtilitiesManager
     public static class ServicesService
     {
 
-        public static async Task ServiceManagementMenu()
+        public static async Task MenuService(CheckDependencyCommand checker)
         {
             Console.WriteLine("DEBUG: Starting Service Management Menu");
             var checker = new CheckDependencyCommand();
             await checker.CheckDependenciesAsync();
-            Console.WriteLine($"DEBUG: IsSystemctlAvailable = {checker.IsSystemctlAvailable}");
+            Console.WriteLine($"DEBUG: IsSystemctlAvailable = {CheckDependencyCommand.IsSystemctlAvailable}");
 
-            if (!checker.IsSystemctlAvailable)
+            if (!CheckDependencyCommand.IsSystemctlAvailable)
             {
                 MenuEngine.ErrorMessage("systemctl is not available on this system.");
                 return;
@@ -41,7 +41,7 @@ namespace UtilitiesManager
         public static async Task HandleServicesCommand(string[] args)
         {
             var checker = new CheckDependencyCommand();
-            if (!checker.IsSystemctlAvailable)
+            if (!CheckDependencyCommand.IsSystemctlAvailable)
             {
                 return;
             }

@@ -50,14 +50,14 @@ namespace UtilitiesManager.ViewModels
             try
             {
                 StatusText = "Refreshing...";
-                await _checker.CheckDependenciesAsync();
+                await CheckDependencyCommand.CheckDependenciesAsync();
                 
-                if (_checker.IsNmcliAvailable)
+                if (_CheckDependencyCommand.IsNmcliAvailable)
                 {
                     await TerminalCommands.RunCommandAsync("nmcli device wifi rescan");
                     await Task.Delay(3000);
                     
-                    var newNetworks = await _checker.GetWiFiNetworksAsync();
+                    var newNetworks = await CheckDependencyCommand.GetWiFiNetworksAsync();
                     await Dispatcher.UIThread.InvokeAsync(() =>
                     {
                         WiFiNetworks.Clear();

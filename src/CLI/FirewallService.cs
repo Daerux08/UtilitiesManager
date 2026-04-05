@@ -35,7 +35,7 @@ namespace UtilitiesManager
             }
         }
 
-        public static async Task FirewallManagementMenu()
+        public static async Task MenuService(CheckDependencyCommand checker)
         {
             var menuOptions = new List<(string, Func<Task>)>
             {

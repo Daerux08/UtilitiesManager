@@ -35,10 +35,10 @@ namespace UtilitiesManager
             }
         }
 
-        public static async Task PowerMenu()
+        public static async Task MenuService(CheckDependencyCommand checker)
         {
             var checker = new CheckDependencyCommand();
-            if (!checker.IsPowerProfilesCtlAvailable)
+            if (!CheckDependencyCommand.IsPowerProfilesCtlAvailable)
             {
                 MenuEngine.ShowError("Power Profiles", "powerprofilesctl is not available on this system.");
                 return;

@@ -25,10 +25,10 @@ namespace UtilitiesManager
 
 
 
-        public static async Task PowerMenu()
+        public static async Task MenuService(CheckDependencyCommand checker)
         {
             var checker = new CheckDependencyCommand();
-            if (!checker.IsPowerProfilesCtlAvailable)
+            if (!CheckDependencyCommand.IsPowerProfilesCtlAvailable)
             {
                 MenuEngine.ShowError("Power Profiles", "powerprofilesctl is not available on this system.");
                 return;
@@ -84,10 +84,10 @@ namespace UtilitiesManager
         }
 
 
-        public static async Task BatteryMenu()
+        public static async Task MenuService(CheckDependencyCommand checker)
         {
             var checker = new CheckDependencyCommand();
-            if (!checker.IsUpowerAvailable)
+            if (!CheckDependencyCommand.IsUpowerAvailable)
             {
                 MenuEngine.ShowError("Battery Status", "upower is not available on this system.");
                 return;
