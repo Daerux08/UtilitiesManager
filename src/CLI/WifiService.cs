@@ -32,14 +32,14 @@ namespace UtilitiesManager
                 Console.WriteLine("Usage: UtilMan wifi list");
             }
         }
-        public static async Task MenuService(CheckDependencyCommand checker)
+        public static async Task MenuService(CheckDependencyCommand checkerParam)
         {
             while (true)
             {
                 var checker = new CheckDependencyCommand();
                 await checker.CheckDependenciesAsync();
 
-                if (!CheckDependencyCommand.IsNmcliAvailable)
+                if (!checker.IsNmcliAvailable)
                 {
                     MenuEngine.ShowError("WiFi Networks", "nmcli (NetworkManager) is not available on this system.");
                     return;

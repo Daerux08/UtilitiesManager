@@ -35,10 +35,9 @@ namespace UtilitiesManager
             }
         }
 
-        public static async Task MenuService(CheckDependencyCommand checker)
+        public static async Task MenuService(CheckDependencyCommand checkerParam)
         {
-            var checker = new CheckDependencyCommand();
-            if (!CheckDependencyCommand.IsPowerProfilesCtlAvailable)
+            if (!checkerParam.IsPowerProfilesCtlAvailable)
             {
                 MenuEngine.ShowError("Power Profiles", "powerprofilesctl is not available on this system.");
                 return;
@@ -46,7 +45,7 @@ namespace UtilitiesManager
 
             while (true)
             {
-                var currentProfile = await checker.GetCurrentPowerProfileAsync();
+                var currentProfile = await checkerParam.GetCurrentPowerProfileAsync();
 
                 var menuOptions = new List<string>
                 {
@@ -80,7 +79,7 @@ namespace UtilitiesManager
                         break;
 
                     case 3:
-                        currentProfile = await checker.GetCurrentPowerProfileAsync();
+                        currentProfile = await checkerParam.GetCurrentPowerProfileAsync();
                         MenuEngine.ShowMessage("Current Profile", $"Current power profile: {currentProfile}");
                         break;
 

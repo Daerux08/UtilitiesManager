@@ -10,6 +10,12 @@ namespace UtilitiesManager
     {
         public static async Task RunCliMode(string[] args)
         {
+            if (args == null || args.Length == 0)
+            {
+                Console.WriteLine("No arguments provided. Run 'UtilMan help' for available commands.");
+                return;
+            }
+            
             var command = args[0].ToLower();
 
             switch (command)
@@ -85,16 +91,16 @@ namespace UtilitiesManager
                 var menuOptions = new List<(string, Func<Task>)>
                 {
                     ("Brightness Control", async () => await BrightnessService.BrightnessMenu()),
-                    ("Volume Control", async () => await VolumeService.VolumeMenu()),
-                    ("Battery Status", async () => await BatteryService.BatteryMenu()),
-                    ("WiFi Networks", async () => await WifiService.WiFiMenu()),
-                    ("Power Profiles", async () => await PowerService.PowerMenu()),
+                    ("Volume Control", async () => await VolumeService.MenuService(new CheckDependencyCommand())),
+                    ("Battery Status", async () => await BatteryService.MenuService(new CheckDependencyCommand())),
+                    ("WiFi Networks", async () => await WifiService.MenuService(new CheckDependencyCommand())),
+                    ("Power Profiles", async () => await PowerService.MenuService(new CheckDependencyCommand())),
                     ("System Monitoring", async () => await SystemMonitoringService.SystemMonitoringMenu()),
-                    ("Service Management", async () => await ServicesService.ServiceManagementMenu()),
-                    ("User Management", async () => await UserService.UserManagementMenu()),
-                    ("Log Management", async () => await LogService.LogManagementMenu()),
-                    ("Firewall Management", async () => await FirewallService.FirewallManagementMenu()),
-                    ("Package Installation", async () => await PackageService.PackageInstallationMenu()),
+                    ("Service Management", async () => await ServicesService.MenuService(new CheckDependencyCommand())),
+                    ("User Management", async () => await UserService.MenuService(new CheckDependencyCommand())),
+                    ("Log Management", async () => await LogService.MenuService(new CheckDependencyCommand())),
+                    ("Firewall Management", async () => await FirewallService.MenuService(new CheckDependencyCommand())),
+                    ("Package Installation", async () => await PackageService.MenuService(new CheckDependencyCommand())),
                     ("Help & Documentation", async () => { Help.ShowAllHelp(); await Task.Delay(1); }),
                     ("Refresh Status", async () => { await Task.Delay(1); }),
                     ("Quit", async () => { MenuEngine.GeneralMessage("Goodbye! Thank you for using Utilities Manager!"); Environment.Exit(0); })

@@ -57,10 +57,10 @@ namespace UtilitiesManager.ViewModels
         {
             try
             {
-                await CheckDependencyCommand.CheckDependenciesAsync();
-                BatteryInfo = _CheckDependencyCommand.IsUpowerAvailable ? await CheckDependencyCommand.GetBatteryAsync() : new BatteryInfo { State = "upower not found" };
-                CurrentProfile = _CheckDependencyCommand.IsPowerProfilesCtlAvailable ? await CheckDependencyCommand.GetCurrentPowerProfileAsync() : "powerprofilesctl not found";
-                PowerProfilesAvailable = _CheckDependencyCommand.IsPowerProfilesCtlAvailable;
+                await _checker.CheckDependenciesAsync();
+                BatteryInfo = _checker.IsUpowerAvailable ? await _checker.GetBatteryAsync() : new BatteryInfo { State = "upower not found" };
+                CurrentProfile = _checker.IsPowerProfilesCtlAvailable ? await _checker.GetCurrentPowerProfileAsync() : "powerprofilesctl not found";
+                PowerProfilesAvailable = _checker.IsPowerProfilesCtlAvailable;
 
                 OnPropertyChanged(nameof(PercentageText));
                 OnPropertyChanged(nameof(StateText));

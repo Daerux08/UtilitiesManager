@@ -23,16 +23,15 @@ namespace UtilitiesManager
         }
 
 
-        public static async Task MenuService(CheckDependencyCommand checker)
+        public static async Task MenuService(CheckDependencyCommand checkerParam)
         {
-            var checker = new CheckDependencyCommand();
-            if (!CheckDependencyCommand.IsPactlAvailable)
+            if (!checkerParam.IsPactlAvailable)
             {
                 MenuEngine.ShowError("Volume Control", "pactl (PulseAudio) is not available on this system.");
                 return;
             }
 
-            var currentVolume = await checker.GetVolumeAsync();
+            var currentVolume = await checkerParam.GetVolumeAsync();
 
             while (true)
             {

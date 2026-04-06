@@ -25,76 +25,16 @@ namespace UtilitiesManager
 
 
 
-        public static async Task MenuService(CheckDependencyCommand checker)
+        public static async Task MenuService(CheckDependencyCommand checkerParam)
         {
-            var checker = new CheckDependencyCommand();
-            if (!CheckDependencyCommand.IsPowerProfilesCtlAvailable)
-            {
-                MenuEngine.ShowError("Power Profiles", "powerprofilesctl is not available on this system.");
-                return;
-            }
-
-            while (true)
-            {
-                var currentProfile = await checker.GetCurrentPowerProfileAsync();
-
-                var menuOptions = new List<string>
-                {
-                    $"⚡ Set performance mode {(currentProfile == "performance" ? "[CURRENT]" : "")}",
-                    $"⚖️ Set balanced mode {(currentProfile == "balanced" ? "[CURRENT]" : "")}",
-                    $"🔋 Set power-saver mode {(currentProfile == "power-saver" ? "[CURRENT]" : "")}",
-                    "📊 Show current profile",
-                    "⬅ Back to main menu"
-                };
-
-                var choice = MenuEngine.ShowArrowMenu("POWER PROFILES", menuOptions);
-
-                switch (choice)
-                {
-                    case 0:
-                        var changer = new ChangeValueCommand();
-                        await changer.SetPowerProfileAsync("performance");
-                        MenuEngine.ShowMessage("Success", "Power profile set to performance");
-                        break;
-
-                    case 1:
-                        changer = new ChangeValueCommand();
-                        await changer.SetPowerProfileAsync("balanced");
-                        MenuEngine.ShowMessage("Success", "Power profile set to balanced");
-                        break;
-
-                    case 2:
-                        changer = new ChangeValueCommand();
-                        await changer.SetPowerProfileAsync("power-saver");
-                        MenuEngine.ShowMessage("Success", "Power profile set to power-saver");
-                        break;
-
-                    case 3:
-                        currentProfile = await checker.GetCurrentPowerProfileAsync();
-                        MenuEngine.ShowMessage("Current Profile", $"Current power profile: {currentProfile}");
-                        break;
-
-                    case 4:
-                        return;
-
-                    case -1:
-                        return;
-                }
-            }
-        }
-
-
-        public static async Task MenuService(CheckDependencyCommand checker)
-        {
-            var checker = new CheckDependencyCommand();
-            if (!CheckDependencyCommand.IsUpowerAvailable)
+            if (!checkerParam.IsUpowerAvailable)
             {
                 MenuEngine.ShowError("Battery Status", "upower is not available on this system.");
                 return;
             }
 
-            await checker.LoadOriginalValuesAsync();
-            var battery = checker.BatteryStatus;
+            await checkerParam.LoadOriginalValuesAsync();
+            var battery = checkerParam.BatteryStatus;
 
             var batteryInfo = $"State: {battery.State}\n" +
                              $"Percentage: {battery.Percentage}%\n" +

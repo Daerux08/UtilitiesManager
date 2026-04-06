@@ -11,7 +11,7 @@ namespace UtilitiesManager
         public static async Task HandleLogsCommand(string[] args)
         {
             var checker = new CheckDependencyCommand();
-            if (!CheckDependencyCommand.IsJournalctlAvailable)
+            if (!checker.IsJournalctlAvailable)
             {
                 Console.WriteLine("journalctl is not available on this system.");
                 return;
@@ -30,10 +30,9 @@ namespace UtilitiesManager
             }
         }
 
-        public static async Task MenuService(CheckDependencyCommand checker)
+        public static async Task MenuService(CheckDependencyCommand checkerParam)
         {
-            var checker = new CheckDependencyCommand();
-            if (!CheckDependencyCommand.IsJournalctlAvailable)
+            if (!checkerParam.IsJournalctlAvailable)
             {
                 MenuEngine.ErrorMessage("journalctl is not available on this system.");
                 return;

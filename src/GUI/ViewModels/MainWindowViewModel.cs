@@ -116,15 +116,15 @@ namespace UtilitiesManager.ViewModels
         {
             try
             {
-                await CheckDependencyCommand.LoadOriginalValuesAsync();
-                SoundLevel = CheckDependencyCommand.OriginalValueSound;
-                Brightness = CheckDependencyCommand.OriginalValueLight;
+                await _checker.LoadOriginalValuesAsync();
+                SoundLevel = _checker.OriginalValueSound;
+                Brightness = _checker.OriginalValueLight;
                 SoundLevelText = SoundLevel.ToString();
                 BrightnessText = Brightness.ToString();
-                BrightnessAvailable = _CheckDependencyCommand.IsBrightnessCtlAvailable;
-                SoundAvailable = _CheckDependencyCommand.IsPactlAvailable;
-                BatteryAvailable = _CheckDependencyCommand.IsUpowerAvailable;
-                WiFiAvailable = _CheckDependencyCommand.IsNmcliAvailable;
+                BrightnessAvailable = _checker.IsBrightnessCtlAvailable;
+                SoundAvailable = _checker.IsPactlAvailable;
+                BatteryAvailable = _checker.IsUpowerAvailable;
+                WiFiAvailable = _checker.IsNmcliAvailable;
             }
             catch (Exception ex)
             {

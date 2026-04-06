@@ -22,7 +22,7 @@ namespace UtilitiesManager
                 Console.WriteLine($"  Time to empty: {battery.TimeToEmpty}");
             
             // Brightness
-            if (CheckDependencyCommand.IsBrightnessCtlAvailable)
+            if (checker.IsBrightnessCtlAvailable)
             {
                 var brightness = await checker.GetBrightnessPercentAsync();
                 Console.WriteLine($"Brightness: {brightness}%");
@@ -33,7 +33,7 @@ namespace UtilitiesManager
             }
             
             // Volume
-            if (CheckDependencyCommand.IsPactlAvailable)
+            if (checker.IsPactlAvailable)
             {
                 var volume = await checker.GetVolumeAsync();
                 Console.WriteLine($"Volume: {volume}%");
@@ -44,7 +44,7 @@ namespace UtilitiesManager
             }
             
             // Power profile
-            if (CheckDependencyCommand.IsPowerProfilesCtlAvailable)
+            if (checker.IsPowerProfilesCtlAvailable)
             {
                 var profile = await checker.GetCurrentPowerProfileAsync();
                 Console.WriteLine($"Power Profile: {profile}");
@@ -56,17 +56,17 @@ namespace UtilitiesManager
             
             Console.WriteLine();
             Console.WriteLine("=== DEPENDENCIES ===");
-            Console.WriteLine($"brightnessctl: {(CheckDependencyCommand.IsBrightnessCtlAvailable ? "Available" : "Not available")}");
-            Console.WriteLine($"pactl: {(CheckDependencyCommand.IsPactlAvailable ? "Available" : "Not available")}");
-            Console.WriteLine($"upower: {(CheckDependencyCommand.IsUpowerAvailable ? "Available" : "Not available")}");
-            Console.WriteLine($"nmcli: {(CheckDependencyCommand.IsNmcliAvailable ? "Available" : "Not available")}");
-            Console.WriteLine($"powerprofilesctl: {(CheckDependencyCommand.IsPowerProfilesCtlAvailable ? "Available" : "Not available")}");
-            Console.WriteLine($"procps (ps/free): {(CheckDependencyCommand.IsProcpsAvailable ? "Available" : "Not available")}");
-            Console.WriteLine($"lm-sensors: {(CheckDependencyCommand.IsLmSensorsAvailable ? "Available" : "Not available")}");
-            Console.WriteLine($"sysstat: {(CheckDependencyCommand.IsSysstatAvailable ? "Available" : "Not available")}");
-            Console.WriteLine($"systemctl: {(CheckDependencyCommand.IsSystemctlAvailable ? "Available" : "Not available")}");
-            Console.WriteLine($"journalctl: {(CheckDependencyCommand.IsJournalctlAvailable ? "Available" : "Not available")}");
-            Console.WriteLine($"ufw: {(CheckDependencyCommand.IsUfwAvailable ? "Available" : "Not available")}");
+            Console.WriteLine($"brightnessctl: {(checker.IsBrightnessCtlAvailable ? "Available" : "Not available")}");
+            Console.WriteLine($"pactl: {(checker.IsPactlAvailable ? "Available" : "Not available")}");
+            Console.WriteLine($"upower: {(checker.IsUpowerAvailable ? "Available" : "Not available")}");
+            Console.WriteLine($"nmcli: {(checker.IsNmcliAvailable ? "Available" : "Not available")}");
+            Console.WriteLine($"powerprofilesctl: {(checker.IsPowerProfilesCtlAvailable ? "Available" : "Not available")}");
+            Console.WriteLine($"procps (ps/free): {(checker.IsProcpsAvailable ? "Available" : "Not available")}");
+            Console.WriteLine($"lm-sensors: {(checker.IsLmSensorsAvailable ? "Available" : "Not available")}");
+            Console.WriteLine($"sysstat: {(checker.IsSysstatAvailable ? "Available" : "Not available")}");
+            Console.WriteLine($"systemctl: {(checker.IsSystemctlAvailable ? "Available" : "Not available")}");
+            Console.WriteLine($"journalctl: {(checker.IsJournalctlAvailable ? "Available" : "Not available")}");
+            Console.WriteLine($"ufw: {(checker.IsUfwAvailable ? "Available" : "Not available")}");
         }
     }
 }

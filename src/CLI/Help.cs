@@ -35,8 +35,8 @@ namespace UtilitiesManager
                 .AddColumn("[bold]Command[/]", c => c.NoWrap())
                 .AddColumn("[bold]Description[/]");
             
-            usageTable.AddRow("[cyan]UtilitiesManager [command] [options][/]", "Run utilities manager");
-            usageTable.AddRow("[cyan]UtilitiesManager --cli [command] [options][/]", "[yellow]Force CLI mode[/]");
+            usageTable.AddRow("[cyan]UtilitiesManager [[command]] [[options]][/]", "Run utilities manager");
+            usageTable.AddRow("[cyan]UtilitiesManager --cli [[command]] [[options]][/]", "[yellow]Force CLI mode[/]");
             AnsiConsole.Write(usageTable);
             AnsiConsole.WriteLine();
 

@@ -242,7 +242,7 @@ namespace UtilitiesManager
 
         static async Task<int> CheckAsync(string command) 
         { 
-            var process = new Process 
+            using var process = new Process 
             { 
                 StartInfo = new ProcessStartInfo 
                 { 
