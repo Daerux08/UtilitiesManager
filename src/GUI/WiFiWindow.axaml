@@ -76,7 +76,8 @@
         <Border Grid.Row="1" Classes="card">
             <DataGrid Name="WiFiDataGrid"
                       ItemsSource="{Binding WiFiNetworks}"
-                      SelectedItem="{Binding SelectedNetwork}">
+                      SelectedItem="{Binding SelectedNetwork}"
+                      DoubleTapped="WiFiDataGrid_DoubleTapped">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Status" 
                                         x:DataType="local:WiFiInfo"
@@ -124,8 +125,6 @@
                         Spacing="8">
                 <Button Content="Refresh" 
                         Command="{Binding RefreshCommand}"/>
-                <Button Content="Connect" 
-                        Command="{Binding ConnectCommand}"/>
                 <Button Content="Close" 
                         Command="{Binding CloseCommand}"/>
             </StackPanel>
