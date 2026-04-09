@@ -92,13 +92,25 @@ namespace UtilitiesManager.ViewModels
         public bool WiFiAvailable
         {
             get => _wifiAvailable;
-            set => SetProperty(ref _wifiAvailable, value);
+            set 
+            { 
+                if (SetProperty(ref _wifiAvailable, value))
+                {
+                    ((RelayCommand)OpenWiFiCommand).RaiseCanExecuteChanged();
+                }
+            }
         }
 
         public bool BatteryAvailable
         {
             get => _batteryAvailable;
-            set => SetProperty(ref _batteryAvailable, value);
+            set 
+            { 
+                if (SetProperty(ref _batteryAvailable, value))
+                {
+                    ((RelayCommand)OpenBatteryCommand).RaiseCanExecuteChanged();
+                }
+            }
         }
 
         public ICommand OpenBatteryCommand { get; }
