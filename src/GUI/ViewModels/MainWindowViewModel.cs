@@ -1,7 +1,8 @@
 using System;
-using System.Threading.Tasks;
 using System.Windows.Input;
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 
 namespace UtilitiesManager.ViewModels
 {
@@ -69,7 +70,7 @@ namespace UtilitiesManager.ViewModels
             {
                 if (SetProperty(ref _brightnessText, value))
                 {
-                    if (int.TryParse(value, out int newValue) && newValue >= 0 && newValue <= 100)
+                    if (int.TryParse(value, out int newValue) && newValue >= 1 && newValue <= 100)
                     {
                         Brightness = newValue;
                     }
@@ -92,13 +93,25 @@ namespace UtilitiesManager.ViewModels
         public bool WiFiAvailable
         {
             get => _wifiAvailable;
-            set => SetProperty(ref _wifiAvailable, value);
+            set 
+            { 
+                if (SetProperty(ref _wifiAvailable, value))
+                {
+                    ((RelayCommand)OpenWiFiCommand).RaiseCanExecuteChanged();
+                }
+            }
         }
 
         public bool BatteryAvailable
         {
             get => _batteryAvailable;
-            set => SetProperty(ref _batteryAvailable, value);
+            set 
+            { 
+                if (SetProperty(ref _batteryAvailable, value))
+                {
+                    ((RelayCommand)OpenBatteryCommand).RaiseCanExecuteChanged();
+                }
+            }
         }
 
         public ICommand OpenBatteryCommand { get; }
@@ -106,21 +119,28 @@ namespace UtilitiesManager.ViewModels
 
         public MainWindowViewModel()
         {
+            InitializeValues();
+            
             OpenBatteryCommand = new RelayCommand(OpenBattery, () => BatteryAvailable);
             OpenWiFiCommand = new RelayCommand(OpenWiFi, () => WiFiAvailable);
-            
-            _ = InitializeValuesAsync();
         }
 
-        private async Task InitializeValuesAsync()
+        private void InitializeValues()
         {
             try
             {
-                await _checker.LoadOriginalValuesAsync();
+                _checker.LoadOriginalValues();
                 SoundLevel = _checker.OriginalValueSound;
                 Brightness = _checker.OriginalValueLight;
                 SoundLevelText = SoundLevel.ToString();
                 BrightnessText = Brightness.ToString();
+                
+                System.Diagnostics.Debug.WriteLine($"Dependency check results:");
+                System.Diagnostics.Debug.WriteLine($"  BrightnessCtl available: {_checker.IsBrightnessCtlAvailable}");
+                System.Diagnostics.Debug.WriteLine($"  Pactl available: {_checker.IsPactlAvailable}");
+                System.Diagnostics.Debug.WriteLine($"  Upower available: {_checker.IsUpowerAvailable}");
+                System.Diagnostics.Debug.WriteLine($"  Nmcli available: {_checker.IsNmcliAvailable}");
+                
                 BrightnessAvailable = _checker.IsBrightnessCtlAvailable;
                 SoundAvailable = _checker.IsPactlAvailable;
                 BatteryAvailable = _checker.IsUpowerAvailable;
@@ -134,19 +154,49 @@ namespace UtilitiesManager.ViewModels
 
         private void OpenBattery()
         {
+            System.Diagnostics.Debug.WriteLine($"OpenBattery called. BatteryAvailable: {BatteryAvailable}");
             if (BatteryAvailable)
             {
-                var batteryWindow = new BatteryWindow();
-                batteryWindow.Show();
+                try
+                {
+                    var batteryWindow = new BatteryWindow();
+                    // Center the window on screen since we can't set owner from ViewModel
+                    batteryWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+                    batteryWindow.Show();
+                    System.Diagnostics.Debug.WriteLine("BatteryWindow created and shown successfully");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Error creating BatteryWindow: {ex.Message}");
+                }
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("Battery not available, window not opened");
             }
         }
 
         private void OpenWiFi()
         {
+            System.Diagnostics.Debug.WriteLine($"OpenWiFi called. WiFiAvailable: {WiFiAvailable}");
             if (WiFiAvailable)
             {
-                var wifiWindow = new WiFiWindow();
-                wifiWindow.Show();
+                try
+                {
+                    var wifiWindow = new WiFiWindow();
+                    // Center the window on screen since we can't set owner from ViewModel
+                    wifiWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+                    wifiWindow.Show();
+                    System.Diagnostics.Debug.WriteLine("WiFiWindow created and shown successfully");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Error creating WiFiWindow: {ex.Message}");
+                }
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("WiFi not available, window not opened");
             }
         }
     }

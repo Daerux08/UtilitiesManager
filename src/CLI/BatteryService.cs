@@ -8,10 +8,10 @@ namespace UtilitiesManager
 {
     public static class BatteryService
     {
-        public static async Task HandleBatteryCommand()
+        public static void HandleBatteryCommand()
         {
             var checker = new CheckDependencyCommand();
-            await checker.LoadOriginalValuesAsync();
+            checker.LoadOriginalValues();
             var battery = checker.BatteryStatus;
 
             Console.WriteLine("Battery Status:");
@@ -25,7 +25,7 @@ namespace UtilitiesManager
 
 
 
-        public static async Task MenuService(CheckDependencyCommand checkerParam)
+        public static void MenuService(CheckDependencyCommand checkerParam)
         {
             if (!checkerParam.IsUpowerAvailable)
             {
@@ -33,7 +33,7 @@ namespace UtilitiesManager
                 return;
             }
 
-            await checkerParam.LoadOriginalValuesAsync();
+            checkerParam.LoadOriginalValues();
             var battery = checkerParam.BatteryStatus;
 
             var batteryInfo = $"State: {battery.State}\n" +

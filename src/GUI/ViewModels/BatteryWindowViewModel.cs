@@ -57,8 +57,8 @@ namespace UtilitiesManager.ViewModels
         {
             try
             {
-                await _checker.CheckDependenciesAsync();
-                BatteryInfo = _checker.IsUpowerAvailable ? await _checker.GetBatteryAsync() : new BatteryInfo { State = "upower not found" };
+                _checker.CheckDependencies();
+                BatteryInfo = _checker.IsUpowerAvailable ? _checker.GetBattery() : new BatteryInfo { State = "upower not found" };
                 CurrentProfile = _checker.IsPowerProfilesCtlAvailable ? await _checker.GetCurrentPowerProfileAsync() : "powerprofilesctl not found";
                 PowerProfilesAvailable = _checker.IsPowerProfilesCtlAvailable;
 
@@ -110,7 +110,10 @@ namespace UtilitiesManager.ViewModels
 
         private void Close()
         {
-            // This will be handled by the View
+            // This will be handled by the View - trigger window close
+            CloseRequested?.Invoke(this, EventArgs.Empty);
         }
+
+        public event EventHandler? CloseRequested;
     }
 }

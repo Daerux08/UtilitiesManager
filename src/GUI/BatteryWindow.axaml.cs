@@ -10,7 +10,9 @@ public partial class BatteryWindow : Window
     public BatteryWindow()
     {
         InitializeComponent();
-        DataContext = new BatteryWindowViewModel();
+        var viewModel = new BatteryWindowViewModel();
+        DataContext = viewModel;
+        viewModel.CloseRequested += (s, e) => Close();
     }
 
     private void InitializeComponent()

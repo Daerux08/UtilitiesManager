@@ -10,7 +10,9 @@ public partial class WiFiWindow : Window
     public WiFiWindow()
     {
         InitializeComponent();
-        DataContext = new WiFiWindowViewModel();
+        var viewModel = new WiFiWindowViewModel();
+        DataContext = viewModel;
+        viewModel.CloseRequested += (s, e) => Close();
     }
 
     private void InitializeComponent()

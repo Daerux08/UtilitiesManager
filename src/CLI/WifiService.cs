@@ -37,7 +37,7 @@ namespace UtilitiesManager
             while (true)
             {
                 var checker = new CheckDependencyCommand();
-                await checker.CheckDependenciesAsync();
+                checker.CheckDependencies();
 
                 if (!checker.IsNmcliAvailable)
                 {

@@ -75,6 +75,29 @@ namespace UtilitiesManager
             return output.Trim();
         }
 
+        public static string RunCommand(string command, int timeoutMs = Timeout.Infinite)
+        {
+            var psi = new ProcessStartInfo
+            {
+                FileName = "/bin/bash",
+                Arguments = $"-c {EscapeBashArgument(command)}",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using var process = new Process { StartInfo = psi };
+            process.Start();
+
+            string output = process.StandardOutput.ReadToEnd();
+            string error = process.StandardError.ReadToEnd();
+
+            process.WaitForExit();
+
+            return output.Trim();
+        }
+
         public static async Task<CommandResult> RunCommandWithResultAsync(string command, int timeoutMs = Timeout.Infinite)
         {
             var psi = new ProcessStartInfo
@@ -152,21 +175,21 @@ namespace UtilitiesManager
         public bool IsBleachbitAvailable { get; private set; }
         public bool IsNcduAvailable { get; private set; }
 
-        public async Task LoadOriginalValuesAsync()
+        public void LoadOriginalValues()
         {
-            await CheckDependenciesAsync();
-            OriginalValueLight = IsBrightnessCtlAvailable ? await GetBrightnessPercentAsync() : 50;
-            OriginalValueSound = IsPactlAvailable ? await GetVolumeAsync() : 50;
-            BatteryStatus = IsUpowerAvailable ? await GetBatteryAsync() : new BatteryInfo();
+            CheckDependencies();
+            OriginalValueLight = IsBrightnessCtlAvailable ? GetBrightnessPercent() : 50;
+            OriginalValueSound = IsPactlAvailable ? GetVolume() : 50;
+            BatteryStatus = IsUpowerAvailable ? GetBattery() : new BatteryInfo();
         }
 
-        public async Task CheckDependenciesAsync()
+        public void CheckDependencies()
         {
             string[] deps = { "upower", "pactl", "brightnessctl", "nmcli", "powerprofilesctl", "ps", "free", "sensors", "iostat", "mpstat", "iotop", "nethogs", "systemctl", "useradd", "journalctl", "ufw", "iptables", "fail2ban-client", "bleachbit", "ncdu" }; 
 
             foreach (string dep in deps) 
             { 
-                int exitCode = await CheckAsync(dep); 
+                int exitCode = Check(dep); 
                 Console.WriteLine($"{dep}: {(exitCode == 0 ? "1" : "0")}"); 
                 
                 // Set the corresponding boolean properties
@@ -179,7 +202,7 @@ namespace UtilitiesManager
                         IsPactlAvailable = exitCode == 0;
                         break;
                     case "upower":
-                        IsUpowerAvailable = exitCode == 0 && await CheckUpowerBatteryAvailable();
+                        IsUpowerAvailable = exitCode == 0 && CheckUpowerBatteryAvailable();
                         break;
                     case "nmcli":
                         IsNmcliAvailable = exitCode == 0;
@@ -192,7 +215,7 @@ namespace UtilitiesManager
                         break;
                     case "free":
                         // Set IsProcpsAvailable if both ps and free are available
-                        int psExitCode = await CheckAsync("ps");
+                        int psExitCode = Check("ps");
                         IsProcpsAvailable = exitCode == 0 && psExitCode == 0;
                         break;
                     case "sensors":
@@ -203,7 +226,7 @@ namespace UtilitiesManager
                         break;
                     case "mpstat":
                         // Set IsSysstatAvailable if both iostat and mpstat are available
-                        int iostatExitCode = await CheckAsync("iostat");
+                        int iostatExitCode = Check("iostat");
                         IsSysstatAvailable = exitCode == 0 && iostatExitCode == 0;
                         break;
                     case "iotop":
@@ -240,7 +263,7 @@ namespace UtilitiesManager
             }
         }
 
-        static async Task<int> CheckAsync(string command) 
+        static int Check(string command) 
         { 
             using var process = new Process 
             { 
@@ -253,16 +276,16 @@ namespace UtilitiesManager
                 } 
             }; 
             process.Start(); 
-            await process.WaitForExitAsync(); 
+            process.WaitForExit(); 
             return process.ExitCode; 
         }
 
-        private async Task<bool> CheckUpowerBatteryAvailable()
+        private bool CheckUpowerBatteryAvailable()
         {
             try
             {
                 // Check if there are actual battery devices
-                string deviceList = await TerminalCommands.RunCommandAsync("upower -e | grep -i battery");
+                string deviceList = TerminalCommands.RunCommand("upower -e | grep -i battery");
                 if (string.IsNullOrWhiteSpace(deviceList))
                 {
                     // No battery devices found
@@ -273,7 +296,7 @@ namespace UtilitiesManager
                 string devicePath = deviceList.Split('\n')[0].Trim();
                 if (!string.IsNullOrWhiteSpace(devicePath))
                 {
-                    string batteryInfo = await TerminalCommands.RunCommandAsync($"upower -i \"{devicePath}\"");
+                    string batteryInfo = TerminalCommands.RunCommand($"upower -i \"{devicePath}\"");
                     // Check for "present: yes" in the battery section (handles various spacing)
                     var lines = batteryInfo.Split('\n', StringSplitOptions.RemoveEmptyEntries);
                     foreach (var line in lines)
@@ -296,10 +319,10 @@ namespace UtilitiesManager
         }
 
         // BRIGHTNESS 
-        public async Task<int> GetBrightnessPercentAsync()
+        public int GetBrightnessPercent()
         {
-            string currentStr = await TerminalCommands.RunCommandAsync("brightnessctl get");
-            string maxStr = await TerminalCommands.RunCommandAsync("brightnessctl max");
+            string currentStr = TerminalCommands.RunCommand("brightnessctl get");
+            string maxStr = TerminalCommands.RunCommand("brightnessctl max");
 
             if (int.TryParse(currentStr, out int current) &&
                 int.TryParse(maxStr, out int max) &&
@@ -312,9 +335,9 @@ namespace UtilitiesManager
         }
 
         // VOLUME
-        public async Task<int> GetVolumeAsync()
+        public int GetVolume()
         {
-            string output = await TerminalCommands.RunCommandAsync(
+            string output = TerminalCommands.RunCommand(
                 "pactl get-sink-volume @DEFAULT_SINK@"
             );
 
@@ -326,17 +349,17 @@ namespace UtilitiesManager
         }
 
         // BATTERY
-        public async Task<BatteryInfo> GetBatteryAsync()
+        public BatteryInfo GetBattery()
         {
             var info = new BatteryInfo();
 
-            string deviceList = await TerminalCommands.RunCommandAsync("upower -e | grep -i -m 1 battery");
+            string deviceList = TerminalCommands.RunCommand("upower -e | grep -i -m 1 battery");
             string devicePath = deviceList.Trim();
 
             if (string.IsNullOrWhiteSpace(devicePath))
                 return info;
 
-            string output = await TerminalCommands.RunCommandAsync($"upower -i \"{devicePath}\"");
+            string output = TerminalCommands.RunCommand($"upower -i \"{devicePath}\"");
 
             if (string.IsNullOrWhiteSpace(output))
                 return info;

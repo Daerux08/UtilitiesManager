@@ -32,7 +32,7 @@ namespace UtilitiesManager
                 return;
             }
 
-            var currentBrightness = await checker.GetBrightnessPercentAsync();
+            var currentBrightness = checker.GetBrightnessPercent();
 
             var menuOptions = new List<(string, Func<Task>)>
             {

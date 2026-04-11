@@ -10,7 +10,7 @@ namespace UtilitiesManager
     {
         public static async Task HandleSystemMonitoringCommand(CheckDependencyCommand checker, string command)
         {
-            await checker.CheckDependenciesAsync();
+            checker.CheckDependencies();
             var systemInfo = await checker.GetSystemInfoAsync();
 
             switch (command.ToLower())
@@ -76,7 +76,7 @@ namespace UtilitiesManager
         public static async Task SystemMonitoringMenu()
         {
             var checker = new CheckDependencyCommand();
-            await checker.CheckDependenciesAsync();
+            checker.CheckDependencies();
 
             while (true)
             {

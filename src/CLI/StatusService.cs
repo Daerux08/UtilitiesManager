@@ -11,7 +11,7 @@ namespace UtilitiesManager
         public static async Task HandleStatusCommand()
         {
             var checker = new CheckDependencyCommand();
-            await checker.LoadOriginalValuesAsync();
+            checker.LoadOriginalValues();
             
             Console.WriteLine("=== SYSTEM STATUS ===");
             
@@ -24,7 +24,7 @@ namespace UtilitiesManager
             // Brightness
             if (checker.IsBrightnessCtlAvailable)
             {
-                var brightness = await checker.GetBrightnessPercentAsync();
+                var brightness = checker.GetBrightnessPercent();
                 Console.WriteLine($"Brightness: {brightness}%");
             }
             else
@@ -35,7 +35,7 @@ namespace UtilitiesManager
             // Volume
             if (checker.IsPactlAvailable)
             {
-                var volume = await checker.GetVolumeAsync();
+                var volume = checker.GetVolume();
                 Console.WriteLine($"Volume: {volume}%");
             }
             else

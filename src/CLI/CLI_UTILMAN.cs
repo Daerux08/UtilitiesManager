@@ -29,7 +29,7 @@ namespace UtilitiesManager
                     break;
 
                 case "battery":
-                    await BatteryService.HandleBatteryCommand();
+                    BatteryService.HandleBatteryCommand();
                     break;
 
                 case "wifi":
@@ -92,7 +92,7 @@ namespace UtilitiesManager
                 {
                     ("Brightness Control", async () => await BrightnessService.BrightnessMenu()),
                     ("Volume Control", async () => await VolumeService.MenuService(new CheckDependencyCommand())),
-                    ("Battery Status", async () => await BatteryService.MenuService(new CheckDependencyCommand())),
+                    ("Battery Status", async () => { BatteryService.MenuService(new CheckDependencyCommand()); await Task.Delay(1); }),
                     ("WiFi Networks", async () => await WifiService.MenuService(new CheckDependencyCommand())),
                     ("Power Profiles", async () => await PowerService.MenuService(new CheckDependencyCommand())),
                     ("System Monitoring", async () => await SystemMonitoringService.SystemMonitoringMenu()),

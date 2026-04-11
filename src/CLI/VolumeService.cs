@@ -31,7 +31,7 @@ namespace UtilitiesManager
                 return;
             }
 
-            var currentVolume = await checkerParam.GetVolumeAsync();
+            var currentVolume = checkerParam.GetVolume();
 
             while (true)
             {

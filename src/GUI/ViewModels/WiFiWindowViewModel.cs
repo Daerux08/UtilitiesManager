@@ -50,7 +50,7 @@ namespace UtilitiesManager.ViewModels
             try
             {
                 StatusText = "Refreshing...";
-                await _checker.CheckDependenciesAsync();
+                _checker.CheckDependencies();
                 
                 if (_checker.IsNmcliAvailable)
                 {
@@ -127,8 +127,11 @@ namespace UtilitiesManager.ViewModels
 
         private void Close()
         {
-            // This will be handled by the View
+            // This will be handled by the View - trigger window close
+            CloseRequested?.Invoke(this, EventArgs.Empty);
         }
+
+        public event EventHandler? CloseRequested;
 
         // Method to be called from the View when password is provided
         public async Task ConnectWithPassword(string ssid, string password)
