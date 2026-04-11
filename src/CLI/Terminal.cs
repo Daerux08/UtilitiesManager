@@ -210,9 +210,6 @@ namespace UtilitiesManager
                     case "powerprofilesctl":
                         IsPowerProfilesCtlAvailable = exitCode == 0;
                         break;
-                    case "ps":
-                        // Will be combined with "free" for IsProcpsAvailable
-                        break;
                     case "free":
                         // Set IsProcpsAvailable if both ps and free are available
                         int psExitCode = Check("ps");
@@ -220,9 +217,6 @@ namespace UtilitiesManager
                         break;
                     case "sensors":
                         IsLmSensorsAvailable = exitCode == 0;
-                        break;
-                    case "iostat":
-                        // Will be combined with "mpstat" for IsSysstatAvailable
                         break;
                     case "mpstat":
                         // Set IsSysstatAvailable if both iostat and mpstat are available
