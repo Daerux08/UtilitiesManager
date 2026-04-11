@@ -154,26 +154,26 @@ namespace UtilitiesManager
         public int OriginalValueSound { get; private set; }
         public BatteryInfo BatteryStatus { get; private set; } = new BatteryInfo();
 
-        public bool IsBrightnessCtlAvailable { get; private set; }
-        public bool IsPactlAvailable { get; private set; }
-        public bool IsUpowerAvailable { get; private set; }
-        public bool IsNmcliAvailable { get; private set; }
-        public bool IsPowerProfilesCtlAvailable { get; private set; }
+        public bool IsBrightnessCtlAvailable => dependencies["brightnessctl"];
+        public bool IsPactlAvailable => dependencies["pactl"];
+        public bool IsUpowerAvailable => dependencies["upower"];
+        public bool IsNmcliAvailable => dependencies["nmcli"];
+        public bool IsPowerProfilesCtlAvailable => dependencies["powerprofilesctl"];
 
         // Terminal/Server monitoring booleans
-        public bool IsProcpsAvailable { get; private set; }
-        public bool IsLmSensorsAvailable { get; private set; }
-        public bool IsSysstatAvailable { get; private set; }
-        public bool IsIotopAvailable { get; private set; }
-        public bool IsNethogsAvailable { get; private set; }
-        public bool IsSystemctlAvailable { get; private set; }
-        public bool IsUseraddAvailable { get; private set; }
-        public bool IsJournalctlAvailable { get; private set; }
-        public bool IsUfwAvailable { get; private set; }
-        public bool IsIptablesAvailable { get; private set; }
-        public bool IsFail2banAvailable { get; private set; }
-        public bool IsBleachbitAvailable { get; private set; }
-        public bool IsNcduAvailable { get; private set; }
+        public bool IsProcpsAvailable => dependencies["ps"];
+        public bool IsLmSensorsAvailable => dependencies["sensors"];
+        public bool IsSysstatAvailable => dependencies["iostat"];
+        public bool IsIotopAvailable => dependencies["iotop"];
+        public bool IsNethogsAvailable => dependencies["nethogs"];
+        public bool IsSystemctlAvailable => dependencies["systemctl"];
+        public bool IsUseraddAvailable => dependencies["useradd"];
+        public bool IsJournalctlAvailable => dependencies["journalctl"];
+        public bool IsUfwAvailable => dependencies["ufw"];
+        public bool IsIptablesAvailable => dependencies["iptables"];
+        public bool IsFail2banAvailable => dependencies["fail2ban-client"];
+        public bool IsBleachbitAvailable => dependencies["bleachbit"];
+        public bool IsNcduAvailable => dependencies["ncdu"];
 
         public void LoadOriginalValues()
         {
@@ -183,77 +183,35 @@ namespace UtilitiesManager
             BatteryStatus = IsUpowerAvailable ? GetBattery() : new BatteryInfo();
         }
 
+       public static Dictionary<string, bool> dependencies = new Dictionary<string, bool>
+            {
+                { "brightnessctl", false },
+                { "pactl", false },
+                { "upower", false },
+                { "nmcli", false },
+                { "powerprofilesctl", false },
+                { "free", false }, // for memory info
+                { "ps", false },   // for CPU info
+                { "sensors", false }, // for temperature info
+                { "iostat", false }, // for CPU info (sysstat)
+                { "mpstat", false }, // for CPU info (sysstat)
+                { "iotop", false },  // for disk I/O monitoring
+                { "nethogs", false }, // for network monitoring
+                { "systemctl", false }, // for service management
+                { "useradd", false }, // for user management
+                { "journalctl", false }, // for log viewing
+                { "ufw", false }, // for firewall status
+                { "iptables", false }, // for firewall status
+                { "fail2ban-client", false }, // for security monitoring
+                { "bleachbit", false }, // for system cleanup
+                { "ncdu", false } // for disk usage analysis
+            };
+
         public void CheckDependencies()
         {
-            string[] deps = { "upower", "pactl", "brightnessctl", "nmcli", "powerprofilesctl", "ps", "free", "sensors", "iostat", "mpstat", "iotop", "nethogs", "systemctl", "useradd", "journalctl", "ufw", "iptables", "fail2ban-client", "bleachbit", "ncdu" }; 
-
-            foreach (string dep in deps) 
-            { 
-                int exitCode = Check(dep); 
-                Console.WriteLine($"{dep}: {(exitCode == 0 ? "1" : "0")}"); 
-                
-                // Set the corresponding boolean properties
-                switch (dep)
-                {
-                    case "brightnessctl":
-                        IsBrightnessCtlAvailable = exitCode == 0;
-                        break;
-                    case "pactl":
-                        IsPactlAvailable = exitCode == 0;
-                        break;
-                    case "upower":
-                        IsUpowerAvailable = exitCode == 0 && CheckUpowerBatteryAvailable();
-                        break;
-                    case "nmcli":
-                        IsNmcliAvailable = exitCode == 0;
-                        break;
-                    case "powerprofilesctl":
-                        IsPowerProfilesCtlAvailable = exitCode == 0;
-                        break;
-                    case "free":
-                        // Set IsProcpsAvailable if both ps and free are available
-                        int psExitCode = Check("ps");
-                        IsProcpsAvailable = exitCode == 0 && psExitCode == 0;
-                        break;
-                    case "sensors":
-                        IsLmSensorsAvailable = exitCode == 0;
-                        break;
-                    case "mpstat":
-                        // Set IsSysstatAvailable if both iostat and mpstat are available
-                        int iostatExitCode = Check("iostat");
-                        IsSysstatAvailable = exitCode == 0 && iostatExitCode == 0;
-                        break;
-                    case "iotop":
-                        IsIotopAvailable = exitCode == 0;
-                        break;
-                    case "nethogs":
-                        IsNethogsAvailable = exitCode == 0;
-                        break;
-                    case "systemctl":
-                        IsSystemctlAvailable = exitCode == 0;
-                        break;
-                    case "useradd":
-                        IsUseraddAvailable = exitCode == 0;
-                        break;
-                    case "journalctl":
-                        IsJournalctlAvailable = exitCode == 0;
-                        break;
-                    case "ufw":
-                        IsUfwAvailable = exitCode == 0;
-                        break;
-                    case "iptables":
-                        IsIptablesAvailable = exitCode == 0;
-                        break;
-                    case "fail2ban-client":
-                        IsFail2banAvailable = exitCode == 0;
-                        break;
-                    case "bleachbit":
-                        IsBleachbitAvailable = exitCode == 0;
-                        break;
-                    case "ncdu":
-                        IsNcduAvailable = exitCode == 0;
-                        break;
-                }
+            foreach (var key in dependencies.Keys.ToList())
+            {
+                dependencies[key] = Check(key) == 0;
             }
         }
 

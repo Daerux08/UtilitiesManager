@@ -30,7 +30,7 @@
 	  <Compile Include="src/CLI/PowerService.cs" />
     <Compile Include="src/CLI/Help.cs" />
     <Compile Include="src/CLI/MenuEngine.cs" />
-    <Compile Include="src/CLI/Terminal.cs" />
+    <Compile Include="src/Shared/Terminal.cs" />
     <Compile Include="src/DownloadScript.cs" />
   </ItemGroup>
 </Project>

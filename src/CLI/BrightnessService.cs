@@ -25,6 +25,7 @@ namespace UtilitiesManager
         
         public static async Task BrightnessMenu()
         {
+            CheckDependencyCommand.CheckDependencies();
             var checker = new CheckDependencyCommand();
             if (!checker.IsBrightnessCtlAvailable)
             {

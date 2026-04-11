@@ -119,10 +119,10 @@ namespace UtilitiesManager.ViewModels
 
         public MainWindowViewModel()
         {
-            InitializeValues();
-            
             OpenBatteryCommand = new RelayCommand(OpenBattery, () => BatteryAvailable);
             OpenWiFiCommand = new RelayCommand(OpenWiFi, () => WiFiAvailable);
+            
+            InitializeValues();
         }
 
         private void InitializeValues()
@@ -135,20 +135,20 @@ namespace UtilitiesManager.ViewModels
                 SoundLevelText = SoundLevel.ToString();
                 BrightnessText = Brightness.ToString();
                 
-                System.Diagnostics.Debug.WriteLine($"Dependency check results:");
-                System.Diagnostics.Debug.WriteLine($"  BrightnessCtl available: {_checker.IsBrightnessCtlAvailable}");
-                System.Diagnostics.Debug.WriteLine($"  Pactl available: {_checker.IsPactlAvailable}");
-                System.Diagnostics.Debug.WriteLine($"  Upower available: {_checker.IsUpowerAvailable}");
-                System.Diagnostics.Debug.WriteLine($"  Nmcli available: {_checker.IsNmcliAvailable}");
+                // Test the dependency detection directly
+                Console.WriteLine($"nmcli available: {_checker.IsNmcliAvailable}");
+                Console.WriteLine($"WiFiAvailable set to: {_checker.IsNmcliAvailable}");
                 
                 BrightnessAvailable = _checker.IsBrightnessCtlAvailable;
                 SoundAvailable = _checker.IsPactlAvailable;
                 BatteryAvailable = _checker.IsUpowerAvailable;
                 WiFiAvailable = _checker.IsNmcliAvailable;
+                
+                Console.WriteLine($"Final WiFiAvailable: {WiFiAvailable}");
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error initializing values: {ex.Message}");
+                Console.WriteLine($"Error initializing values: {ex.Message}");
             }
         }
 

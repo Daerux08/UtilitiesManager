@@ -34,18 +34,16 @@ namespace UtilitiesManager
         }
         public static async Task MenuService(CheckDependencyCommand checkerParam)
         {
+            CheckDependencyCommand.CheckDependencies();
             while (true)
             {
-                var checker = new CheckDependencyCommand();
-                checker.CheckDependencies();
-
-                if (!checker.IsNmcliAvailable)
+                if (!checkerParam.IsNmcliAvailable)
                 {
                     MenuEngine.ShowError("WiFi Networks", "nmcli (NetworkManager) is not available on this system.");
                     return;
                 }
 
-                var networks = await checker.GetWiFiNetworksAsync();
+                var networks = await checkerParam.GetWiFiNetworksAsync();
 
                 if (networks.Count == 0)
                 {
