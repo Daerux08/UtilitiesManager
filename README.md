@@ -76,7 +76,7 @@ UtilMan status
 
 ## Installation
 ```bash
-sudo dpkg -i UtilitiesManager_0.6.0-prealpha6_amd64.deb
+sudo dpkg -i UtilitiesManager_0.7.0-prealpha6_amd64.deb
 sudo apt-get install -f
 ```
 
@@ -98,10 +98,11 @@ dotnet build
 - Backup & recovery tools
 
 ## Recent Updates
+- **Enhanced CLI Interface**: Completely redesigned CLI using Spectre.Console with modern menu engine
+- **Reduced CLI Bloat**: Streamlined menu system using simple, efficient engine
 - **Improved Architecture**: Refactored codebase into modular service classes
 - **Enhanced Dependency System**: Simplified and robust dependency checking
 - **Better GUI**: Material design improvements with modern styling
-- **Better CLI**: Spectre Console based menus and functions
 - **Bug Fixes**: WiFi parsing, service detection, and startup reliability improvements
 
 ## Known Bugs

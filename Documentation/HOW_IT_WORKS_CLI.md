@@ -6,7 +6,7 @@ The CLI interface provides comprehensive system control and monitoring capabilit
 ## CLI Main Files
 1. `Program.cs` - Entry point and environment detection
 2. `CLI_UTILMAN.cs` - CLI interface routing and main menu coordination
-3. `MenuHelper.cs` - Arrow key navigation and menu system
+3. `MenuEngine.cs` - Modern Spectre.Console based menu system with arrow key navigation
 4. `DownloadScript.cs` - Package installation with sudo handling
 5. `Terminal.cs` - Linux command execution and parsing
 6. `Help.cs` - Comprehensive help documentation
@@ -40,14 +40,15 @@ Each service follows a consistent pattern:
 2. Falls back to CLI mode if GUI not available
 3. `CLI_UTILMAN.cs` routes commands to appropriate service classes
 4. Service classes handle CLI commands and interactive menus
-5. `MenuHelper.cs` provides arrow key navigation with numbered fallback
+5. `MenuEngine.cs` provides modern Spectre.Console based navigation with arrow keys
 
 ## Interactive Menu System
 
 ### Navigation
 - **Arrow Keys**: ↑↓ to navigate, ENTER to select, Q to quit
+- **Spectre.Console**: Modern terminal UI with colors and styling
 - **Fallback**: Numbered input when console redirected (SSH, scripts)
-- **Visual**: `> Selected Item` vs `  Normal Item`
+- **Visual**: Enhanced panels and formatted output
 
 ### Main Menu Structure
 ```
@@ -179,17 +180,19 @@ UtilMan status                 # Show system overview and dependencies
 
 ## CLI Features Working
 1. **Modular Service Architecture** - Separated concerns into focused service classes
-2. **Arrow Key Navigation** - Modern menu interface with fallback
-3. **System Monitoring** - CPU, memory, disk, network statistics
-4. **Service Management** - Full systemd service control
-5. **User Management** - User account information display
-6. **Log Management** - System, kernel, and boot log viewing
-7. **Firewall Management** - UFW and iptables configuration
-8. **Package Installation** - Automated dependency installation
-9. **Environment Detection** - Automatic GUI/CLI mode selection
-10. **Error Handling** - Graceful degradation for missing tools
-11. **Cross-Distro Compatibility** - Works on major Linux distributions
-12. **Maintainable Code** - Each service has single responsibility
+2. **Enhanced Menu Engine** - Modern Spectre.Console based interface with reduced complexity
+3. **Arrow Key Navigation** - Modern menu interface with fallback support
+4. **System Monitoring** - CPU, memory, disk, network statistics
+5. **Service Management** - Full systemd service control
+6. **User Management** - User account information display
+7. **Log Management** - System, kernel, and boot log viewing
+8. **Firewall Management** - UFW and iptables configuration
+9. **Package Installation** - Automated dependency installation
+10. **Environment Detection** - Automatic GUI/CLI mode selection
+11. **Error Handling** - Graceful degradation for missing tools
+12. **Cross-Distro Compatibility** - Works on major Linux distributions
+13. **Maintainable Code** - Each service has single responsibility
+14. **Streamlined Interface** - Reduced CLI bloat with efficient menu engine
 
 ## CLI Dependencies
 

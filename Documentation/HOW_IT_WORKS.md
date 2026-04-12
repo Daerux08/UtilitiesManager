@@ -30,7 +30,7 @@ The application automatically detects the appropriate mode:
 
 ### CLI Components
 9. `CLI_UTILMAN.cs` - CLI interface routing and main menu coordination
-10. `MenuHelper.cs` - Arrow key navigation and menu system
+10. `MenuEngine.cs` - Modern Spectre.Console based menu system with arrow key navigation
 11. `DownloadScript.cs` - Package installation with sudo handling
 12. **Service Classes** - Refactored modular service-based architecture:
     - `BrightnessService.cs` - Screen brightness control
@@ -59,6 +59,7 @@ Both GUI and CLI interfaces share:
 - **Cross-distribution compatibility**
 - **Service-based architecture** for maintainable code (CLI)
 - **Enhanced GUI** with material design cards and modern styling
+- **Modern CLI** with Spectre.Console based menus and reduced bloat
 
 ## What works now
 1. Brightness control - via brightnessctl
@@ -75,8 +76,9 @@ Both GUI and CLI interfaces share:
 12. Log management - system, kernel, and boot log viewing (CLI only)
 13. Firewall management - UFW and iptables configuration (CLI only)
 14. Package installation - automated dependency installation (CLI only)
-15. Arrow key navigation - modern CLI menu interface (CLI only)
+15. Arrow key navigation - modern CLI menu interface with Spectre.Console (CLI only)
 16. Environment detection - automatic GUI/CLI mode selection
+17. **Enhanced Menu Engine** - streamlined CLI interface with reduced complexity
 
 ## Future Enhancements
 1. Bluetooth management
