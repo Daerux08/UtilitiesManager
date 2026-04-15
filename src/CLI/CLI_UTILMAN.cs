@@ -91,10 +91,10 @@ namespace UtilitiesManager
                 var menuOptions = new List<(string, Func<Task>)>
                 {
                     ("Brightness Control", async () => await BrightnessService.BrightnessMenu()),
-                    ("Volume Control", async () => { CheckDependencyCommand.CheckDependencies(); await VolumeService.MenuService(new CheckDependencyCommand()); }),
-                    ("Battery Status", async () => { CheckDependencyCommand.CheckDependencies(); BatteryService.MenuService(new CheckDependencyCommand()); await Task.Delay(1); }),
-                    ("WiFi Networks", async () => { CheckDependencyCommand.CheckDependencies(); await WifiService.MenuService(new CheckDependencyCommand()); }),
-                    ("Power Profiles", async () => { CheckDependencyCommand.CheckDependencies(); await PowerService.MenuService(new CheckDependencyCommand()); }),
+                    ("Volume Control", async () => { var checker = new CheckDependencyCommand(); checker.CheckDependencies(); await VolumeService.MenuService(checker); }),
+                    ("Battery Status", async () => { var checker = new CheckDependencyCommand(); checker.CheckDependencies(); BatteryService.MenuService(checker); await Task.Delay(1); }),
+                    ("WiFi Networks", async () => { var checker = new CheckDependencyCommand(); checker.CheckDependencies(); await WifiService.MenuService(checker); }),
+                    ("Power Profiles", async () => { var checker = new CheckDependencyCommand(); checker.CheckDependencies(); await PowerService.MenuService(checker); }),
                     ("System Monitoring", async () => await SystemMonitoringService.SystemMonitoringMenu()),
                     ("Service Management", async () => await ServicesService.MenuService(new CheckDependencyCommand())),
                     ("User Management", async () => await UserService.MenuService(new CheckDependencyCommand())),

@@ -27,7 +27,7 @@ namespace UtilitiesManager
 
         public static void MenuService(CheckDependencyCommand checkerParam)
         {
-            CheckDependencyCommand.CheckDependencies();
+            checkerParam.CheckDependencies();
             if (!checkerParam.IsUpowerAvailable)
             {
                 MenuEngine.ShowError("Battery Status", "upower is not available on this system.");

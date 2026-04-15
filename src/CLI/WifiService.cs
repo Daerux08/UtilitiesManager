@@ -34,7 +34,7 @@ namespace UtilitiesManager
         }
         public static async Task MenuService(CheckDependencyCommand checkerParam)
         {
-            CheckDependencyCommand.CheckDependencies();
+            checkerParam.CheckDependencies();
             while (true)
             {
                 if (!checkerParam.IsNmcliAvailable)
