@@ -9,9 +9,10 @@ The GUI interface provides an Avalonia-based desktop application with intuitive 
 3. `MainWindow.axaml/.cs` - Main window with sliders and buttons
 4. `BatteryWindow.axaml/.cs` - Battery status window
 5. `WiFiWindow.axaml/.cs` - WiFi management window
-6. `EnterPasswordPopup.axaml/.cs` - WiFi password input dialog
-7. `Terminal.cs` - Linux command execution and parsing
-8. `Help.cs` - Help documentation
+6. `BluetoothWindow.axaml/.cs` - Bluetooth device management window
+7. `EnterPasswordPopup.axaml/.cs` - Generic password/PIN dialog for WiFi and Bluetooth
+8. `Terminal.cs` - Linux command execution and parsing
+9. `Help.cs` - Help documentation
 
 ## How GUI Mode Starts
 1. `Program.cs` checks environment variables (DISPLAY/WAYLAND_DISPLAY)
@@ -40,6 +41,12 @@ The GUI interface provides an Avalonia-based desktop application with intuitive 
 - **Enabled when**: `nmcli` command is available
 - **Tooltip**: Shows current connection status
 - **Visual**: Changes based on connection state
+
+### Bluetooth Button
+- **Action**: Opens BluetoothWindow when clicked
+- **Enabled when**: `bluetoothctl` command is available
+- **Tooltip**: Shows Bluetooth availability status
+- **Visual**: Enabled when BlueZ service is available
 
 ### Battery Button
 - **Action**: Opens BatteryWindow when clicked
@@ -100,17 +107,50 @@ The GUI interface provides an Avalonia-based desktop application with intuitive 
 ## EnterPasswordPopup
 
 ### Purpose
-- Secure password input for WiFi networks
-- Modal dialog with password field
-- Show/hide password toggle
-- Connect and Cancel buttons
+- Secure password/PIN input for WiFi and Bluetooth
+- Modal dialog with masked input field
+- Context-aware prompts (password vs PIN)
+- Connect/Pair and Cancel buttons
 
 ### How it Works
-1. Opens when WiFi connection requires password
-2. User enters password (masked by default)
-3. Can toggle password visibility
-4. Connect button retries WiFi connection with password
-5. Cancel button closes popup
+1. Opens when WiFi connection requires password or Bluetooth pairing needs PIN
+2. User enters credentials (masked by default)
+3. Prompt adapts based on context (WiFi = "password", Bluetooth = "PIN or passkey")
+4. Button text changes (Connect for WiFi, Pair for Bluetooth)
+5. Retry connection/pairing with provided credentials
+6. Cancel button closes popup
+
+## Bluetooth Window
+
+### DataGrid Display
+- **Columns**: Name, Address, Type, RSSI, Paired, Connected, Trusted
+- **Sorting**: By connection status and signal strength
+- **Highlighting**: Connected devices marked with `*`
+- **Refresh**: Manual refresh button for device list
+- **Scan**: Toggle scan on/off to discover new devices
+
+### Bluetooth Actions
+1. **Scan/Stop Scan** - Toggle device discovery
+2. **Connect** - Connect to selected device
+3. **Disconnect** - Disconnect from selected device
+4. **Pair** - Pair with unpaired device
+5. **Trust** - Mark device as trusted
+
+### Bluetooth Connection Process
+1. **Double-click device** or click **Connect** → attempts connection
+2. **If not paired** → click **Pair** to initiate pairing
+3. **If PIN required** → EnterPasswordPopup opens for PIN input
+4. **Trust device** → Device automatically connects in future
+5. **Refresh list** to show updated connection status
+
+### How Bluetooth Window Works
+1. Window opens → calls `RefreshAsync()`
+2. Checks if `bluetoothctl` is available
+3. Runs `bluetoothctl devices` to get paired/known devices
+4. For each device, runs `bluetoothctl info {address}` for details
+5. Parses device info (name, type, RSSI, paired, connected, trusted)
+6. Displays devices in DataGrid
+7. Scan button triggers `bluetoothctl scan on` to find new devices
 
 ## GUI Linux Commands Used
 
@@ -124,6 +164,9 @@ The GUI interface provides an Avalonia-based desktop application with intuitive 
 7. `nmcli device wifi list` - List WiFi networks
 8. `nmcli device wifi rescan` - Trigger fresh network scan
 9. `powerprofilesctl get` - Get current power profile
+10. `bluetoothctl devices` - List Bluetooth devices
+11. `bluetoothctl info {address}` - Get device details
+12. `bluetoothctl scan on/off` - Toggle device scanning
 
 ### Control Commands
 1. `brightnessctl set {percent}%` - Set brightness
@@ -131,6 +174,10 @@ The GUI interface provides an Avalonia-based desktop application with intuitive 
 3. `powerprofilesctl set {profile}` - Set power profile
 4. `nmcli device wifi connect "{ssid}"` - Connect to open network
 5. `nmcli device wifi connect "{ssid}" password "{pass}"` - Connect to secured network
+6. `bluetoothctl connect {address}` - Connect to Bluetooth device
+7. `bluetoothctl disconnect {address}` - Disconnect from Bluetooth device
+8. `bluetoothctl pair {address}` - Pair with Bluetooth device
+9. `bluetoothctl trust {address}` - Trust Bluetooth device
 
 ## GUI Features Working
 1. **Brightness Control** - Via brightnessctl with real-time feedback
@@ -139,10 +186,11 @@ The GUI interface provides an Avalonia-based desktop application with intuitive 
 4. **Power Profiles** - Easy profile switching with visual feedback
 5. **WiFi Scanning** - Robust nmcli parsing with multiple fallbacks
 6. **WiFi Connection** - Secure password handling and retry logic
-7. **Cross-Distro Compatibility** - Works where NetworkManager available
-8. **Error Handling** - Graceful degradation for missing tools
-9. **Real-time Updates** - Current values shown on load
-10. **Visual Feedback** - Tooltips and status indicators
+7. **Bluetooth Management** - Device scanning, pairing, and connection
+8. **Cross-Distro Compatibility** - Works where NetworkManager/BlueZ available
+9. **Error Handling** - Graceful degradation for missing tools
+10. **Real-time Updates** - Current values shown on load
+11. **Visual Feedback** - Tooltips and status indicators
 
 ## GUI Dependencies
 
@@ -151,12 +199,14 @@ The GUI interface provides an Avalonia-based desktop application with intuitive 
 - **pactl** (pulseaudio) - Audio volume control
 - **upower** - Battery monitoring
 - **nmcli** (NetworkManager) - WiFi management
+- **bluetoothctl** (BlueZ) - Bluetooth device management
 - **powerprofilesctl** - Power profile management
 
 ### System Requirements
 - **Display Server** - X11 or Wayland
 - **Desktop Environment** - Any Linux desktop
 - **NetworkManager** - For WiFi functionality
+- **BlueZ** - For Bluetooth functionality
 - **PulseAudio** - For audio control
 
 ## GUI Error Handling
@@ -165,6 +215,7 @@ The GUI interface provides an Avalonia-based desktop application with intuitive 
 - **Permission Issues** - Suggests user/group configuration
 - **Parsing Failures** - Multiple fallback strategies for command output
 - **WiFi Timeouts** - Handles scan delays and connection timeouts
+- **Bluetooth Pairing** - Handles PIN/passkey entry and pairing failures
 
 ## GUI Testing
 - **Tested on**: Linux Mint 22.2 (Cinnamon), Debian 13 (XFCE), Ubuntu 24.04

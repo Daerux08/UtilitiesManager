@@ -36,6 +36,10 @@ namespace UtilitiesManager
                     await WifiService.HandleWifiCommand(args);
                     break;
 
+                case "bluetooth":
+                    await BluetoothService.HandleBluetoothCommand(args);
+                    break;
+
                 case "power":
                     await PowerService.HandlePowerCommand(args);
                     break;
@@ -94,6 +98,7 @@ namespace UtilitiesManager
                     ("Volume Control", async () => { var checker = new CheckDependencyCommand(); checker.CheckDependencies(); await VolumeService.MenuService(checker); }),
                     ("Battery Status", async () => { var checker = new CheckDependencyCommand(); checker.CheckDependencies(); BatteryService.MenuService(checker); await Task.Delay(1); }),
                     ("WiFi Networks", async () => { var checker = new CheckDependencyCommand(); checker.CheckDependencies(); await WifiService.MenuService(checker); }),
+                    ("Bluetooth Devices", async () => { var checker = new CheckDependencyCommand(); checker.CheckDependencies(); await BluetoothService.MenuService(checker); }),
                     ("Power Profiles", async () => { var checker = new CheckDependencyCommand(); checker.CheckDependencies(); await PowerService.MenuService(checker); }),
                     ("System Monitoring", async () => await SystemMonitoringService.SystemMonitoringMenu()),
                     ("Service Management", async () => await ServicesService.MenuService(new CheckDependencyCommand())),

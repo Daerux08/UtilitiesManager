@@ -31,6 +31,19 @@ namespace UtilitiesManager
         public bool IsActive { get; set; } = false;
     }
 
+    public class BluetoothInfo
+    {
+        public string Address { get; set; } = "";
+        public string Name { get; set; } = "";
+        public string Alias { get; set; } = "";
+        public string Type { get; set; } = "";
+        public string RSSI { get; set; } = "";
+        public bool Paired { get; set; } = false;
+        public bool Connected { get; set; } = false;
+        public bool Trusted { get; set; } = false;
+        public bool Available { get; set; } = false;
+    }
+
     public class CommandResult
     {
         public int ExitCode { get; set; }
@@ -146,6 +159,98 @@ namespace UtilitiesManager
         {
             await TerminalCommands.RunCommandAsync($"powerprofilesctl set {profile}");
         }
+
+        public async Task<bool> ScanBluetoothDevicesAsync()
+        {
+            try
+            {
+                var result = await TerminalCommands.RunCommandWithResultAsync("bluetoothctl scan on");
+                return result.IsSuccess;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> StopBluetoothScanAsync()
+        {
+            try
+            {
+                var result = await TerminalCommands.RunCommandWithResultAsync("bluetoothctl scan off");
+                return result.IsSuccess;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> ConnectToDeviceAsync(string deviceAddress)
+        {
+            try
+            {
+                var result = await TerminalCommands.RunCommandWithResultAsync($"bluetoothctl connect {deviceAddress}");
+                return result.IsSuccess;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> DisconnectDeviceAsync(string deviceAddress)
+        {
+            try
+            {
+                var result = await TerminalCommands.RunCommandWithResultAsync($"bluetoothctl disconnect {deviceAddress}");
+                return result.IsSuccess;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> PairDeviceAsync(string deviceAddress)
+        {
+            try
+            {
+                var result = await TerminalCommands.RunCommandWithResultAsync($"bluetoothctl pair {deviceAddress}");
+                return result.IsSuccess;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> TrustDeviceAsync(string deviceAddress)
+        {
+            try
+            {
+                var result = await TerminalCommands.RunCommandWithResultAsync($"bluetoothctl trust {deviceAddress}");
+                return result.IsSuccess;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> ToggleBluetoothAsync(bool enable)
+        {
+            try
+            {
+                var command = enable ? "bluetoothctl power on" : "bluetoothctl power off";
+                var result = await TerminalCommands.RunCommandWithResultAsync(command);
+                return result.IsSuccess;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 
     public class CheckDependencyCommand
@@ -159,6 +264,7 @@ namespace UtilitiesManager
         public bool IsUpowerAvailable => dependencies["upower"];
         public bool IsNmcliAvailable => dependencies["nmcli"];
         public bool IsPowerProfilesCtlAvailable => dependencies["powerprofilesctl"];
+        public bool IsBluetoothctlAvailable => dependencies["bluetoothctl"];
 
         // Terminal/Server monitoring booleans
         public bool IsProcpsAvailable => dependencies["ps"];
@@ -190,6 +296,7 @@ namespace UtilitiesManager
                 { "upower", false },
                 { "nmcli", false },
                 { "powerprofilesctl", false },
+                { "bluetoothctl", false },
                 { "free", false }, // for memory info
                 { "ps", false },   // for CPU info
                 { "sensors", false }, // for temperature info
@@ -441,6 +548,112 @@ namespace UtilitiesManager
             }
 
             return networks;
+        }
+
+        // BLUETOOTH
+        public async Task<ObservableCollection<BluetoothInfo>> GetBluetoothDevicesAsync()
+        {
+            var devices = new ObservableCollection<BluetoothInfo>();
+            
+            try
+            {
+                // Get devices info using bluetoothctl
+                string output = await TerminalCommands.RunCommandAsync("bluetoothctl devices Paired");
+                
+                if (string.IsNullOrWhiteSpace(output))
+                {
+                    // Try to get all devices if no paired devices
+                    output = await TerminalCommands.RunCommandAsync("bluetoothctl devices");
+                }
+                
+                if (string.IsNullOrWhiteSpace(output))
+                    return devices;
+
+                var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+                
+                foreach (var line in lines)
+                {
+                    var trimmedLine = line.Trim();
+                    if (string.IsNullOrEmpty(trimmedLine)) continue;
+                    
+                    // Parse device line format: "Device XX:XX:XX:XX:XX:XX Device Name"
+                    if (trimmedLine.StartsWith("Device "))
+                    {
+                        var parts = trimmedLine.Substring(7).Split(new[] { ' ' }, 2);
+                        if (parts.Length >= 2)
+                        {
+                            var device = new BluetoothInfo
+                            {
+                                Address = parts[0].Trim(),
+                                Name = parts[1].Trim(),
+                                Alias = parts[1].Trim(),
+                                Available = true
+                            };
+                            
+                            // Get detailed device info
+                            await GetDeviceDetailsAsync(device);
+                            
+                            if (!string.IsNullOrEmpty(device.Address))
+                            {
+                                devices.Add(device);
+                            }
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // Log error if needed, return empty collection
+            }
+
+            return devices;
+        }
+
+        private async Task GetDeviceDetailsAsync(BluetoothInfo device)
+        {
+            try
+            {
+                string infoOutput = await TerminalCommands.RunCommandAsync($"bluetoothctl info {device.Address}");
+                
+                if (string.IsNullOrWhiteSpace(infoOutput))
+                    return;
+
+                var lines = infoOutput.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+                
+                foreach (var line in lines)
+                {
+                    var trimmedLine = line.Trim();
+                    
+                    if (trimmedLine.StartsWith("Alias: "))
+                    {
+                        device.Alias = trimmedLine.Substring(7).Trim();
+                    }
+                    else if (trimmedLine.StartsWith("Type: "))
+                    {
+                        device.Type = trimmedLine.Substring(6).Trim();
+                    }
+                    else if (trimmedLine.StartsWith("RSSI: "))
+                    {
+                        device.RSSI = trimmedLine.Substring(6).Trim();
+                    }
+                    else if (trimmedLine.StartsWith("Paired: "))
+                    {
+                        device.Paired = trimmedLine.Substring(8).Trim().Equals("yes", StringComparison.OrdinalIgnoreCase);
+                    }
+                    else if (trimmedLine.StartsWith("Connected: "))
+                    {
+                        device.Connected = trimmedLine.Substring(11).Trim().Equals("yes", StringComparison.OrdinalIgnoreCase);
+                    }
+                    else if (trimmedLine.StartsWith("Trusted: "))
+                    {
+                        device.Trusted = trimmedLine.Substring(9).Trim().Equals("yes", StringComparison.OrdinalIgnoreCase);
+                    }
+                }
+            }
+            catch
+            {
+                // Ignore errors in getting device details
+            }
         }
 
         // POWER PROFILE

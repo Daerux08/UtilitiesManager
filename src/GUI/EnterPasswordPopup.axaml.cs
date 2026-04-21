@@ -7,17 +7,28 @@ namespace UtilitiesManager;
 
 public partial class EnterPasswordPopup : Window
 {
-    private string _ssid = "";
+    private string _deviceName = "";
+    private string _promptText = "password";
+    private string _buttonText = "Connect";
 
     public EnterPasswordPopup()
     {
         InitializeComponent();
     }
 
-    public EnterPasswordPopup(string ssid) : this()
+    public EnterPasswordPopup(string deviceName) : this()
     {
-        _ssid = ssid;
-        InitSSIDLabel();
+        _deviceName = deviceName;
+        InitLabel();
+    }
+
+    public EnterPasswordPopup(string deviceName, string promptText, string buttonText) : this()
+    {
+        _deviceName = deviceName;
+        _promptText = promptText;
+        _buttonText = buttonText;
+        InitLabel();
+        UpdateButtonText();
     }
 
     private void InitializeComponent()
@@ -25,12 +36,12 @@ public partial class EnterPasswordPopup : Window
         AvaloniaXamlLoader.Load(this);
     }
 
-    private void InitSSIDLabel()
+    private void InitLabel()
     {
         var label = this.FindControl<TextBlock>("SSIDLabel");
         if (label != null)
         {
-            label.Text = $"Enter password for \"{_ssid}\":";
+            label.Text = $"Enter {_promptText} for \"{_deviceName}\":";
         }
 
         var textBox = this.FindControl<TextBox>("PasswordTextBox");
@@ -40,12 +51,32 @@ public partial class EnterPasswordPopup : Window
         }
     }
 
+    private void UpdateButtonText()
+    {
+        var button = this.FindControl<Button>("ConnectButton");
+        if (button != null)
+        {
+            button.Content = _buttonText;
+        }
+    }
+
     private void ConnectButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         var passwordTextBox = this.FindControl<TextBox>("PasswordTextBox");
         string password = passwordTextBox?.Text ?? "";
         
         this.Close(password);
+    }
+
+    // Static helpers for common use cases
+    public static EnterPasswordPopup ForWiFi(string ssid)
+    {
+        return new EnterPasswordPopup(ssid, "password", "Connect");
+    }
+
+    public static EnterPasswordPopup ForBluetooth(string deviceName)
+    {
+        return new EnterPasswordPopup(deviceName, "PIN or passkey", "Pair");
     }
 
     private void CancelButton_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e)

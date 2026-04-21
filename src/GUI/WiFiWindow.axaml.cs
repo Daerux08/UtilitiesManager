@@ -15,6 +15,24 @@ public partial class WiFiWindow : Window
         var viewModel = new WiFiWindowViewModel();
         DataContext = viewModel;
         viewModel.CloseRequested += (s, e) => Close();
+        viewModel.PasswordRequested += OnPasswordRequested;
+    }
+
+    private async void OnPasswordRequested(object? sender, string ssid)
+    {
+        if (ViewModel == null) return;
+
+        var popup = EnterPasswordPopup.ForWiFi(ssid);
+        var password = await popup.ShowDialog<string?>(this);
+
+        if (!string.IsNullOrEmpty(password))
+        {
+            await ViewModel.ConnectWithPassword(ssid, password);
+        }
+        else
+        {
+            ViewModel.StatusText = "Connection cancelled - no password provided";
+        }
     }
 
     private void InitializeComponent()

@@ -19,6 +19,7 @@ namespace UtilitiesManager.ViewModels
         private bool _soundAvailable;
         private bool _batteryAvailable;
         private bool _wifiAvailable;
+        private bool _bluetoothAvailable;
 
         public int SoundLevel
         {
@@ -102,6 +103,18 @@ namespace UtilitiesManager.ViewModels
             }
         }
 
+        public bool BluetoothAvailable
+        {
+            get => _bluetoothAvailable;
+            set 
+            { 
+                if (SetProperty(ref _bluetoothAvailable, value))
+                {
+                    ((RelayCommand)OpenBluetoothCommand).RaiseCanExecuteChanged();
+                }
+            }
+        }
+
         public bool BatteryAvailable
         {
             get => _batteryAvailable;
@@ -116,11 +129,13 @@ namespace UtilitiesManager.ViewModels
 
         public ICommand OpenBatteryCommand { get; }
         public ICommand OpenWiFiCommand { get; }
+        public ICommand OpenBluetoothCommand { get; }
 
         public MainWindowViewModel()
         {
             OpenBatteryCommand = new RelayCommand(OpenBattery, () => BatteryAvailable);
             OpenWiFiCommand = new RelayCommand(OpenWiFi, () => WiFiAvailable);
+            OpenBluetoothCommand = new RelayCommand(OpenBluetooth, () => BluetoothAvailable);
             
             InitializeValues();
         }
@@ -143,6 +158,7 @@ namespace UtilitiesManager.ViewModels
                 SoundAvailable = _checker.IsPactlAvailable;
                 BatteryAvailable = _checker.IsUpowerAvailable;
                 WiFiAvailable = _checker.IsNmcliAvailable;
+                BluetoothAvailable = _checker.IsBluetoothctlAvailable;
                 
                 Console.WriteLine($"Final WiFiAvailable: {WiFiAvailable}");
             }
@@ -197,6 +213,30 @@ namespace UtilitiesManager.ViewModels
             else
             {
                 System.Diagnostics.Debug.WriteLine("WiFi not available, window not opened");
+            }
+        }
+
+        private void OpenBluetooth()
+        {
+            System.Diagnostics.Debug.WriteLine($"OpenBluetooth called. BluetoothAvailable: {BluetoothAvailable}");
+            if (BluetoothAvailable)
+            {
+                try
+                {
+                    var bluetoothWindow = new BluetoothWindow();
+                    // Center the window on screen since we can't set owner from ViewModel
+                    bluetoothWindow.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+                    bluetoothWindow.Show();
+                    System.Diagnostics.Debug.WriteLine("BluetoothWindow created and shown successfully");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Error creating BluetoothWindow: {ex.Message}");
+                }
+            }
+            else
+            {
+                System.Diagnostics.Debug.WriteLine("Bluetooth not available, window not opened");
             }
         }
     }

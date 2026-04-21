@@ -19,6 +19,7 @@ The CLI has been refactored into a modular service-based architecture:
 - `VolumeService.cs` - Audio volume management
 - `BatteryService.cs` - Battery status and power profiles
 - `WifiService.cs` - WiFi network management
+- `BluetoothService.cs` - Bluetooth device management
 - `PowerService.cs` - Power profile management
 - `StatusService.cs` - System status overview
 - `SystemMonitoringService.cs` - CPU, memory, disk, network monitoring
@@ -57,6 +58,7 @@ Each service follows a consistent pattern:
   Volume Control
   Battery Status
   WiFi Networks
+  Bluetooth Devices
   Power Profiles
   System Monitoring
   Service Management
@@ -76,6 +78,7 @@ Each service follows a consistent pattern:
 - **Log Management**: System, Kernel, Boot logs
 - **Firewall Management**: UFW status, rule management
 - **Package Installation**: All, Individual, Status, Sensors, Firewall
+- **Bluetooth Management**: Scan, pair, connect, device listing
 
 ## CLI Commands
 
@@ -87,6 +90,16 @@ UtilMan battery                # Show battery status
 UtilMan wifi list              # List WiFi networks
 UtilMan power get              # Get current power profile
 UtilMan power set [profile]    # Set power profile (performance/balanced/power-saver)
+```
+
+### Bluetooth Management
+```bash
+UtilMan bluetooth list              # List Bluetooth devices
+UtilMan bluetooth scan              # Scan for devices
+UtilMan bluetooth connect [addr]    # Connect to device
+UtilMan bluetooth disconnect [addr] # Disconnect from device
+UtilMan bluetooth pair [addr]       # Pair with device
+UtilMan bluetooth power [on|off]    # Toggle Bluetooth power
 ```
 
 ### Server Monitoring
@@ -149,6 +162,16 @@ UtilMan status                 # Show system overview and dependencies
 5. `free -h` - Memory usage in human-readable format
 6. `df -h` - Disk usage in human-readable format
 7. `ip addr show` - Network interface information
+
+### Bluetooth Commands
+1. `bluetoothctl devices` - List paired/known Bluetooth devices
+2. `bluetoothctl scan on` - Start scanning for devices
+3. `bluetoothctl scan off` - Stop scanning
+4. `bluetoothctl connect {address}` - Connect to a device
+5. `bluetoothctl disconnect {address}` - Disconnect from a device
+6. `bluetoothctl pair {address}` - Pair with a device
+7. `bluetoothctl trust {address}` - Trust a device
+8. `bluetoothctl power on/off` - Toggle Bluetooth controller power
 
 ### Service Management Commands
 1. `systemctl list-units --type=service` - List system services

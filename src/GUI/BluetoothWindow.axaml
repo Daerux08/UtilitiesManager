@@ -1,0 +1,151 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:UtilitiesManager"
+        xmlns:vm="clr-namespace:UtilitiesManager.ViewModels"
+        xmlns:vc="clr-namespace:UtilitiesManager.ViewModels.Converters"
+        Width="850" Height="450"
+        x:Class="UtilitiesManager.BluetoothWindow"
+        x:DataType="vm:BluetoothWindowViewModel"
+        Title="Bluetooth Devices"
+        WindowStartupLocation="CenterScreen"
+        Icon="avares://UtilitiesManager/Assets/UtilManagerV3.png">
+
+    <Window.Resources>
+        <vc:BoolToStatusConverter x:Key="BoolToStatusConverter" />
+    </Window.Resources>
+
+    <Window.Styles>
+        <!-- Material Card Style -->
+        <Style Selector="Border.card">
+            <Setter Property="Background" Value="#FFFFFF"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="BoxShadow" Value="0 1 4 0 rgba(0,0,0,0.08)"/>
+            <Setter Property="Padding" Value="12"/>
+            <Setter Property="Margin" Value="8"/>
+        </Style>
+        
+        <Style Selector="Button">
+            <Setter Property="Margin" Value="4"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="CornerRadius" Value="4"/>
+        </Style>
+        <Style Selector="Button.scan">
+            <Setter Property="Background" Value="#4CAF50"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+        <Style Selector="Button.scan:pointerover">
+            <Setter Property="Background" Value="#45A049"/>
+        </Style>
+        <Style Selector="DataGrid">
+            <Setter Property="Margin" Value="8"/>
+            <Setter Property="AutoGenerateColumns" Value="False"/>
+            <Setter Property="CanUserReorderColumns" Value="True"/>
+            <Setter Property="CanUserResizeColumns" Value="True"/>
+            <Setter Property="CanUserSortColumns" Value="True"/>
+            <Setter Property="GridLinesVisibility" Value="Horizontal,Vertical"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+            <Setter Property="IsReadOnly" Value="True"/>
+            <Setter Property="SelectionMode" Value="Single"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+            <Setter Property="Padding" Value="0"/>
+        </Style>
+        <Style Selector="DataGridCell">
+            <Setter Property="Padding" Value="0"/>
+        </Style>
+        <Style Selector="DataGridRow:selected /template/ Rectangle#BackgroundRectangle">
+            <Setter Property="Fill" Value="#1976D2"/>
+        </Style>
+    </Window.Styles>
+
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header Card -->
+        <Border Grid.Row="0" Classes="card">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
+                <TextBlock Text=" bluetooth" FontSize="16"/>
+                <TextBlock Text="Bluetooth Devices" 
+                           FontSize="16" 
+                           FontWeight="Bold" 
+                           Foreground="#1976D2"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Data Grid -->
+        <Border Grid.Row="1" Classes="card">
+            <DataGrid Name="BluetoothDataGrid"
+                      ItemsSource="{Binding BluetoothDevices}"
+                      SelectedItem="{Binding SelectedDevice}"
+                      DoubleTapped="BluetoothDataGrid_DoubleTapped">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Status" 
+                                        x:DataType="local:BluetoothInfo"
+                                        Binding="{Binding Connected, Converter={StaticResource BoolToStatusConverter}}" 
+                                        Width="100"/>
+                    <DataGridTextColumn Header="Name" 
+                                        x:DataType="local:BluetoothInfo"
+                                        Binding="{Binding Name}" 
+                                        Width="200"/>
+                    <DataGridTextColumn Header="Address" 
+                                        x:DataType="local:BluetoothInfo"
+                                        Binding="{Binding Address}" 
+                                        Width="150"/>
+                    <DataGridTextColumn Header="Type" 
+                                        x:DataType="local:BluetoothInfo"
+                                        Binding="{Binding Type}" 
+                                        Width="100"/>
+                    <DataGridTextColumn Header="RSSI" 
+                                        x:DataType="local:BluetoothInfo"
+                                        Binding="{Binding RSSI}" 
+                                        Width="80"/>
+                    <DataGridTextColumn Header="Paired" 
+                                        x:DataType="local:BluetoothInfo"
+                                        Binding="{Binding Paired}" 
+                                        Width="80"/>
+                    <DataGridTextColumn Header="Trusted" 
+                                        x:DataType="local:BluetoothInfo"
+                                        Binding="{Binding Trusted}" 
+                                        Width="80"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+
+        <!-- Status and Buttons -->
+        <StackPanel Grid.Row="2" Spacing="8" Margin="0,8,0,0">
+            <!-- Status Label -->
+            <TextBlock Text="{Binding StatusText}" 
+                       HorizontalAlignment="Center" 
+                       FontSize="12"
+                       Foreground="#666666"/>
+            
+            <!-- Action Buttons -->
+            <StackPanel Orientation="Horizontal" 
+                        HorizontalAlignment="Center" 
+                        Spacing="8">
+                <Button Content="{Binding IsScanning, Converter={x:Static vc:BooleanToStringConverter}, ConverterParameter='Scan|Stop Scan'}" 
+                        Command="{Binding ScanCommand}"
+                        Classes="scan"/>
+                <Button Content="Refresh" 
+                        Command="{Binding RefreshCommand}"/>
+                <Button Content="Connect" 
+                        Command="{Binding ConnectCommand}"/>
+                <Button Content="Disconnect" 
+                        Command="{Binding DisconnectCommand}"/>
+                <Button Content="Pair" 
+                        Command="{Binding PairCommand}"/>
+                <Button Content="Trust" 
+                        Command="{Binding TrustCommand}"/>
+                <Button Content="Close" 
+                        Command="{Binding CloseCommand}"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>

@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.8.0-prealpha7] - 2026-04-21
+
+### New Features
+- **Bluetooth Management**: Complete Bluetooth support added to both GUI and CLI
+  - GUI: New Bluetooth window with device scanning, pairing, connection, and trust management
+  - CLI: Full `UtilMan bluetooth` command suite with interactive menu
+  - Device discovery and status monitoring via bluetoothctl
+  - PIN/passkey support for secure device pairing
+
+### GUI Improvements
+- **New Bluetooth Window**: Material design interface showing device list with connection status
+- **Generic Password Popup**: Refactored EnterPasswordPopup for reuse with WiFi and Bluetooth
+- **Main Window Integration**: Bluetooth button added with dependency-based availability
+
+### CLI Improvements  
+- **Bluetooth Commands**: `list`, `scan`, `connect`, `disconnect`, `pair`, `power`
+- **Interactive Bluetooth Menu**: Arrow-key navigation for device selection and management
+- **Help Documentation**: Complete Bluetooth help section with examples and requirements
+
+### Technical Improvements
+- **Terminal.cs**: Added BluetoothInfo model and bluetoothctl integration methods
+- **MVVM Pattern**: BluetoothWindowViewModel following established architecture
+- **Service Architecture**: BluetoothService.cs for CLI operations
+
 ## [0.7.0-prealpha6] - 2026-03-30
 - **Remade the CLI interface**: Completely redesigned the CLI interface using Spectre.Console for improved usability and aesthetics
 - **Reduced the overall size and bloat of the CLI menu, currently using a simple engine**

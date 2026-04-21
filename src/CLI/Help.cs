@@ -18,7 +18,7 @@ namespace UtilitiesManager
             AnsiConsole.WriteLine();
             
             // Description panel
-            var descriptionPanel = new Panel("[italic]A Linux system utility manager for controlling brightness, volume, battery, WiFi, and power profiles.[/]")
+            var descriptionPanel = new Panel("[italic]A Linux system utility manager for controlling brightness, volume, battery, WiFi, Bluetooth, and power profiles.[/]")
             {
                 Border = BoxBorder.Rounded,
                 BorderStyle = new Style(Color.Blue),
@@ -48,6 +48,7 @@ namespace UtilitiesManager
             ShowVolumeHelp();
             ShowBatteryHelp();
             ShowWiFiHelp();
+            ShowBluetoothHelp();
             ShowPowerHelp();
             ShowStatusHelp();
             ShowGeneralHelp();
@@ -391,6 +392,99 @@ namespace UtilitiesManager
             AnsiConsole.WriteLine();
         }
 
+        private static void ShowBluetoothHelp()
+        {
+            var bluetoothPanel = new Panel(
+                "[bold cyan]bluetooth list[/]                List available Bluetooth devices\n" +
+                "[bold cyan]bluetooth connect <device>[/]    Connect to Bluetooth device")
+            {
+                Border = BoxBorder.Double,
+                BorderStyle = new Style(Color.Yellow),
+                Header = new PanelHeader("[bold yellow]BLUETOOTH[/]")
+            };
+            AnsiConsole.Write(bluetoothPanel);
+            AnsiConsole.WriteLine();
+
+            // Examples section
+            AnsiConsole.MarkupLine("[bold green]Examples:[/]");
+            var examplesTable = new Table()
+                .Border(TableBorder.Simple)
+                .AddColumn("[bold]Command[/]")
+                .AddColumn("[bold]Result[/]");
+            
+            examplesTable.AddRow("[cyan]bluetooth list[/]", "Show all available devices");
+            examplesTable.AddRow("[cyan]bluetooth connect 00:11:22:33:44:55[/]", "Connect to device with specified MAC address");
+            AnsiConsole.Write(examplesTable);
+            AnsiConsole.WriteLine();
+
+            // Information displayed
+            var infoPanel = new Panel(
+                "[blue]•[/] Device: Device name\n" +
+                "[blue]•[/] Address: Device MAC address\n" +
+                "[blue]•[/] RSSI: Signal strength (dBm)\n" +
+                "[blue]•[/] Paired: Whether device is paired\n" +
+                "[blue]•[/] Connected: Whether device is connected")
+            {
+                Border = BoxBorder.Rounded,
+                BorderStyle = new Style(Color.Blue),
+                Header = new PanelHeader("[bold]Information Displayed[/]")
+            };
+            AnsiConsole.Write(infoPanel);
+            AnsiConsole.WriteLine();
+
+            // Requirements
+            var reqPanel = new Panel(
+                "[red]•[/] bluez package must be installed\n" +
+                "[red]•[/] bluetooth service must be running\n" +
+                "[red]•[/] Bluetooth adapter must be enabled")
+            {
+                Border = BoxBorder.Rounded,
+                BorderStyle = new Style(Color.Red),
+                Header = new PanelHeader("[bold]System Requirements[/]")
+            };
+            AnsiConsole.Write(reqPanel);
+            AnsiConsole.WriteLine();
+
+            // Linux commands
+            AnsiConsole.MarkupLine("[bold blue]Linux Commands Used:[/]");
+            var commandsTable = new Table()
+                .Border(TableBorder.Simple)
+                .AddColumn("[bold]Command[/]")
+                .AddColumn("[bold]Purpose[/]");
+            
+            commandsTable.AddRow("[cyan]bluetoothctl devices[/]", "List available devices");
+            commandsTable.AddRow("[cyan]bluetoothctl connect <device>[/]", "Connect to device");
+            AnsiConsole.Write(commandsTable);
+            AnsiConsole.WriteLine();
+
+            // Dependencies
+            var depPanel = new Panel(
+                "[yellow]•[/] bluez (Bluetooth daemon)\n" +
+                "[yellow]•[/] bluetoothctl (Bluetooth CLI tool)\n" +
+                "[yellow]•[/] Linux kernel Bluetooth drivers")
+            {
+                Border = BoxBorder.Rounded,
+                BorderStyle = new Style(Color.Orange1),
+                Header = new PanelHeader("[bold]Dependencies[/]")
+            };
+            AnsiConsole.Write(depPanel);
+            AnsiConsole.WriteLine();
+
+            // Notes
+            var notesPanel = new Panel(
+                "[italic]• Only lists devices, doesn't connect (GUI feature)\n" +
+                "• Uses multiple parsing strategies for compatibility\n" +
+                "• Works across different Linux distributions\n" +
+                "• May need sudo for some Bluetooth operations[/]")
+            {
+                Border = BoxBorder.Rounded,
+                BorderStyle = new Style(Color.Grey),
+                Header = new PanelHeader("[bold]Notes[/]")
+            };
+            AnsiConsole.Write(notesPanel);
+            AnsiConsole.WriteLine();
+        }
+
         private static void ShowPowerHelp()
         {
             var powerPanel = new Panel(
@@ -539,6 +633,7 @@ namespace UtilitiesManager
                 "[yellow]•[/] pactl: For audio volume control\n" +
                 "[yellow]•[/] upower: For battery monitoring\n" +
                 "[yellow]•[/] nmcli: For WiFi management\n" +
+                "[yellow]•[/] bluetoothctl: For Bluetooth management\n" +
                 "[yellow]•[/] powerprofilesctl: For power profile management")
             {
                 Border = BoxBorder.Rounded,
@@ -571,7 +666,7 @@ namespace UtilitiesManager
 
             // About section
             var aboutPanel = new Panel(
-                "[italic]Utilities Manager is a Linux system utility manager for controlling brightness, volume, battery, WiFi, and power profiles via command line.[/]")
+                "[italic]Utilities Manager is a Linux system utility manager for controlling brightness, volume, battery, WiFi, Bluetooth, and power profiles via command line.[/]")
             {
                 Border = BoxBorder.Double,
                 BorderStyle = new Style(Color.Blue),
@@ -612,7 +707,8 @@ namespace UtilitiesManager
                 "[red]•[/] Use 'status' command to check dependency availability\n" +
                 "[red]•[/] Some features may require udev rules or group membership\n" +
                 "[red]•[/] Check system logs for permission-related errors\n" +
-                "[red]•[/] Ensure NetworkManager is running for WiFi features")
+                "[red]•[/] Ensure NetworkManager is running for WiFi features\n" +
+                "[red]•[/] Ensure BlueZ/bluetooth service is running for Bluetooth features")
             {
                 Border = BoxBorder.Rounded,
                 BorderStyle = new Style(Color.Red),

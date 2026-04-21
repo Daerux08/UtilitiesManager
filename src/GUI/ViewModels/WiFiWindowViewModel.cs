@@ -112,7 +112,7 @@ namespace UtilitiesManager.ViewModels
                 {
                     // Request password from view
                     StatusText = "Password required for this network";
-                    // The view will need to handle the password popup
+                    PasswordRequested?.Invoke(this, SelectedNetwork.SSID);
                 }
                 else
                 {
@@ -132,6 +132,7 @@ namespace UtilitiesManager.ViewModels
         }
 
         public event EventHandler? CloseRequested;
+        public event EventHandler<string>? PasswordRequested;
 
         // Method to be called from the View when password is provided
         public async Task ConnectWithPassword(string ssid, string password)

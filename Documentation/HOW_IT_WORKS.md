@@ -26,7 +26,8 @@ The application automatically detects the appropriate mode:
 5. `MainWindow.axaml/.cs` - Main GUI window
 6. `BatteryWindow.axaml/.cs` - Battery status window
 7. `WiFiWindow.axaml/.cs` - WiFi management window
-8. `EnterPasswordPopup.axaml/.cs` - WiFi password dialog
+8. `BluetoothWindow.axaml/.cs` - Bluetooth device management window
+9. `EnterPasswordPopup.axaml/.cs` - Generic password/PIN dialog for WiFi and Bluetooth
 
 ### CLI Components
 9. `CLI_UTILMAN.cs` - CLI interface routing and main menu coordination
@@ -37,6 +38,7 @@ The application automatically detects the appropriate mode:
     - `VolumeService.cs` - Audio volume management
     - `BatteryService.cs` - Battery status and power profiles
     - `WifiService.cs` - WiFi network management
+    - `BluetoothService.cs` - Bluetooth device management
     - `PowerService.cs` - Power profile management
     - `StatusService.cs` - System status overview
     - `SystemMonitoringService.cs` - CPU, memory, disk, network monitoring
@@ -68,20 +70,22 @@ Both GUI and CLI interfaces share:
 4. Power profiles - via powerprofilesctl
 5. Wi-Fi scanning - robust nmcli parsing with fallbacks
 6. Wi-Fi connection - with password support and retry logic
-7. Cross-distro compatibility - works where NetworkManager available
-8. Error handling - graceful degradation for missing tools
-9. System monitoring - CPU, memory, disk, network statistics (CLI only)
-10. Service management - start, stop, restart systemd services (CLI only)
-11. User management - view user accounts and login status (CLI only)
-12. Log management - system, kernel, and boot log viewing (CLI only)
-13. Firewall management - UFW and iptables configuration (CLI only)
-14. Package installation - automated dependency installation (CLI only)
-15. Arrow key navigation - modern CLI menu interface with Spectre.Console (CLI only)
-16. Environment detection - automatic GUI/CLI mode selection
-17. **Enhanced Menu Engine** - streamlined CLI interface with reduced complexity
+7. Bluetooth device discovery - via bluetoothctl
+8. Bluetooth pairing and connection - with PIN/passkey support
+9. Cross-distro compatibility - works where NetworkManager available
+10. Error handling - graceful degradation for missing tools
+11. System monitoring - CPU, memory, disk, network statistics (CLI only)
+12. Service management - start, stop, restart systemd services (CLI only)
+13. User management - view user accounts and login status (CLI only)
+14. Log management - system, kernel, and boot log viewing (CLI only)
+15. Firewall management - UFW and iptables configuration (CLI only)
+16. Package installation - automated dependency installation (CLI only)
+17. Arrow key navigation - modern CLI menu interface with Spectre.Console (CLI only)
+18. Environment detection - automatic GUI/CLI mode selection
+19. **Enhanced Menu Engine** - streamlined CLI interface with reduced complexity
 
 ## Future Enhancements
-1. Bluetooth management
+1. ~~Bluetooth management~~ ✅ Added in v0.8.0
 2. Advanced user account management (create/modify/delete)
 3. Package manager GUI
 4. Real-time system monitoring with graphs
