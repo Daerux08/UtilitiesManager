@@ -1,4 +1,4 @@
-<Window xmlns="https://github.com/avaloniaui"
+ <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -130,7 +130,7 @@
             <StackPanel Orientation="Horizontal" 
                         HorizontalAlignment="Center" 
                         Spacing="8">
-                <Button Content="{Binding IsScanning, Converter={x:Static vc:BooleanToStringConverter}, ConverterParameter='Scan|Stop Scan'}" 
+                <Button Content="{Binding IsScanning, Converter={StaticResource BoolToStatusConverter}, ConverterParameter='Scan|Stop Scan'}" 
                         Command="{Binding ScanCommand}"
                         Classes="scan"/>
                 <Button Content="Refresh" 

@@ -163,10 +163,18 @@
                                 HorizontalAlignment="Center"
                                 Spacing="12">
                         <Button Classes="clickable-label"
-                    Content="📶 Wi-Fi"
+                    Content="📶 WiFi"
                     Command="{Binding OpenWiFiCommand}">
                 <ToolTip.Tip>
                     <TextBlock Text="{Binding WiFiAvailable, Converter={StaticResource BoolToStringConverter}, ConverterParameter='nmcli is not found|Manage Wi-Fi networks'}" />
+                </ToolTip.Tip>
+            </Button>
+
+            <Button Classes="clickable-label"
+                    Content="📱 Bluetooth"
+                    Command="{Binding OpenBluetoothCommand}">
+                <ToolTip.Tip>
+                    <TextBlock Text="{Binding BluetoothAvailable, Converter={StaticResource BoolToStringConverter}, ConverterParameter='bluetoothctl is not found|Manage Bluetooth devices'}" />
                 </ToolTip.Tip>
             </Button>
 
