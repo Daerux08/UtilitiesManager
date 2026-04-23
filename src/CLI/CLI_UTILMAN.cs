@@ -90,24 +90,27 @@ namespace UtilitiesManager
 
         public static async Task RunInteractiveMode()
         {
+            var checker = new CheckDependencyCommand();
+            checker.CheckDependencies();
+
             while (true)
             {
                 var menuOptions = new List<(string, Func<Task>)>
                 {
-                    ("Brightness Control", async () => await BrightnessService.BrightnessMenu()),
-                    ("Volume Control", async () => { var checker = new CheckDependencyCommand(); checker.CheckDependencies(); await VolumeService.MenuService(checker); }),
-                    ("Battery Status", async () => { var checker = new CheckDependencyCommand(); checker.CheckDependencies(); BatteryService.MenuService(checker); await Task.Delay(1); }),
-                    ("WiFi Networks", async () => { var checker = new CheckDependencyCommand(); checker.CheckDependencies(); await WifiService.MenuService(checker); }),
-                    ("Bluetooth Devices", async () => { var checker = new CheckDependencyCommand(); checker.CheckDependencies(); await BluetoothService.MenuService(checker); }),
-                    ("Power Profiles", async () => { var checker = new CheckDependencyCommand(); checker.CheckDependencies(); await PowerService.MenuService(checker); }),
+                    ("Brightness Control", async () => await BrightnessService.BrightnessMenu(checker)),
+                    ("Volume Control", async () => await VolumeService.MenuService(checker)),
+                    ("Battery Status", async () => { BatteryService.MenuService(checker); await Task.Delay(1); }),
+                    ("WiFi Networks", async () => await WifiService.MenuService(checker)),
+                    ("Bluetooth Devices", async () => await BluetoothService.MenuService(checker)),
+                    ("Power Profiles", async () => await PowerService.MenuService(checker)),
                     ("System Monitoring", async () => await SystemMonitoringService.SystemMonitoringMenu()),
-                    ("Service Management", async () => await ServicesService.MenuService(new CheckDependencyCommand())),
-                    ("User Management", async () => await UserService.MenuService(new CheckDependencyCommand())),
-                    ("Log Management", async () => await LogService.MenuService(new CheckDependencyCommand())),
-                    ("Firewall Management", async () => await FirewallService.MenuService(new CheckDependencyCommand())),
-                    ("Package Installation", async () => await PackageService.MenuService(new CheckDependencyCommand())),
+                    ("Service Management", async () => await ServicesService.MenuService(checker)),
+                    ("User Management", async () => await UserService.MenuService(checker)),
+                    ("Log Management", async () => await LogService.MenuService(checker)),
+                    ("Firewall Management", async () => await FirewallService.MenuService(checker)),
+                    ("Package Installation", async () => await PackageService.MenuService(checker)),
                     ("Help & Documentation", async () => { Help.ShowAllHelp(); await Task.Delay(1); }),
-                    ("Refresh Status", async () => { await Task.Delay(1); }),
+                    ("Refresh Status", async () => { checker.CheckDependencies(); await Task.Delay(1); }),
                     ("Quit", async () => { MenuEngine.GeneralMessage("Goodbye! Thank you for using Utilities Manager!"); Environment.Exit(0); })
                 };
 

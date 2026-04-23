@@ -23,10 +23,8 @@ namespace UtilitiesManager
         }
         
         
-        public static async Task BrightnessMenu()
+        public static async Task BrightnessMenu(CheckDependencyCommand checker)
         {
-            var checker = new CheckDependencyCommand();
-            checker.CheckDependencies();
             if (!checker.IsBrightnessCtlAvailable)
             {
                 MenuEngine.ErrorMessage("brightnessctl is not available on this system.");

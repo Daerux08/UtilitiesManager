@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using UtilitiesManager;
 using System.Linq;
 using System.Collections.Generic;
@@ -34,7 +34,6 @@ namespace UtilitiesManager
         }
         public static async Task MenuService(CheckDependencyCommand checkerParam)
         {
-            checkerParam.CheckDependencies();
             while (true)
             {
                 if (!checkerParam.IsNmcliAvailable)

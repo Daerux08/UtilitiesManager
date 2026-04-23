@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using UtilitiesManager;
 using System.Linq;
 using System.Collections.Generic;
@@ -25,7 +25,6 @@ namespace UtilitiesManager
 
         public static async Task MenuService(CheckDependencyCommand checkerParam)
         {
-            checkerParam.CheckDependencies();
             if (!checkerParam.IsPactlAvailable)
             {
                 MenuEngine.ShowError("Volume Control", "pactl (PulseAudio) is not available on this system.");
@@ -102,4 +101,3 @@ namespace UtilitiesManager
         }
     }
 }
-
