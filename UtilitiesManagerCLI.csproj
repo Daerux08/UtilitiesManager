@@ -19,6 +19,7 @@
 	  <Compile Include="src/CLI/BrightnessService.cs" />
 	  <Compile Include="src/CLI/VolumeService.cs" />
 	  <Compile Include="src/CLI/BatteryService.cs" />
+	  <Compile Include="src/CLI/BluetoothService.cs" />
 	  <Compile Include="src/CLI/WifiService.cs" />
 	  <Compile Include="src/CLI/ServicesService.cs" />
 	  <Compile Include="src/CLI/PackageService.cs" />
@@ -31,6 +32,7 @@
     <Compile Include="src/CLI/Help.cs" />
     <Compile Include="src/CLI/MenuEngine.cs" />
     <Compile Include="src/Shared/Terminal.cs" />
+    <Compile Include="src/Shared/Models.cs" />
     <Compile Include="src/DownloadScript.cs" />
   </ItemGroup>
 </Project>

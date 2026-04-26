@@ -1,6 +1,7 @@
 # UtilitiesManager
 
 A Linux utility manager with GUI and CLI interfaces for controlling system settings and monitoring.
+A comprehensive Linux utility manager with GUI and CLI interfaces for controlling system settings and monitoring.
 
 Tested on Linux Mint 22.2, Linux Debian 13, Ubuntu 24.04, and headless servers.
 
@@ -77,6 +78,7 @@ UtilMan status
 ## Installation
 ```bash
 sudo dpkg -i UtilitiesManager_0.7.0-prealpha6_amd64.deb
+sudo dpkg -i UtilitiesManager_0.9.0-beta_amd64.deb
 sudo apt-get install -f
 ```
 
@@ -92,7 +94,8 @@ dotnet build
 - `HOW_IT_WORKS_GUI.md` - GUI-specific features and components
 
 ## Future Updates
-- Bluetooth management
+- Package negotiation system - Support for multiple alternative packages instead of hard requirements
+- Enhanced download script with package selector - Interactive package selection during installation
 - Advanced system monitoring
 - User account management
 - Backup & recovery tools
