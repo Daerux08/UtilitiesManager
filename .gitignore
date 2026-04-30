@@ -150,6 +150,7 @@ FodyWeavers.xsd
 
 # Build scripts output
 Package/
+publish/
 
 # Lock files (keep the .~lock.* pattern)
 .~lock.*

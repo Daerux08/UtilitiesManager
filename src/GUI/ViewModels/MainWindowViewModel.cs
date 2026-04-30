@@ -130,12 +130,14 @@ namespace UtilitiesManager.ViewModels
         public ICommand OpenBatteryCommand { get; }
         public ICommand OpenWiFiCommand { get; }
         public ICommand OpenBluetoothCommand { get; }
+        public ICommand OpenSettingsCommand { get; }
 
         public MainWindowViewModel()
         {
             OpenBatteryCommand = new RelayCommand(OpenBattery, () => BatteryAvailable);
             OpenWiFiCommand = new RelayCommand(OpenWiFi, () => WiFiAvailable);
             OpenBluetoothCommand = new RelayCommand(OpenBluetooth, () => BluetoothAvailable);
+            OpenSettingsCommand = new RelayCommand(OpenSettings);
             
             InitializeValues();
         }
@@ -237,6 +239,24 @@ namespace UtilitiesManager.ViewModels
             else
             {
                 System.Diagnostics.Debug.WriteLine("Bluetooth not available, window not opened");
+            }
+        }
+
+        private void OpenSettings()
+        {
+            try
+            {
+                var settingsWindow = new SettingsWindow();
+                // Get the main window to use as owner so settings appears on top
+                var mainWindow = Application.Current?.ApplicationLifetime 
+                    is IClassicDesktopStyleApplicationLifetime desktop 
+                    ? desktop.MainWindow : null;
+                // Show with owner so window appears on top of main window
+                settingsWindow.Show(mainWindow);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error creating SettingsWindow: {ex.Message}");
             }
         }
     }

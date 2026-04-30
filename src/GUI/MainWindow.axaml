@@ -86,17 +86,25 @@
             
             <!-- Header Card -->
             <Border Classes="card">
-                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Spacing="8">
-                    <TextBlock Text="⚡" FontSize="16"/>
-                    <TextBlock Text="Utilities Manager" 
-                               FontSize="16" 
-                               FontWeight="Bold" 
-                               Foreground="#1976D2"/>
-                    <TextBlock Text="v0.4.0" 
-                               FontSize="10" 
-                               Foreground="#757575"
-                               VerticalAlignment="Center"/>
-                </StackPanel>
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    <Button Grid.Column="0"
+                            Classes="clickable-label"
+                            Content="⚙️"
+                            FontSize="14"
+                            Command="{Binding OpenSettingsCommand}"
+                            ToolTip.Tip="Open Settings"/>
+                    <StackPanel Grid.Column="1" HorizontalAlignment="Center" Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="⚡" FontSize="16"/>
+                        <TextBlock Text="Utilities Manager" 
+                                   FontSize="16" 
+                                   FontWeight="Bold" 
+                                   Foreground="#1976D2"/>
+                        <TextBlock Text="v0.4.0" 
+                                   FontSize="10" 
+                                   Foreground="#757575"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Grid>
             </Border>
 
             <!-- Sound Control Card -->
