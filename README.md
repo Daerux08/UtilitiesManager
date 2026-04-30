@@ -109,4 +109,4 @@ dotnet build
 - **Bug Fixes**: WiFi parsing, service detection, and startup reliability improvements
 
 ## Known Bugs
-- Currently no bugs are present
+- Currently no major bugs are present
