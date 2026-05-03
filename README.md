@@ -99,6 +99,7 @@ dotnet build
 - Advanced system monitoring
 - User account management
 - Backup & recovery tools
+- Theme selector
 
 ## Recent Updates
 - **Enhanced CLI Interface**: Completely redesigned CLI using Spectre.Console with modern menu engine
