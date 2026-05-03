@@ -107,6 +107,3 @@ dotnet build
 - **Enhanced Dependency System**: Simplified and robust dependency checking
 - **Better GUI**: Material design improvements with modern styling
 - **Bug Fixes**: WiFi parsing, service detection, and startup reliability improvements
-
-## Known Bugs
-- Currently no major bugs are present
