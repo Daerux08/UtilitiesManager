@@ -452,12 +452,18 @@ namespace UtilitiesManager
                     var trimmedLine = line.Trim();
                     if (string.IsNullOrEmpty(trimmedLine)) continue;
                     
-                    // Split on first colon to get field name and value
-                    var colonIndex = trimmedLine.IndexOf(':');
+                    // We look for ": " specifically. Standard colons often appear inside 
+                    // Mac Addresses (BSSIDs) like AA:BB:CC... 
+                    // Searching for the space ensures we only split on the actual delimiter.
+                    var colonIndex = trimmedLine.IndexOf(": ");
+                    
                     if (colonIndex <= 0) continue;
                     
                     var fieldName = trimmedLine.Substring(0, colonIndex);
-                    var fieldValue = trimmedLine.Substring(colonIndex + 1);
+                    
+                    // Substring starts 2 characters after the colon to skip the ": " delimiter.
+                    // Trim() is essential to remove trailing whitespace that nmcli often includes.
+                    var fieldValue = trimmedLine.Substring(colonIndex + 2).Trim();
                     
                     switch (fieldName)
                     {

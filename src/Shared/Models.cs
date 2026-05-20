@@ -11,6 +11,12 @@ namespace UtilitiesManager
         public string TimeToFull { get; set; } = "N/A";
         public double EnergyRate { get; set; } = -1;
         public bool IsPresent { get; set; } = false;
+
+        // Encapsulating state logic here ensures that both the GUI and CLI 
+        // interpret the "State" string consistently across the whole app.
+        public bool IsCharging => State?.Contains("charging", StringComparison.OrdinalIgnoreCase) ?? false;
+        public bool IsDischarging => State?.Contains("discharging", StringComparison.OrdinalIgnoreCase) ?? false;
+        public bool IsFull => State?.Contains("fully-charged", StringComparison.OrdinalIgnoreCase) ?? false;
     }
 
     public class WiFiInfo

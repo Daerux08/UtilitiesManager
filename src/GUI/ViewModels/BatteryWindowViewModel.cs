@@ -99,10 +99,12 @@ namespace UtilitiesManager.ViewModels
             if (string.IsNullOrEmpty(BatteryInfo.State))
                 return "N/A";
 
-            if (BatteryInfo.State.Contains("discharging", StringComparison.OrdinalIgnoreCase))
+            // Use the smart properties from the model.
+            // This keeps the ViewModel logic simple and readable.
+            if (BatteryInfo.IsDischarging)
                 return $"~{BatteryInfo.TimeToEmpty} left";
             
-            if (BatteryInfo.State.Contains("charging", StringComparison.OrdinalIgnoreCase))
+            if (BatteryInfo.IsCharging)
                 return $"~{BatteryInfo.TimeToFull} to full";
             
             return "N/A";
