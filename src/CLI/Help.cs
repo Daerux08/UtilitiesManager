@@ -716,7 +716,7 @@ namespace UtilitiesManager
             };
             AnsiConsole.Write(troublePanel);
             AnsiConsole.WriteLine();
-            MenuEngine.DisplayMessage("Press any key to continue...");
+            MenuEngine.GeneralMessage("Press any key to continue...");
         }
     }
 }
