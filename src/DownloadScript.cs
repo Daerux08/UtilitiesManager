@@ -20,6 +20,7 @@ namespace UtilitiesManager
             ("sysstat", "System performance monitoring (iostat, mpstat, sar)"),
             ("iotop", "I/O monitoring for disk usage by process"),
             ("nethogs", "Network monitoring showing bandwidth by process"),
+            ("systemd-journal-remote", "Remote systemd journal logging (for advanced logging)"),
             
             // Security and maintenance
             ("ufw", "Uncomplicated Firewall - easy iptables frontend"),
@@ -45,7 +46,7 @@ namespace UtilitiesManager
 
         private static readonly string[] PackageCommands = {
             "apt update",
-            "apt install -y brightnessctl pulseaudio-utils upower network-manager power-profiles-daemon procps lm-sensors sysstat iotop nethogs ufw fail2ban bleachbit ncdu htop tree jq curl wget vim git unzip tar net-tools dnsutils man-db sudo"
+            "apt install -y systemd-journal-remote brightnessctl pulseaudio-utils upower network-manager power-profiles-daemon procps lm-sensors sysstat iotop nethogs ufw fail2ban bleachbit ncdu htop tree jq curl wget vim git unzip tar net-tools dnsutils man-db sudo"
         };
 
         public static async Task<bool> RunPackageInstallationAsync()
