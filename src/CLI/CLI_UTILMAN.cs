@@ -15,6 +15,7 @@ namespace UtilitiesManager
                 Console.WriteLine("No arguments provided. Run 'UtilMan help' for available commands.");
                 return;
             }
+            //main menu, basically
             
             var command = args[0].ToLower();
 
@@ -109,7 +110,6 @@ namespace UtilitiesManager
                     ("Log Management", async () => await LogService.MenuService(checker)),
                     ("Firewall Management", async () => await FirewallService.MenuService(checker)),
                     ("Package Installation", async () => await PackageService.MenuService(checker)),
-                    ("Help & Documentation", async () => { Help.ShowAllHelp(); await Task.Delay(1); }),
                     ("Refresh Status", async () => { checker.CheckDependencies(); await Task.Delay(1); }),
                     ("Quit", async () => { MenuEngine.GeneralMessage("Goodbye! Thank you for using Utilities Manager!"); Environment.Exit(0); })
                 };
