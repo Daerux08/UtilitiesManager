@@ -31,13 +31,6 @@
             <Setter Property="Padding" Value="12,6"/>
             <Setter Property="CornerRadius" Value="4"/>
         </Style>
-        <Style Selector="Button.scan">
-            <Setter Property="Background" Value="#4CAF50"/>
-            <Setter Property="Foreground" Value="White"/>
-        </Style>
-        <Style Selector="Button.scan:pointerover">
-            <Setter Property="Background" Value="#45A049"/>
-        </Style>
         <Style Selector="DataGrid">
             <Setter Property="Margin" Value="8"/>
             <Setter Property="AutoGenerateColumns" Value="False"/>
@@ -71,7 +64,7 @@
         <!-- Header Card -->
         <Border Grid.Row="0" Classes="card">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
-                <TextBlock Text=" bluetooth" FontSize="16"/>
+                <TextBlock Text="📶" FontSize="16"/>
                 <TextBlock Text="Bluetooth Devices" 
                            FontSize="16" 
                            FontWeight="Bold" 
@@ -85,6 +78,14 @@
                       ItemsSource="{Binding BluetoothDevices}"
                       SelectedItem="{Binding SelectedDevice}"
                       DoubleTapped="BluetoothDataGrid_DoubleTapped">
+                <DataGrid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Pair" Command="{Binding PairSelectedCommand}"/>
+                        <MenuItem Header="Forget" Command="{Binding ForgetSelectedCommand}"/>
+                        <MenuItem Header="Disconnect" Command="{Binding DisconnectSelectedCommand}"/>
+                        <MenuItem Header="Enable auto-pair" Command="{Binding TrustSelectedCommand}"/>
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Status" 
                                         x:DataType="local:BluetoothInfo"
@@ -120,29 +121,28 @@
 
         <!-- Status and Buttons -->
         <StackPanel Grid.Row="2" Spacing="8" Margin="0,8,0,0">
-            <!-- Status Label -->
             <TextBlock Text="{Binding StatusText}" 
                        HorizontalAlignment="Center" 
                        FontSize="12"
                        Foreground="#666666"/>
             
-            <!-- Action Buttons -->
             <StackPanel Orientation="Horizontal" 
                         HorizontalAlignment="Center" 
                         Spacing="8">
-                <Button Content="{Binding IsScanning, Converter={StaticResource BoolToStatusConverter}, ConverterParameter='Scan|Stop Scan'}" 
-                        Command="{Binding ScanCommand}"
-                        Classes="scan"/>
+                <Button Name="ActiveBoolButton"
+                        Content="{Binding PoweredButtonText}"
+                        Background="{Binding PoweredButtonBackground}"
+                        Foreground="White"
+                        Command="{Binding ActiveBoolCommand}"/>
+                <Button Name="DiscoverableButton"
+                        Content="{Binding DiscoverableButtonText}"
+                        Background="{Binding DiscoverableButtonBackground}"
+                        Foreground="White"
+                        Command="{Binding DiscoverableCommand}"/>
+                <Button Content="{Binding ScanButtonText}"
+                        Command="{Binding ScanCommand}"/>
                 <Button Content="Refresh" 
                         Command="{Binding RefreshCommand}"/>
-                <Button Content="Connect" 
-                        Command="{Binding ConnectCommand}"/>
-                <Button Content="Disconnect" 
-                        Command="{Binding DisconnectCommand}"/>
-                <Button Content="Pair" 
-                        Command="{Binding PairCommand}"/>
-                <Button Content="Trust" 
-                        Command="{Binding TrustCommand}"/>
                 <Button Content="Close" 
                         Command="{Binding CloseCommand}"/>
             </StackPanel>

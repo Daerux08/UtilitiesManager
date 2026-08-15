@@ -44,6 +44,15 @@ namespace UtilitiesManager
         public bool Available { get; set; } = false;
     }
 
+    public class BluetoothControllerState
+    {
+        public bool IsPowered { get; set; } = false;
+        public bool IsDiscoverable { get; set; } = false;
+        public string Name { get; set; } = "";
+        public string Alias { get; set; } = "";
+        public string Address { get; set; } = "";
+    }
+
     public class SystemInfo
     {
         public string Uptime { get; set; } = "";

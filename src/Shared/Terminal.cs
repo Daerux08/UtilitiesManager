@@ -129,7 +129,9 @@ namespace UtilitiesManager
         {
             try
             {
-                var result = await TerminalCommands.RunCommandWithResultAsync("bluetoothctl scan on");
+                var result = await TerminalCommands.RunCommandWithResultAsync(
+                    "stdbuf -oL bluetoothctl --timeout 30 scan on 2>/dev/null | grep --line-buffered \"Device\""
+                );
                 return result.IsSuccess;
             }
             catch
@@ -515,6 +517,234 @@ namespace UtilitiesManager
             return networks;
         }
 
+        public BluetoothControllerState GetBluetoothControllerState()
+        {
+            var state = new BluetoothControllerState();
+
+            try
+            {
+                var output = TerminalCommands.RunCommand("bluetoothctl show");
+                if (string.IsNullOrWhiteSpace(output))
+                    return state;
+
+                foreach (var line in output.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+                {
+                    var trimmedLine = line.Trim();
+
+                    if (trimmedLine.StartsWith("Name:", StringComparison.OrdinalIgnoreCase))
+                    {
+                        state.Name = trimmedLine.Substring("Name:".Length).Trim();
+                    }
+                    else if (trimmedLine.StartsWith("Alias:", StringComparison.OrdinalIgnoreCase))
+                    {
+                        state.Alias = trimmedLine.Substring("Alias:".Length).Trim();
+                    }
+                    else if (trimmedLine.StartsWith("Powered:", StringComparison.OrdinalIgnoreCase))
+                    {
+                        state.IsPowered = ParseYesNoFlag(trimmedLine.Substring("Powered:".Length).Trim());
+                    }
+                    else if (trimmedLine.StartsWith("Discoverable:", StringComparison.OrdinalIgnoreCase))
+                    {
+                        state.IsDiscoverable = ParseYesNoFlag(trimmedLine.Substring("Discoverable:".Length).Trim());
+                    }
+                    else if (trimmedLine.StartsWith("Controller ", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var controllerPart = trimmedLine.Substring("Controller ".Length).Trim();
+                        var address = controllerPart.Split(' ', 2)[0];
+                        state.Address = address;
+                    }
+                }
+            }
+            catch
+            {
+                // Ignore controller-state parse errors and keep the default values.
+            }
+
+            return state;
+        }
+
+        private static bool ParseYesNoFlag(string input)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+                return false;
+
+            var normalized = input.Trim();
+            return normalized.Equals("yes", StringComparison.OrdinalIgnoreCase)
+                || normalized.Equals("on", StringComparison.OrdinalIgnoreCase)
+                || normalized.Equals("true", StringComparison.OrdinalIgnoreCase);
+        }
+
+        public async Task<(ObservableCollection<BluetoothInfo> Devices, List<string> RemovedAddresses)> GetBluetoothScanUpdatesAsync()
+        {
+            var devices = new ObservableCollection<BluetoothInfo>();
+            var removedAddresses = new List<string>();
+
+            try
+            {
+                var output = await TerminalCommands.RunCommandAsync(
+                    "stdbuf -oL bluetoothctl --timeout 30 scan on 2>/dev/null | grep --line-buffered \"Device\""
+                );
+
+                if (string.IsNullOrWhiteSpace(output))
+                    return (devices, removedAddresses);
+
+                var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+
+                foreach (var rawLine in lines)
+                {
+                    var line = rawLine.Trim();
+                    if (string.IsNullOrWhiteSpace(line))
+                        continue;
+
+                    var deviceMatch = Regex.Match(
+                        line,
+                        @"^(?:\[(?<action>NEW|CHG|DEL)\]\s+)?Device\s+(?<address>[0-9A-Fa-f:]+)(?:\s+(?<rest>.*))?$",
+                        RegexOptions.IgnoreCase | RegexOptions.CultureInvariant
+                    );
+
+                    if (!deviceMatch.Success)
+                        continue;
+
+                    var address = deviceMatch.Groups["address"].Value.Trim();
+                    var rest = (deviceMatch.Groups["rest"].Value ?? string.Empty).Trim();
+                    var action = deviceMatch.Groups["action"].Success
+                        ? deviceMatch.Groups["action"].Value.ToUpperInvariant()
+                        : "NEW";
+
+                    if (string.IsNullOrWhiteSpace(address))
+                        continue;
+
+                    if (string.Equals(action, "DEL", StringComparison.OrdinalIgnoreCase) ||
+                        line.Contains("[DEL]", StringComparison.OrdinalIgnoreCase))
+                    {
+                        removedAddresses.Add(address);
+                        continue;
+                    }
+
+                    var existing = devices.FirstOrDefault(d =>
+                        string.Equals(d.Address, address, StringComparison.OrdinalIgnoreCase));
+
+                    if (string.IsNullOrWhiteSpace(rest))
+                    {
+                        if (existing != null)
+                        {
+                            existing.Available = true;
+                        }
+                        else
+                        {
+                            devices.Add(new BluetoothInfo
+                            {
+                                Address = address,
+                                Name = "Unknown",
+                                Alias = "Unknown",
+                                Available = true
+                            });
+                        }
+
+                        continue;
+                    }
+
+                    if (IsBluetoothMetadata(rest))
+                    {
+                        if (existing != null)
+                        {
+                            existing.Available = true;
+                        }
+
+                        if (rest.StartsWith("Name:", StringComparison.OrdinalIgnoreCase))
+                        {
+                            var value = rest.Substring("Name:".Length).Trim();
+                            if (!string.IsNullOrWhiteSpace(value))
+                            {
+                                if (existing != null)
+                                {
+                                    existing.Name = value;
+                                    existing.Alias = value;
+                                }
+                                else
+                                {
+                                    devices.Add(new BluetoothInfo
+                                    {
+                                        Address = address,
+                                        Name = value,
+                                        Alias = value,
+                                        Available = true
+                                    });
+                                }
+                            }
+                        }
+                        else if (rest.StartsWith("Alias:", StringComparison.OrdinalIgnoreCase))
+                        {
+                            var value = rest.Substring("Alias:".Length).Trim();
+                            if (!string.IsNullOrWhiteSpace(value))
+                            {
+                                if (existing != null)
+                                {
+                                    existing.Alias = value;
+                                }
+                                else
+                                {
+                                    devices.Add(new BluetoothInfo
+                                    {
+                                        Address = address,
+                                        Name = value,
+                                        Alias = value,
+                                        Available = true
+                                    });
+                                }
+                            }
+                        }
+
+                        continue;
+                    }
+
+                    var device = existing ?? new BluetoothInfo { Address = address, Available = true };
+                    device.Name = rest;
+                    device.Alias = rest;
+                    device.Address = address;
+                    device.Available = true;
+
+                    if (existing == null)
+                    {
+                        devices.Add(device);
+                    }
+                }
+            }
+            catch
+            {
+                // Ignore scan parsing errors.
+            }
+
+            return (devices, removedAddresses);
+        }
+
+        private static bool IsBluetoothMetadata(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return false;
+
+            var metadataPrefixes = new[]
+            {
+                "Name:",
+                "Alias:",
+                "Type:",
+                "Connected:",
+                "Paired:",
+                "Trusted:",
+                "UUIDs:",
+                "RSSI:",
+                "ManufacturerData",
+                "AdvertisingFlags",
+                "Icon:",
+                "LegacyPairing:",
+                "Blocked:",
+                "Modalias:"
+            };
+
+            return metadataPrefixes.Any(prefix =>
+                value.StartsWith(prefix, StringComparison.OrdinalIgnoreCase));
+        }
+
         // BLUETOOTH
         public async Task<ObservableCollection<BluetoothInfo>> GetBluetoothDevicesAsync()
         {
@@ -533,57 +763,6 @@ namespace UtilitiesManager
                 
                 if (string.IsNullOrWhiteSpace(output))
                 {
-                    // TEST MODE: Add mock devices for testing when no real devices found
-                    Console.WriteLine("No real Bluetooth devices found, adding test devices...");
-                    
-                    devices.Add(new BluetoothInfo
-                    {
-                        Address = "AA:BB:CC:DD:EE:01",
-                        Name = "Test Smartphone",
-                        Alias = "Test Smartphone",
-                        Available = true,
-                        Paired = false,
-                        Connected = false,
-                        Trusted = false,
-                        RSSI = "-65"
-                    });
-                    
-                    devices.Add(new BluetoothInfo
-                    {
-                        Address = "AA:BB:CC:DD:EE:02", 
-                        Name = "Test Wireless Headphones",
-                        Alias = "Test Wireless Headphones",
-                        Available = true,
-                        Paired = true,
-                        Connected = false,
-                        Trusted = true,
-                        RSSI = "-45"
-                    });
-                    
-                    devices.Add(new BluetoothInfo
-                    {
-                        Address = "AA:BB:CC:DD:EE:03",
-                        Name = "Test Bluetooth Speaker",
-                        Alias = "Test Bluetooth Speaker", 
-                        Available = true,
-                        Paired = false,
-                        Connected = false,
-                        Trusted = false,
-                        RSSI = "-78"
-                    });
-                    
-                    devices.Add(new BluetoothInfo
-                    {
-                        Address = "AA:BB:CC:DD:EE:04",
-                        Name = "Test Smartwatch",
-                        Alias = "Test Smartwatch",
-                        Available = false,
-                        Paired = false,
-                        Connected = false,
-                        Trusted = false,
-                        RSSI = "-92"
-                    });
-                    
                     return devices;
                 }
 

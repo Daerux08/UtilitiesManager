@@ -44,15 +44,7 @@ public partial class BluetoothWindow : Window
     {
         if (ViewModel?.SelectedDevice != null)
         {
-            // If device is connected, disconnect. Otherwise try to connect.
-            if (ViewModel.SelectedDevice.Connected)
-            {
-                ViewModel.DisconnectCommand.Execute(null);
-            }
-            else
-            {
-                ViewModel.ConnectCommand.Execute(null);
-            }
+            ViewModel.ConnectCommand.Execute(null);
         }
     }
 }

@@ -1,7 +1,9 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Avalonia.Media;
 using Avalonia.Threading;
 
 namespace UtilitiesManager.ViewModels
@@ -10,11 +12,13 @@ namespace UtilitiesManager.ViewModels
     {
         private readonly CheckDependencyCommand _checker = new();
         private readonly ChangeValueCommand _changer = new();
-        
+
         private ObservableCollection<BluetoothInfo> _bluetoothDevices = new ObservableCollection<BluetoothInfo>();
         private string _statusText = "Loading Bluetooth devices...";
         private BluetoothInfo? _selectedDevice;
         private bool _isScanning = false;
+        private bool _isPowered = false;
+        private bool _isDiscoverable = false;
 
         public ObservableCollection<BluetoothInfo> BluetoothDevices
         {
@@ -37,26 +41,70 @@ namespace UtilitiesManager.ViewModels
         public bool IsScanning
         {
             get => _isScanning;
-            set => SetProperty(ref _isScanning, value);
+            set
+            {
+                if (SetProperty(ref _isScanning, value))
+                {
+                    OnPropertyChanged(nameof(ScanButtonText));
+                }
+            }
         }
 
+        public bool IsPowered
+        {
+            get => _isPowered;
+            set
+            {
+                if (SetProperty(ref _isPowered, value))
+                {
+                    OnPropertyChanged(nameof(PoweredButtonText));
+                    OnPropertyChanged(nameof(PoweredButtonBackground));
+                }
+            }
+        }
+
+        public bool IsDiscoverable
+        {
+            get => _isDiscoverable;
+            set
+            {
+                if (SetProperty(ref _isDiscoverable, value))
+                {
+                    OnPropertyChanged(nameof(DiscoverableButtonText));
+                    OnPropertyChanged(nameof(DiscoverableButtonBackground));
+                }
+            }
+        }
+
+        public string PoweredButtonText => IsPowered ? "On" : "Off";
+        public string DiscoverableButtonText => IsDiscoverable ? "Yes" : "No";
+        public string ScanButtonText => IsScanning ? "Stop Scan" : "Scan";
+        public IBrush PoweredButtonBackground => IsPowered ? new SolidColorBrush(Colors.Green) : new SolidColorBrush(Colors.Red);
+        public IBrush DiscoverableButtonBackground => IsDiscoverable ? new SolidColorBrush(Colors.Green) : new SolidColorBrush(Colors.Red);
+
         public ICommand RefreshCommand { get; }
+        public ICommand ActiveBoolCommand { get; }
+        public ICommand DiscoverableCommand { get; }
         public ICommand ScanCommand { get; }
         public ICommand ConnectCommand { get; }
-        public ICommand DisconnectCommand { get; }
-        public ICommand PairCommand { get; }
-        public ICommand TrustCommand { get; }
         public ICommand CloseCommand { get; }
+        public ICommand PairSelectedCommand { get; }
+        public ICommand ForgetSelectedCommand { get; }
+        public ICommand DisconnectSelectedCommand { get; }
+        public ICommand TrustSelectedCommand { get; }
 
         public BluetoothWindowViewModel()
         {
             RefreshCommand = new RelayCommand(Refresh);
-            ScanCommand = new RelayCommand(ToggleScan);
-            ConnectCommand = new RelayCommand(ConnectToSelected, () => SelectedDevice != null && !SelectedDevice.Connected);
-            DisconnectCommand = new RelayCommand(DisconnectFromSelected, () => SelectedDevice != null && SelectedDevice.Connected);
-            PairCommand = new RelayCommand(PairWithSelected, () => SelectedDevice != null && !SelectedDevice.Paired);
-            TrustCommand = new RelayCommand(TrustSelected, () => SelectedDevice != null && !SelectedDevice.Trusted);
+            ActiveBoolCommand = new RelayCommand(TogglePower, () => _checker.IsBluetoothctlAvailable);
+            DiscoverableCommand = new RelayCommand(ToggleDiscoverable, () => _checker.IsBluetoothctlAvailable);
+            ScanCommand = new RelayCommand(ToggleScan, () => _checker.IsBluetoothctlAvailable);
+            ConnectCommand = new RelayCommand(ConnectToSelected, () => SelectedDevice != null);
             CloseCommand = new RelayCommand(Close);
+            PairSelectedCommand = new RelayCommand(PairSelected, () => SelectedDevice != null);
+            ForgetSelectedCommand = new RelayCommand(ForgetSelected, () => SelectedDevice != null);
+            DisconnectSelectedCommand = new RelayCommand(DisconnectSelected, () => SelectedDevice != null);
+            TrustSelectedCommand = new RelayCommand(TrustSelected, () => SelectedDevice != null);
 
             _ = RefreshAsync();
         }
@@ -67,9 +115,13 @@ namespace UtilitiesManager.ViewModels
             {
                 StatusText = "Refreshing...";
                 _checker.CheckDependencies();
-                
+
                 if (_checker.IsBluetoothctlAvailable)
                 {
+                    var controllerState = _checker.GetBluetoothControllerState();
+                    IsPowered = controllerState.IsPowered;
+                    IsDiscoverable = controllerState.IsDiscoverable;
+
                     var newDevices = await _checker.GetBluetoothDevicesAsync();
                     await Dispatcher.UIThread.InvokeAsync(() =>
                     {
@@ -79,6 +131,7 @@ namespace UtilitiesManager.ViewModels
                             BluetoothDevices.Add(device);
                         }
                     });
+
                     StatusText = $"Found {newDevices.Count} Bluetooth devices.";
                 }
                 else
@@ -99,15 +152,68 @@ namespace UtilitiesManager.ViewModels
             _ = RefreshAsync();
         }
 
+        private async void TogglePower()
+        {
+            if (!_checker.IsBluetoothctlAvailable)
+                return;
+
+            var targetState = !IsPowered;
+            StatusText = targetState ? "Enabling Bluetooth..." : "Disabling Bluetooth...";
+
+            var result = await TerminalCommands.RunCommandWithResultAsync(
+                targetState ? "bluetoothctl power on" : "bluetoothctl power off"
+            );
+
+            if (result.IsSuccess)
+            {
+                IsPowered = targetState;
+                StatusText = targetState ? "Bluetooth enabled" : "Bluetooth disabled";
+                await Task.Delay(1000);
+                await RefreshAsync();
+            }
+            else
+            {
+                StatusText = "Failed to change Bluetooth power state";
+            }
+        }
+
+        private async void ToggleDiscoverable()
+        {
+            if (!_checker.IsBluetoothctlAvailable)
+                return;
+
+            var targetState = !IsDiscoverable;
+            StatusText = targetState ? "Enabling discoverability..." : "Disabling discoverability...";
+
+            var result = await TerminalCommands.RunCommandWithResultAsync(
+                targetState ? "bluetoothctl discoverable on" : "bluetoothctl discoverable off"
+            );
+
+            if (result.IsSuccess)
+            {
+                IsDiscoverable = targetState;
+                StatusText = targetState ? "Bluetooth is now discoverable" : "Bluetooth is no longer discoverable";
+                await Task.Delay(1000);
+                await RefreshAsync();
+            }
+            else
+            {
+                StatusText = "Failed to change discoverability";
+            }
+        }
+
         private async void ToggleScan()
         {
+            if (!_checker.IsBluetoothctlAvailable)
+                return;
+
             if (IsScanning)
             {
-                // Stop scanning
                 IsScanning = false;
                 StatusText = "Stopping scan...";
-                var success = await _changer.StopBluetoothScanAsync();
-                if (success)
+
+                var result = await TerminalCommands.RunCommandWithResultAsync("bluetoothctl scan off");
+                if (result.IsSuccess)
                 {
                     StatusText = "Scan stopped";
                     await Task.Delay(1000);
@@ -115,28 +221,60 @@ namespace UtilitiesManager.ViewModels
                 }
                 else
                 {
-                    StatusText = "Failed to stop scan";
+                    StatusText = "Failed to stop Bluetooth scan";
                 }
+
+                return;
             }
-            else
+
+            IsScanning = true;
+            StatusText = "Scanning for devices...";
+
+            var scanResult = await TerminalCommands.RunCommandWithResultAsync(
+                "stdbuf -oL bluetoothctl --timeout 30 scan on 2>/dev/null | grep --line-buffered \"Device\""
+            );
+
+            if (scanResult.IsSuccess || !string.IsNullOrWhiteSpace(scanResult.CombinedOutput))
             {
-                // Start scanning
-                IsScanning = true;
-                StatusText = "Scanning for devices...";
-                var success = await _changer.ScanBluetoothDevicesAsync();
-                if (success)
+                var updates = await _checker.GetBluetoothScanUpdatesAsync();
+                await Dispatcher.UIThread.InvokeAsync(() =>
                 {
-                    StatusText = "Scanning... (will find new devices)";
-                    // Wait a bit for scan to discover devices
-                    await Task.Delay(5000);
-                    await RefreshAsync();
-                }
-                else
-                {
-                    IsScanning = false;
-                    StatusText = "Failed to start scan";
-                }
+                    foreach (var removedAddress in updates.RemovedAddresses)
+                    {
+                        var match = BluetoothDevices.FirstOrDefault(device =>
+                            string.Equals(device.Address, removedAddress, StringComparison.OrdinalIgnoreCase));
+
+                        if (match != null)
+                        {
+                            BluetoothDevices.Remove(match);
+                        }
+                    }
+
+                    foreach (var device in updates.Devices)
+                    {
+                        var existing = BluetoothDevices.FirstOrDefault(item =>
+                            string.Equals(item.Address, device.Address, StringComparison.OrdinalIgnoreCase));
+
+                        if (existing != null)
+                        {
+                            existing.Name = device.Name;
+                            existing.Alias = device.Alias;
+                            existing.Available = true;
+                        }
+                        else
+                        {
+                            BluetoothDevices.Add(device);
+                        }
+                    }
+                });
+
+                StatusText = $"Found {BluetoothDevices.Count} Bluetooth devices.";
+                IsScanning = false;
+                return;
             }
+
+            IsScanning = false;
+            StatusText = "Failed to start Bluetooth scan";
         }
 
         private async void ConnectToSelected()
@@ -146,17 +284,74 @@ namespace UtilitiesManager.ViewModels
             try
             {
                 StatusText = $"Connecting to {SelectedDevice.Name}...";
-                var success = await _changer.ConnectToDeviceAsync(SelectedDevice.Address);
+                var result = await TerminalCommands.RunCommandWithResultAsync($"bluetoothctl connect {SelectedDevice.Address}");
 
-                if (success)
+                if (result.IsSuccess)
                 {
                     StatusText = $"Connected to {SelectedDevice.Name}";
+                    await Task.Delay(2000);
+                    await RefreshAsync();
+                    return;
+                }
+
+                var output = result.CombinedOutput;
+                var requiresAuth = output.Contains("Authentication", StringComparison.OrdinalIgnoreCase)
+                    || output.Contains("PIN", StringComparison.OrdinalIgnoreCase)
+                    || output.Contains("Passkey", StringComparison.OrdinalIgnoreCase)
+                    || output.Contains("pairing", StringComparison.OrdinalIgnoreCase)
+                    || output.Contains("Failed to pair", StringComparison.OrdinalIgnoreCase)
+                    || output.Contains("not paired", StringComparison.OrdinalIgnoreCase)
+                    || output.Contains("needs authentication", StringComparison.OrdinalIgnoreCase)
+                    || output.Contains("password", StringComparison.OrdinalIgnoreCase);
+
+                if (requiresAuth)
+                {
+                    StatusText = "Authentication required for this connection";
+                    PinRequested?.Invoke(this, SelectedDevice.Name);
+                    return;
+                }
+
+                StatusText = "Connection failed";
+            }
+            catch (Exception ex)
+            {
+                StatusText = $"Error: {ex.Message}";
+            }
+        }
+
+        private async void PairSelected()
+        {
+            if (SelectedDevice == null) return;
+
+            try
+            {
+                StatusText = $"Pairing with {SelectedDevice.Name}...";
+                var result = await TerminalCommands.RunCommandWithResultAsync($"bluetoothctl pair {SelectedDevice.Address}");
+
+                if (result.IsSuccess)
+                {
+                    StatusText = $"Paired with {SelectedDevice.Name}";
                     await Task.Delay(2000);
                     await RefreshAsync();
                 }
                 else
                 {
-                    StatusText = "Connection failed - device may need pairing";
+                    var output = result.CombinedOutput;
+                    var requiresAuth = output.Contains("Authentication", StringComparison.OrdinalIgnoreCase)
+                        || output.Contains("PIN", StringComparison.OrdinalIgnoreCase)
+                        || output.Contains("Passkey", StringComparison.OrdinalIgnoreCase)
+                        || output.Contains("pairing", StringComparison.OrdinalIgnoreCase)
+                        || output.Contains("password", StringComparison.OrdinalIgnoreCase);
+
+                    if (requiresAuth)
+                    {
+                        StatusText = "Pairing requires authentication";
+                        PinRequested?.Invoke(this, SelectedDevice.Name);
+                    }
+                    else
+                    {
+                        StatusText = "Pairing failed";
+                    }
                 }
             }
             catch (Exception ex)
@@ -165,19 +360,45 @@ namespace UtilitiesManager.ViewModels
             }
         }
 
-        private async void DisconnectFromSelected()
+        private async void ForgetSelected()
+        {
+            if (SelectedDevice == null) return;
+
+            try
+            {
+                StatusText = $"Removing {SelectedDevice.Name}...";
+                var result = await TerminalCommands.RunCommandWithResultAsync($"bluetoothctl remove {SelectedDevice.Address}");
+
+                if (result.IsSuccess)
+                {
+                    StatusText = $"Removed {SelectedDevice.Name}";
+                    await Task.Delay(1000);
+                    await RefreshAsync();
+                }
+                else
+                {
+                    StatusText = "Remove failed";
+                }
+            }
+            catch (Exception ex)
+            {
+                StatusText = $"Error: {ex.Message}";
+            }
+        }
+
+        private async void DisconnectSelected()
         {
             if (SelectedDevice == null) return;
 
             try
             {
                 StatusText = $"Disconnecting from {SelectedDevice.Name}...";
-                var success = await _changer.DisconnectDeviceAsync(SelectedDevice.Address);
+                var result = await TerminalCommands.RunCommandWithResultAsync($"bluetoothctl disconnect {SelectedDevice.Address}");
 
-                if (success)
+                if (result.IsSuccess)
                 {
                     StatusText = $"Disconnected from {SelectedDevice.Name}";
-                    await Task.Delay(2000);
+                    await Task.Delay(1000);
                     await RefreshAsync();
                 }
                 else
@@ -191,26 +412,24 @@ namespace UtilitiesManager.ViewModels
             }
         }
 
-        private async void PairWithSelected()
+        private async void TrustSelected()
         {
             if (SelectedDevice == null) return;
 
             try
             {
-                StatusText = $"Pairing with {SelectedDevice.Name}...";
-                var success = await _changer.PairDeviceAsync(SelectedDevice.Address);
+                StatusText = $"Trusting {SelectedDevice.Name}...";
+                var result = await TerminalCommands.RunCommandWithResultAsync($"bluetoothctl trust {SelectedDevice.Address}");
 
-                if (success)
+                if (result.IsSuccess)
                 {
-                    StatusText = $"Paired with {SelectedDevice.Name}";
-                    await Task.Delay(2000);
+                    StatusText = $"Auto-pair enabled for {SelectedDevice.Name}";
+                    await Task.Delay(1000);
                     await RefreshAsync();
                 }
                 else
                 {
-                    // Pairing might need a PIN/passkey
-                    StatusText = "PIN or passkey may be required";
-                    PinRequested?.Invoke(this, SelectedDevice.Name);
+                    StatusText = "Trust failed";
                 }
             }
             catch (Exception ex)
@@ -219,7 +438,6 @@ namespace UtilitiesManager.ViewModels
             }
         }
 
-        // Method to be called from View when PIN is provided
         public async Task PairWithPin(string deviceName, string pin)
         {
             if (SelectedDevice == null) return;
@@ -227,14 +445,12 @@ namespace UtilitiesManager.ViewModels
             try
             {
                 StatusText = $"Pairing with {deviceName} using PIN...";
-                
-                // Use bluetoothctl with PIN - note: this is a simplified approach
-                // In practice, bluetoothctl interaction with PINs is complex
+
                 var result = await TerminalCommands.RunCommandWithResultAsync(
                     $"echo -e \"pair {SelectedDevice.Address}\n{pin}\n\" | bluetoothctl"
                 );
 
-                if (result.IsSuccess && !result.CombinedOutput.Contains("Failed"))
+                if (result.IsSuccess && !result.CombinedOutput.Contains("Failed", StringComparison.OrdinalIgnoreCase))
                 {
                     StatusText = $"Paired with {deviceName}";
                     await Task.Delay(2000);
@@ -251,41 +467,8 @@ namespace UtilitiesManager.ViewModels
             }
         }
 
-        private async void TrustSelected()
-        {
-            if (SelectedDevice == null) return;
-
-            try
-            {
-                StatusText = $"Trusting {SelectedDevice.Name}...";
-                var success = await _changer.TrustDeviceAsync(SelectedDevice.Address);
-
-                if (success)
-                {
-                    StatusText = $"Trusted {SelectedDevice.Name}";
-                    await Task.Delay(2000);
-                    await RefreshAsync();
-                }
-                else
-                {
-                    StatusText = "Trust operation failed";
-                }
-            }
-            catch (Exception ex)
-            {
-                StatusText = $"Error: {ex.Message}";
-            }
-        }
-
         private void Close()
         {
-            // Stop any ongoing scan before closing
-            if (IsScanning)
-            {
-                _ = _changer.StopBluetoothScanAsync();
-            }
-            
-            // This will be handled by the View - trigger window close
             CloseRequested?.Invoke(this, EventArgs.Empty);
         }
 
