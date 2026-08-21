@@ -12,25 +12,25 @@ namespace UtilitiesManager
         {
             var checker = new CheckDependencyCommand();
             var firewall = await checker.GetFirewallStatusAsync();
-            
-            Console.WriteLine("=== FIREWALL STATUS ===");
-            
+
+            MenuEngine.GeneralMessage("=== FIREWALL STATUS ===");
+
             if (!string.IsNullOrEmpty(firewall.UfwStatus))
             {
-                Console.WriteLine($"UFW Status: {firewall.UfwStatus}");
+                MenuEngine.GeneralMessage($"UFW Status: {firewall.UfwStatus}");
             }
-            
+
             if (!string.IsNullOrEmpty(firewall.Fail2banStatus))
             {
-                Console.WriteLine($"Fail2ban Status: {firewall.Fail2banStatus}");
+                MenuEngine.GeneralMessage($"Fail2ban Status: {firewall.Fail2banStatus}");
             }
-            
+
             if (firewall.IptablesRules.Any())
             {
-                Console.WriteLine("\nRecent iptables rules:");
+                MenuEngine.GeneralMessage("\nRecent iptables rules:");
                 foreach (var rule in firewall.IptablesRules.Take(5))
                 {
-                    Console.WriteLine($"  {rule}");
+                    MenuEngine.GeneralMessage($"  {rule}");
                 }
             }
         }

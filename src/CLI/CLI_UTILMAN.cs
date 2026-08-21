@@ -16,7 +16,7 @@ namespace UtilitiesManager
                 return;
             }
             //main menu, basically
-            
+
             var command = args[0].ToLower();
 
             switch (command)

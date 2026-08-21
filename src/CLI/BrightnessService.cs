@@ -3,6 +3,7 @@ using UtilitiesManager;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.ComponentModel.Design;
 
 namespace UtilitiesManager
 {
@@ -14,15 +15,15 @@ namespace UtilitiesManager
             {
                 var changer = new ChangeValueCommand();
                 await changer.SetBrightnessAsync(brightness);
-                Console.WriteLine($"Brightness set to {brightness}%");
+                MenuEngine.GeneralMessage($"Brightness set to {brightness}%");
             }
             else
             {
-                Console.WriteLine("Usage: UtilMan brightness <percentage (0-100)>");
+                MenuEngine.ErrorMessage("Usage: UtilMan brightness <percentage (0-100)>");
             }
         }
-        
-        
+
+
         public static async Task BrightnessMenu(CheckDependencyCommand checker)
         {
             if (!checker.IsBrightnessCtlAvailable)

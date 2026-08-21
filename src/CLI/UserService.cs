@@ -12,12 +12,12 @@ namespace UtilitiesManager
         {
             var checker = new CheckDependencyCommand();
             var users = await checker.GetUsersAsync();
-            
-            Console.WriteLine("=== USER INFORMATION ===");
-            Console.WriteLine("{0,-15} {1,-6} {2,-6} {3,-15} {4,-10} {5,-5}", 
+
+             MenuEngine.GeneralMessage("=== USER INFORMATION ===");
+            Console.WriteLine("{0,-15} {1,-6} {2,-6} {3,-15} {4,-10} {5,-5}",
                 "Username", "UID", "GID", "Home", "Shell", "Online");
             Console.WriteLine(new string('-', 70));
-            
+
             foreach (var user in users)
             {
                 Console.WriteLine("{0,-15} {1,-6} {2,-6} {3,-15} {4,-10} {5,-5}",

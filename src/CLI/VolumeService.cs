@@ -18,7 +18,7 @@ namespace UtilitiesManager
             }
             else
             {
-                Console.WriteLine("Usage: UtilMan volume <percentage (0-100)>");
+                 MenuEngine.ShowError("Usage: UtilMan volume <percentage (0-100)>");
             }
         }
 

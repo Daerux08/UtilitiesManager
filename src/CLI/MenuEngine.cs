@@ -60,7 +60,7 @@ namespace UtilitiesManager
                     .Title(title)
                     .HighlightStyle(new Style(foreground: Color.Cyan1, decoration: Decoration.Bold))
                     .AddChoices(options.Keys));
-            
+
             return options.Keys.ToList().IndexOf(choice);
         }
 
@@ -72,7 +72,7 @@ namespace UtilitiesManager
                     .Title(title)
                     .HighlightStyle(new Style(foreground: Color.Cyan1, decoration: Decoration.Bold))
                     .AddChoices(options));
-            
+
             return options.IndexOf(choice);
         }
 
@@ -85,13 +85,13 @@ namespace UtilitiesManager
                     .HighlightStyle(new Style(foreground: Color.Cyan1, decoration: Decoration.Bold))
                     .AddChoices(menu.Select(x => x.Item1).ToArray()));
 
-            try 
-            { 
-                await menu.First(x => x.Item1 == choice).Item2(); 
-            } 
+            try
+            {
+                await menu.First(x => x.Item1 == choice).Item2();
+            }
             catch (GoBackException)
-            { 
-                return; 
+            {
+                return;
             }
         }
 
@@ -104,13 +104,13 @@ namespace UtilitiesManager
                     .HighlightStyle(new Style(foreground: Color.Cyan1, decoration: Decoration.Bold))
                     .AddChoices(menu.Select(x => x.Item1).ToArray()));
 
-            try 
-            { 
-                await menu.First(x => x.Item1 == choice).Item2(); 
-            } 
+            try
+            {
+                await menu.First(x => x.Item1 == choice).Item2();
+            }
             catch (GoBackException)
-            { 
-                return; 
+            {
+                return;
             }
         }
 
@@ -123,13 +123,13 @@ namespace UtilitiesManager
                     .HighlightStyle(new Style(foreground: Color.Cyan1, decoration: Decoration.Bold))
                     .AddChoices(menu.Select(x => x.Item1).ToArray()));
 
-            try 
-            { 
-                menu.First(x => x.Item1 == choice).Item2(); 
-            } 
+            try
+            {
+                menu.First(x => x.Item1 == choice).Item2();
+            }
             catch (GoBackException)
-            { 
-                return; 
+            {
+                return;
             }
         }
 

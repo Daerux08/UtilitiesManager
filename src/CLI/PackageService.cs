@@ -13,7 +13,7 @@ namespace UtilitiesManager
             if (args.Length > 1)
             {
                 var action = args[1].ToLower();
-                
+
                 switch (action)
                 {
                     case "all":

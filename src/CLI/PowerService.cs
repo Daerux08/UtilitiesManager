@@ -13,25 +13,25 @@ namespace UtilitiesManager
             var powerChecker = new CheckDependencyCommand();
             if (args.Length > 1)
             {
-                if (args[1].ToLower() == "get")
+                if (string.Equals(args[1], "get", StringComparison.OrdinalIgnoreCase))
                 {
                     var profile = await powerChecker.GetCurrentPowerProfileAsync();
-                    Console.WriteLine($"Current power profile: {profile}");
+                    MenuEngine.GeneralMessage($"Current power profile: {profile}");
                 }
-                else if (args[1].ToLower() == "set" && args.Length > 2)
+                else if (string.Equals(args[1], "set", StringComparison.OrdinalIgnoreCase) && args.Length > 2)
                 {
                     var changer = new ChangeValueCommand();
                     await changer.SetPowerProfileAsync(args[2]);
-                    Console.WriteLine($"Power profile set to: {args[2]}");
+                    MenuEngine.GeneralMessage($"Power profile set to: {args[2]}");
                 }
                 else
                 {
-                    Console.WriteLine("Usage: UtilMan power get|set <profile>");
+                    MenuEngine.GeneralMessage("Usage: UtilMan power get|set <profile>");
                 }
             }
             else
             {
-                Console.WriteLine("Usage: UtilMan power get|set <profile>");
+                MenuEngine.GeneralMessage("Usage: UtilMan power get|set <profile>");
             }
         }
 

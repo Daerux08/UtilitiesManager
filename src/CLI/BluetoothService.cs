@@ -64,13 +64,13 @@ namespace UtilitiesManager
             }
             else
             {
-                Console.WriteLine("Usage: UtilMan bluetooth <list|scan|connect|disconnect|pair|power>");
-                Console.WriteLine("  list              - List paired/available devices");
-                Console.WriteLine("  scan              - Scan for nearby devices");
-                Console.WriteLine("  connect <addr>    - Connect to device");
-                Console.WriteLine("  disconnect <addr> - Disconnect from device");
-                Console.WriteLine("  pair <addr>       - Pair with device");
-                Console.WriteLine("  power <on|off>    - Turn Bluetooth on/off");
+                MenuEngine.GeneralMessage("Usage: UtilMan bluetooth <list|scan|connect|disconnect|pair|power>");
+                MenuEngine.GeneralMessage("  list              - List paired/available devices");
+                MenuEngine.GeneralMessage("  scan              - Scan for nearby devices");
+                MenuEngine.GeneralMessage("  connect <addr>    - Connect to device");
+                MenuEngine.GeneralMessage("  disconnect <addr> - Disconnect from device");
+                MenuEngine.GeneralMessage("  pair <addr>       - Pair with device");
+                MenuEngine.GeneralMessage("  power <on|off>    - Turn Bluetooth on/off");
             }
         }
 
@@ -115,7 +115,7 @@ namespace UtilitiesManager
             }
 
             Console.WriteLine("Scanning for Bluetooth devices (5 seconds)...");
-            
+
             var changer = new ChangeValueCommand();
             await changer.ScanBluetoothDevicesAsync();
             await Task.Delay(5000);
@@ -170,7 +170,7 @@ namespace UtilitiesManager
 
             Console.WriteLine($"Pairing with {address}...");
             Console.WriteLine("Note: Device must be in pairing mode.");
-            
+
             var changer = new ChangeValueCommand();
             var success = await changer.PairDeviceAsync(address);
 
@@ -232,7 +232,7 @@ namespace UtilitiesManager
                     MenuEngine.ShowMessage("Bluetooth", "No Bluetooth devices found. Try scanning first.", false);
                     Console.WriteLine("\n[S] Scan for devices | [R] Refresh | [Q] Go back");
                     var key = Console.ReadKey(true);
-                    
+
                     if (key.Key == ConsoleKey.Q || key.Key == ConsoleKey.Escape)
                         return;
                     else if (key.Key == ConsoleKey.S)
@@ -242,7 +242,7 @@ namespace UtilitiesManager
                     }
                     else if (key.Key == ConsoleKey.R)
                         continue;
-                    
+
                     continue;
                 }
 
@@ -326,7 +326,7 @@ namespace UtilitiesManager
                 {
                     Console.WriteLine($"Connecting to {device.Name}...");
                     var success = await changer.ConnectToDeviceAsync(device.Address);
-                    
+
                     if (success)
                         MenuEngine.ShowMessage("Connected", $"Connected to {device.Name}");
                     else
@@ -353,9 +353,9 @@ namespace UtilitiesManager
                 {
                     Console.WriteLine($"Pairing with {device.Name}...");
                     Console.WriteLine("Make sure the device is in pairing mode.");
-                    
+
                     var success = await changer.PairDeviceAsync(device.Address);
-                    
+
                     if (success)
                     {
                         MenuEngine.ShowMessage("Paired", $"Successfully paired with {device.Name}");
@@ -365,15 +365,15 @@ namespace UtilitiesManager
                     else
                     {
                         // Pairing might need PIN
-                        Console.WriteLine("Pairing failed. PIN/passkey may be required.");
+                        MenuEngine.ShowError("Pairing Failed", "Device may require authentication.");
                         var pin = MenuEngine.GetUserInput("Enter PIN/passkey (or press Enter to cancel)");
-                        
+
                         if (!string.IsNullOrEmpty(pin))
                         {
                             var result = await TerminalCommands.RunCommandWithResultAsync(
                                 $"echo -e \"pair {device.Address}\n{pin}\n\" | bluetoothctl"
                             );
-                            
+
                             if (result.IsSuccess)
                             {
                                 MenuEngine.ShowMessage("Paired", $"Successfully paired with {device.Name}");
@@ -392,7 +392,7 @@ namespace UtilitiesManager
         public static async Task HandleDeviceOptions(BluetoothInfo device, CheckDependencyCommand checker)
         {
             var changer = new ChangeValueCommand();
-            
+
             var options = new List<string>
             {
                 $"Options for {device.Name}",

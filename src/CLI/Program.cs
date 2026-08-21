@@ -11,7 +11,7 @@ namespace UtilitiesManager
         static async Task Main(string[] args)
         {
             // Check if GUI environment is available
-            bool hasGui = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DISPLAY")) || 
+            bool hasGui = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("DISPLAY")) ||
                          !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("WAYLAND_DISPLAY"));
 
             // Force GUI mode for testing on Windows
@@ -20,7 +20,7 @@ namespace UtilitiesManager
 
             if (args.Length > 0)
             {
-                await CliUtilMan.RunCliMode(args);
+                await CliUtilMan.RunCliMode(args); //GUI mode
             }
             else if (!hasGui)
             {

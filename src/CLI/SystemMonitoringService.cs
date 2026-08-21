@@ -16,43 +16,43 @@ namespace UtilitiesManager
             switch (command.ToLower())
             {
                 case "cpu":
-                    Console.WriteLine("=== CPU INFORMATION ===");
-                    Console.WriteLine($"Uptime: {systemInfo.Uptime}");
-                    Console.WriteLine($"Load Average: {string.Join(", ", systemInfo.LoadAverage)}");
-                    
+                    MenuEngine.GeneralMessage("CPU Information");
+                     MenuEngine.GeneralMessage($"Uptime: {systemInfo.Uptime}");
+                     MenuEngine.GeneralMessage($"Load Average: {string.Join(", ", systemInfo.LoadAverage)}");
+
                     if (systemInfo.Temperatures.Any())
                     {
-                        Console.WriteLine("\nTemperatures:");
+                         MenuEngine.GeneralMessage("\nTemperatures:");
                         foreach (var temp in systemInfo.Temperatures)
                         {
-                            Console.WriteLine($"  {temp.Key}: {temp.Value}");
+                             MenuEngine.GeneralMessage($"  {temp.Key}: {temp.Value}");
                         }
                     }
                     break;
 
-                case "memory":
-                    Console.WriteLine("=== MEMORY INFORMATION ===");
-                    if (systemInfo.MemoryInfo.Any())
-                    {
-                        Console.WriteLine($"Memory Total: {(systemInfo.MemoryInfo.TryGetValue("Total", out var total) ? total : "N/A")}");
-                        Console.WriteLine($"Memory Used: {(systemInfo.MemoryInfo.TryGetValue("Used", out var used) ? used : "N/A")}");
-                        Console.WriteLine($"Memory Free: {(systemInfo.MemoryInfo.TryGetValue("Free", out var free) ? free : "N/A")}");
-                        Console.WriteLine($"Swap Total: {(systemInfo.MemoryInfo.TryGetValue("SwapTotal", out var swapTotal) ? swapTotal : "N/A")}");
-                        Console.WriteLine($"Swap Used: {(systemInfo.MemoryInfo.TryGetValue("SwapUsed", out var swapUsed) ? swapUsed : "N/A")}");
-                        Console.WriteLine($"Swap Free: {(systemInfo.MemoryInfo.TryGetValue("SwapFree", out var swapFree) ? swapFree : "N/A")}");
-                    }
-                    else
-                    {
-                        Console.WriteLine("Memory information not available");
-                    }
-                    break;
+                    case "memory":
+                        MenuEngine.GeneralMessage("=== MEMORY INFORMATION ===");
+                        if (systemInfo.MemoryInfo.Any())
+                        {
+                            MenuEngine.GeneralMessage($"Memory Total: {(systemInfo.MemoryInfo.TryGetValue("Total", out var total) ? total : "N/A")}");
+                            MenuEngine.GeneralMessage($"Memory Used: {(systemInfo.MemoryInfo.TryGetValue("Used", out var used) ? used : "N/A")}");
+                            MenuEngine.GeneralMessage($"Memory Free: {(systemInfo.MemoryInfo.TryGetValue("Free", out var free) ? free : "N/A")}");
+                            MenuEngine.GeneralMessage($"Swap Total: {(systemInfo.MemoryInfo.TryGetValue("SwapTotal", out var swapTotal) ? swapTotal : "N/A")}");
+                            MenuEngine.GeneralMessage($"Swap Used: {(systemInfo.MemoryInfo.TryGetValue("SwapUsed", out var swapUsed) ? swapUsed : "N/A")}");
+                            MenuEngine.GeneralMessage($"Swap Free: {(systemInfo.MemoryInfo.TryGetValue("SwapFree", out var swapFree) ? swapFree : "N/A")}");
+                        }
+                        else
+                        {
+                            MenuEngine.ErrorMessage("Memory information not available");
+                        }
+                        break;
 
                 case "disk":
-                    Console.WriteLine("=== DISK USAGE ===");
-                    Console.WriteLine("{0,-15} {1,-8} {2,-8} {3,-8} {4,-6} {5,-20}", 
+                     MenuEngine.GeneralMessage("=== DISK USAGE ===");
+                    Console.WriteLine("{0,-15} {1,-8} {2,-8} {3,-8} {4,-6} {5,-20}",
                         "Filesystem", "Size", "Used", "Avail", "Use%", "Mount");
                     Console.WriteLine(new string('-', 80));
-                    
+
                     foreach (var disk in systemInfo.DiskUsage)
                     {
                         Console.WriteLine("{0,-15} {1,-8} {2,-8} {3,-8} {4,-6} {5,-20}",
@@ -61,10 +61,10 @@ namespace UtilitiesManager
                     break;
 
                 case "network":
-                    Console.WriteLine("=== NETWORK INTERFACES ===");
+                     MenuEngine.GeneralMessage("=== NETWORK INTERFACES ===");
                     Console.WriteLine("{0,-15} {1,-15}", "Interface", "IP Address");
                     Console.WriteLine(new string('-', 30));
-                    
+
                     foreach (var net in systemInfo.NetworkInterfaces)
                     {
                         Console.WriteLine("{0,-15} {1,-15}", net.Interface, net.IPAddress);
@@ -83,7 +83,7 @@ namespace UtilitiesManager
                 var menuOptions = new List<string>
                 {
                     "🖥️ CPU Information - Usage, load, temperature",
-                    "💾 Memory Usage - RAM and swap usage", 
+                    "💾 Memory Usage - RAM and swap usage",
                     "💿 Disk Usage - Storage space and mount points",
                     "🌐 Network Interfaces - IP addresses and connections",
                     "📊 Full System Overview - All information at once",
@@ -120,27 +120,27 @@ namespace UtilitiesManager
                         break;
                     case 4:
                         var systemInfo = await checker.GetSystemInfoAsync();
-                        
+
                         // Display Full System Overview
                         Console.Clear();
                         Console.WriteLine("=== FULL SYSTEM OVERVIEW ===");
                         Console.WriteLine();
-                        
+
                         // CPU Information
                         await HandleSystemMonitoringCommand(checker, "cpu");
                         Console.WriteLine();
-                        
-                        // Memory Information  
+
+                        // Memory Information
                         await HandleSystemMonitoringCommand(checker, "memory");
                         Console.WriteLine();
-                        
+
                         // Disk Information
                         await HandleSystemMonitoringCommand(checker, "disk");
                         Console.WriteLine();
-                        
+
                         // Network Information
                         await HandleSystemMonitoringCommand(checker, "network");
-                        
+
                         Console.WriteLine();
                         Console.WriteLine("Press any key to continue...");
                         Console.ReadKey(true);

@@ -11,7 +11,7 @@ namespace UtilitiesManager
 
         public static async Task MenuService(CheckDependencyCommand checkerParam)
         {
-            Console.WriteLine("DEBUG: Starting Service Management Menu");
+             MenuEngine.GeneralMessage("DEBUG: Starting Service Management Menu");
             if (!checkerParam.IsSystemctlAvailable)
             {
                 MenuEngine.ErrorMessage("systemctl is not available on this system.");
@@ -75,13 +75,13 @@ namespace UtilitiesManager
                 }
                 else
                 {
-                    Console.WriteLine("Usage: UtilMan services start|stop|restart|status <service_name>");
+                    MenuEngine.GeneralMessage("Usage: UtilMan services start|stop|restart|status <service_name>");
                 }
             }
             else
             {
                 var services = await checker.GetServicesAsync();
-                Console.WriteLine("=== SERVICES ===");
+                 MenuEngine.GeneralMessage("=== SERVICES ===");
                 Console.WriteLine("{0,-25} {1,-8} {2,-8} {3,-8}", "Service", "Load", "Active", "Sub");
                 Console.WriteLine(new string('-', 60));
 
@@ -94,4 +94,3 @@ namespace UtilitiesManager
         }
     }
 }
-

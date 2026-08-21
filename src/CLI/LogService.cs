@@ -14,17 +14,17 @@ namespace UtilitiesManager
             checker.CheckDependencies();
             if (!checker.IsJournalctlAvailable)
             {
-                Console.WriteLine("journalctl is not available on this system.");
+                MenuEngine.ErrorMessage("journalctl is not available on this system.");
                 return;
             }
 
             var logType = args.Length > 1 ? args[1].ToLower() : "system";
             var logs = await checker.GetRecentLogsAsync(logType);
-            
-            Console.WriteLine($"=== RECENT LOGS ({logType.ToUpper()}) ===");
+
+            MenuEngine.GeneralMessage($"=== RECENT LOGS ({logType.ToUpper()}) ===");
             Console.WriteLine("{0,-20} {1}", "Timestamp", "Message");
             Console.WriteLine(new string('-', 80));
-            
+
             foreach (var log in logs.Take(15))
             {
                 Console.WriteLine("{0,-20} {1}", log.Timestamp, log.Message);
