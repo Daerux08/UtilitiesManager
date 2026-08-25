@@ -4,6 +4,7 @@
 
 ### Major Features
 - **Ahead-Of-Time (AOT) Compilation**: Application now compiles to native binaries
+  - Optimized the application down to 130-150MB of RAM and 1-1.5% of CPU
   - Eliminates dependency on .NET runtime installation
   - Significantly improved performance and startup time
   - Reduced application footprint and resource usage
