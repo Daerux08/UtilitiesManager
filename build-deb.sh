@@ -2,7 +2,7 @@
 set -e
 
 APP_NAME="utilitiesmanager"
-APP_VERSION="0.9.0-prealpha1"
+APP_VERSION="0.9.0-prealpha2"
 ARCH="amd64"
 
 # project file
@@ -22,8 +22,8 @@ rm -rf "$DEB_DIR"
 rm -f Package.deb
 rm -f utilitiesmanager_*.deb
 
-echo "==> Publishing Avalonia app"
-dotnet publish "$PROJECT_PATH" -c Release -r linux-x64 --self-contained true -o "$PUBLISH_DIR"
+echo "==> Publishing Avalonia app (AOT)"
+dotnet publish "$PROJECT_PATH" -c Release -r linux-x64 /p:PublishAot=true -o "$PUBLISH_DIR"
 
 echo "==> Creating Debian package structure"
 mkdir -p "$DEBIAN_DIR"
@@ -32,22 +32,15 @@ mkdir -p "$USR_SHARE_DIR"
 mkdir -p "$DEB_DIR/usr/share/applications"
 mkdir -p "$ICON_DIR"
 
-echo "==> Copying published files"
-cp -r "$PUBLISH_DIR"/* "$USR_SHARE_DIR"
-
-echo "==> Copying icon"
-cp "./Assets/UtilManagerV3.png" "$ICON_DIR/utilitiesmanager.png"
-
-echo "==> Creating launcher script"
-cat <<EOF > "$USR_BIN_DIR/$APP_NAME"
-#!/bin/bash
-exec /usr/share/UtilitiesManager/UtilitiesManager "\$@"
-EOF
+echo "==> Copying executable"
+cp "$PUBLISH_DIR/UtilitiesManager" "$USR_BIN_DIR/$APP_NAME"
 chmod +x "$USR_BIN_DIR/$APP_NAME"
 
 echo "==> Creating symlink for common command name"
-# Create symlink from UtilMan to utilitiesmanager for easier access
 ln -sf "$APP_NAME" "$USR_BIN_DIR/UtilMan"
+
+echo "==> Copying icon"
+cp "./Assets/UtilManagerV3.png" "$ICON_DIR/utilitiesmanager.png"
 
 echo "==> Creating .desktop file"
 cat <<EOF > "$DEB_DIR/usr/share/applications/$APP_NAME.desktop"
@@ -100,12 +93,9 @@ chmod 555 "$DEBIAN_DIR/postinst"
 chmod 555 "$DEBIAN_DIR/postrm"
 
 echo "==> Finalizing permissions"
-# Set standard permissions: 755 for dirs, 644 for files
 find "$DEB_DIR" -type d -exec chmod 755 {} +
 find "$DEB_DIR" -type f -exec chmod 644 {} +
-# Restore execution bits for binaries and scripts
-chmod 755 "$USR_BIN_DIR/$APP_NAME"
-chmod 755 "$USR_SHARE_DIR/UtilitiesManager"
+chmod 755 "$USR_BIN_DIR/$APP_NAME" "$USR_BIN_DIR/UtilMan"
 chmod 755 "$DEBIAN_DIR/postinst" "$DEBIAN_DIR/postrm"
 
 echo "==> Building .deb package"
