@@ -1,0 +1,122 @@
+[33mcommit 9635522f7745fe6cc86720122b4c71f7357dc26e[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: Alexander Kozlov <129600799+Daerux08@users.noreply.github.com>
+Date:   Wed Jul 1 21:36:21 2026 +0300
+
+    Remade, fixed, and simplified the Help.cs file, added the theme settings for the future UI
+
+ src/CLI/CLI_UTILMAN.cs             |   2 [32m+[m[31m-[m
+ src/CLI/Help.cs                    | 810 [32m+++++++++++++++++++++++++++++[m[31m--------------------------------------------------------------------------------------------------------------------------------------------[m
+ src/Shared/ThemeSettings.cs        |  27 [32m++++++[m
+ src/Shared/ThemeSettingsService.cs |  71 [32m+++++++++++++++[m
+ 4 files changed, 236 insertions(+), 674 deletions(-)
+
+[33mcommit b32f718f777ca55552e2a71bc11369ff4e9ab98f[m
+Author: grouchz111 <129600799+Daerux08@users.noreply.github.com>
+Date:   Tue Jun 23 17:28:40 2026 +0300
+
+    Call CheckDependencies and update help prompt
+    
+    Ensure dependency status is refreshed before checking journalctl availability and standardize the help prompt. LogService: invoke CheckDependencies() in HandleLogsCommand and MenuService so IsJournalctlAvailable is evaluated after an explicit dependency check. Help: replace MenuEngine.DisplayMessage with MenuEngine.GeneralMessage for the continue prompt.
+
+ src/CLI/Help.cs       | 2 [32m+[m[31m-[m
+ src/CLI/LogService.cs | 2 [32m++[m
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+[33mcommit c75fd8f50ef8578e7d07eb1c68effe5ee7d694c6[m
+Author: grouchz111 <129600799+Daerux08@users.noreply.github.com>
+Date:   Tue Jun 23 17:10:01 2026 +0300
+
+    Add systemd-journal-remote and continue prompt
+    
+    Show a "Press any key to continue..." prompt in the Help UI to pause after the trouble panel. Also add systemd-journal-remote to the package list (with a brief description) and include it in the apt install command so the installer will install the remote systemd journal logging tool.
+
+ src/CLI/Help.cs       | 1 [32m+[m
+ src/DownloadScript.cs | 3 [32m++[m[31m-[m
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+
+[33mcommit 567d827df902d0d65f5c25581533061e11d2391d[m
+Author: grouchz111 <129600799+Daerux08@users.noreply.github.com>
+Date:   Tue Jun 2 10:45:36 2026 +0300
+
+    Debugged the NMCLI parsing
+
+ src/GUI/App.axaml      |   2 [32m+[m[31m-[m
+ src/Shared/Terminal.cs | 508 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m----------------------------------------------------------------------------------[m
+ 2 files changed, 279 insertions(+), 231 deletions(-)
+
+[33mcommit 0f7cbab0fa7903051e3b1d46c6065c532bdc65b7[m
+Author: grouchz111 <129600799+Daerux08@users.noreply.github.com>
+Date:   Wed May 27 15:40:50 2026 +0300
+
+    Update build-deb.sh
+
+ build-deb.sh | 52 [32m++++++++++++++++++++++++++++++++++++++++++++++[m[31m------[m
+ 1 file changed, 46 insertions(+), 6 deletions(-)
+
+[33mcommit 6afcd065eb6edeb95718ae0d4fb39332ad9843d2[m
+Author: grouchz111 <129600799+Daerux08@users.noreply.github.com>
+Date:   Thu May 21 01:27:02 2026 +0300
+
+    Add battery state properties and refine parsing
+    
+    Move battery state interpretation into the shared model (IsCharging, IsDischarging, IsFull) so ViewModel logic is simpler and consistent across UI/CLI. Update BatteryWindowViewModel to use those flags and display time-to-empty/to-full accordingly. Improve Terminal parsing by splitting on the ": " delimiter (avoids colons in MAC/BSSID fields), starting the value substring after the delimiter, and trimming whitespace for more robust field extraction.
+
+ src/GUI/ViewModels/BatteryWindowViewModel.cs |  6 [32m++++[m[31m--[m
+ src/Shared/Models.cs                         |  6 [32m++++++[m
+ src/Shared/Terminal.cs                       | 12 [32m+++++++++[m[31m---[m
+ 3 files changed, 19 insertions(+), 5 deletions(-)
+
+[33mcommit 783fc665fbfbc9db92804d211ada01a4b3f9052a[m
+Author: Alexander Kozlov <129600799+grouchz111@users.noreply.github.com>
+Date:   Sun May 3 11:59:05 2026 +0300
+
+    Revise README for clarity and updated features
+    
+    Updated README to improve clarity and structure, added GUI and CLI sections, and refined installation instructions.
+
+ README.md | 122 [32m+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++[m[31m---------------------------------------------------[m
+ 1 file changed, 71 insertions(+), 51 deletions(-)
+
+[33mcommit f8b4d1cf1342be6a1097e89378819c96f00b4c49[m
+Author: Alexander Kozlov <129600799+grouchz111@users.noreply.github.com>
+Date:   Sun May 3 11:55:22 2026 +0300
+
+    Add theme selector to README future features
+    
+    Added theme selector to features list.
+
+ README.md | 1 [32m+[m
+ 1 file changed, 1 insertion(+)
+
+[33mcommit 54b2b6ee19352ee196c9c94a6ceb3615d8964fe6[m
+Author: Alexander Kozlov <129600799+grouchz111@users.noreply.github.com>
+Date:   Sun May 3 11:54:02 2026 +0300
+
+    Remove known bugs section from README
+    
+    Removed the known bugs section from the README.
+
+ README.md | 3 [31m---[m
+ 1 file changed, 3 deletions(-)
+
+[33mcommit 5be000d47d278cdafa916e31b89926eaccd07894[m
+Author: grouchz111 <129600799+grouchz111@users.noreply.github.com>
+Date:   Thu Apr 30 05:32:33 2026 +0300
+
+    Add Settings window and settings command
+    
+    Introduce a Settings window and hook it into the main UI.
+    
+    - Add SettingsWindow.axaml and SettingsWindow.axaml.cs (simple window shell).
+    - Add OpenSettingsCommand and OpenSettings() to MainWindowViewModel, showing the SettingsWindow with the main window as owner and basic exception handling.
+    - Update MainWindow.axaml header to include a settings button bound to OpenSettingsCommand.
+    - Add publish/ to .gitignore.
+    - Remove deb-package/DEBIAN/control packaging control file.
+
+ .gitignore                                |  1 [32m+[m
+ deb-package/DEBIAN/control                | 10 [31m----------[m
+ src/GUI/MainWindow.axaml                  | 30 [32m+++++++++++++++++++[m[31m-----------[m
+ src/GUI/SettingsWindow.axaml              | 14 [32m++++++++++++++[m
+ src/GUI/SettingsWindow.axaml.cs           | 11 [32m+++++++++++[m
+ src/GUI/ViewModels/MainWindowViewModel.cs | 20 [32m++++++++++++++++++++[m
+ 6 files changed, 65 insertions(+), 21 deletions(-)

@@ -18,7 +18,7 @@ namespace UtilitiesManager
             }
             else
             {
-                 MenuEngine.ShowError("Usage: UtilMan volume <percentage (0-100)>");
+                 MenuEngine.ShowError("Invalid Usage", "Usage: UtilMan volume <percentage (0-100)>");
             }
         }
 

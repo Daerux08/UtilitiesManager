@@ -1,10 +1,17 @@
 using System;
 using System.IO;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using UtilitiesManager.Models;
 
 namespace UtilitiesManager.Services
 {
+    // ─── Native AOT JSON Source Generator Context ───
+    [JsonSerializable(typeof(ThemeSettings))]
+    internal partial class ThemeJsonSerializerContext : JsonSerializerContext
+    {
+    }
+
     public class ThemeSettingsService
     {
         private static readonly string SettingsFilePath = Path.Combine(
@@ -25,7 +32,8 @@ namespace UtilitiesManager.Services
                 if (File.Exists(SettingsFilePath))
                 {
                     var json = File.ReadAllText(SettingsFilePath);
-                    _cachedSettings = JsonSerializer.Deserialize<ThemeSettings>(json);
+                    // Use Source Generator Context instead of reflection
+                    _cachedSettings = JsonSerializer.Deserialize(json, ThemeJsonSerializerContext.Default.ThemeSettings);
                     return _cachedSettings ?? new ThemeSettings();
                 }
             }
@@ -43,15 +51,13 @@ namespace UtilitiesManager.Services
             try
             {
                 var directory = Path.GetDirectoryName(SettingsFilePath);
-                if (!Directory.Exists(directory))
+                if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
                 {
                     Directory.CreateDirectory(directory);
                 }
 
-                var json = JsonSerializer.Serialize(settings, new JsonSerializerOptions
-                {
-                    WriteIndented = true
-                });
+                // Use Source Generator Context for serialization
+                var json = JsonSerializer.Serialize(settings, ThemeJsonSerializerContext.Default.ThemeSettings);
 
                 File.WriteAllText(SettingsFilePath, json);
                 _cachedSettings = settings;

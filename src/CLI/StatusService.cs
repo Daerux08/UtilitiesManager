@@ -54,7 +54,7 @@ namespace UtilitiesManager
                     MenuEngine.ErrorMessage("Power Profile: Not available");
                 }
 
-            MenuEngine.GeneralMessage();
+            
             MenuEngine.GeneralMessage("=== DEPENDENCIES ===");
             MenuEngine.GeneralMessage($"brightnessctl: {(checker.IsBrightnessCtlAvailable ? "Available" : "Not available")}");
             MenuEngine.GeneralMessage($"pactl: {(checker.IsPactlAvailable ? "Available" : "Not available")}");
