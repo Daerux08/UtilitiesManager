@@ -38,9 +38,13 @@ Tested on Linux Mint 22.2, Debian 13, Ubuntu 24.04, and headless servers.
 Download the latest `.deb` from [Releases](../../releases), then:
 
 ```bash
-sudo dpkg -i UtilitiesManager_0.7.0-pre-alpha-7_amd64.deb
+sudo dpkg -i UtilitiesManager_0.9.0-pre-alpha-8_amd64.deb
 sudo apt-get install -f
 ```
+
+### Requirements
+
+**No .NET runtime required** — Compiled as native binary with AOT compilation
 
 ### Dependencies
 
@@ -113,6 +117,11 @@ dotnet build
 
 ## Recent Changes
 
+- **v0.9.0**: Ahead-Of-Time (AOT) compilation for native binary execution
+  - No .NET runtime required
+  - Significantly faster startup and runtime performance
+  - Optimized Debian package generation
+  - Refactored all CLI services to use MenuEngine for consistent output
 - Redesigned CLI using Spectre.Console with modern menu engine
 - Refactored codebase into modular service classes
 - Simplified dependency checking

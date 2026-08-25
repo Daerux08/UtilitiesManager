@@ -1,5 +1,16 @@
 # Bugs Fixed:
 
+## Version 0.9.0-prealpha8
+- **CLI Menu Consistency**: Refactored all CLI services to use `MenuEngine.cs` for consistent output
+  - Fixed inconsistent menu formatting across services
+  - Improved Spectre.Console integration for better visual presentation
+- **AOT Compilation**: Debugged and optimized the AOT (Ahead-Of-Time) compilation process
+  - Fixed compilation errors in StatusService.cs and VolumeService.cs
+  - Resolved ThemeSettingsService.cs initialization issues for AOT compatibility
+  - Optimized build-deb.sh for native binary generation
+- **Performance**: Significantly improved startup time and runtime performance with AOT binaries
+- **Compatibility**: Eliminated .NET runtime dependency for broader system compatibility
+
 ## Version 0.7.0-prealpha6
 - **Enhanced CLI Interface**: Completely redesigned CLI using Spectre.Console for improved usability
 - **Reduced CLI Bloat**: Streamlined menu system using simple, efficient engine

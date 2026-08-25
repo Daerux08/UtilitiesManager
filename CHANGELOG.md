@@ -1,5 +1,42 @@
 # Changelog
 
+## [0.9.0-prealpha8] - 2026-08-25
+
+### Major Features
+- **Ahead-Of-Time (AOT) Compilation**: Application now compiles to native binaries
+  - Eliminates dependency on .NET runtime installation
+  - Significantly improved performance and startup time
+  - Reduced application footprint and resource usage
+  - Compatible with systems without C# .NET runtime
+
+### CLI Improvements
+- **MenuEngine Integration**: Refactored all CLI services to use `MenuEngine.cs` methods
+  - Replaced raw `Console.WriteLine` calls with consistent menu rendering
+  - Improved visual consistency across all CLI services
+  - Better support for Spectre.Console formatting
+  - Enhanced interactive menu experience
+
+### Affected Services
+- BluetoothService.cs
+- BrightnessService.cs
+- FirewallService.cs
+- LogService.cs
+- MenuEngine.cs
+- PowerService.cs
+- ServicesService.cs
+- StatusService.cs
+- SystemMonitoringService.cs
+- UserService.cs
+- VolumeService.cs
+
+### Technical Improvements
+- **Project Configuration**: Updated project files for AOT compilation
+  - UtilitiesManager.csproj: Added PublishAot property
+  - UtilitiesManagerCLI.csproj: Added PublishAot property
+  - Optimized build-deb.sh for AOT native binary generation
+- **Build Process**: Optimized Debian package creation for native binaries
+- **ThemeSettingsService.cs**: Improved theme settings initialization and handling
+
 ## [0.8.0-prealpha7] - 2026-04-21
 
 ### New Features

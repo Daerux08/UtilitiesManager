@@ -7,6 +7,15 @@ A Linux utility manager that provides both GUI and CLI interfaces for controllin
 UtilitiesManager uses a dual-interface approach:
 - **GUI Mode**: Avalonia desktop application for interactive use
 - **CLI Mode**: Command-line interface with interactive menus for servers and automation
+- **Native Binaries**: Built with Ahead-Of-Time (AOT) compilation for standalone execution without .NET runtime
+
+## Compilation Model
+As of v0.9.0, UtilitiesManager is compiled using **Ahead-Of-Time (AOT)** compilation:
+- **Native Binary**: Compiled directly to machine code, eliminating .NET runtime dependency
+- **Performance**: Significantly faster startup time and runtime performance
+- **Portability**: Can run on systems without C# .NET runtime installed
+- **Size**: Optimized binary footprint compared to framework-dependent builds
+- **Reliability**: Reduced external dependencies for better stability
 
 ## Environment Detection
 The application automatically detects the appropriate mode:
