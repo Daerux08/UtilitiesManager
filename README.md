@@ -2,7 +2,7 @@
 
 A Linux utility manager with both a GUI and CLI interface for controlling system settings and monitoring.
 
-Tested on Linux Mint 22.2, Debian 13, Ubuntu 24.04, and headless servers.
+Tested on Linux Mint 22.2, Debian 13, Debian testing, Ubuntu 24.04, and headless servers.
 
 <img width="513" height="554" alt="Main menu" src="https://github.com/user-attachments/assets/78e5ab19-095e-4c40-b873-21cb1361b3da" />
 
