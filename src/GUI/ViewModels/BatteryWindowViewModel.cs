@@ -14,6 +14,7 @@ namespace UtilitiesManager.ViewModels
         private bool _powerProfilesAvailable;
         private System.Collections.ObjectModel.ObservableCollection<string> _availableProfiles = new();
         private string _selectedProfile = "";
+        private bool _suppressProfileChange = false;
 
         public BatteryInfo BatteryInfo
         {
@@ -40,7 +41,7 @@ namespace UtilitiesManager.ViewModels
             {
                 if (SetProperty(ref _selectedProfile, value))
                 {
-                    if (!string.IsNullOrEmpty(_selectedProfile))
+                    if (!_suppressProfileChange && !string.IsNullOrEmpty(_selectedProfile))
                         _ = SetPowerProfile(_selectedProfile);
                 }
             }
@@ -87,7 +88,9 @@ namespace UtilitiesManager.ViewModels
                 {
                     var current = await _checker.GetCurrentPowerProfileAsync();
                     AvailableProfiles = new System.Collections.ObjectModel.ObservableCollection<string>(new[] { "power-saver", "balanced", "performance" });
+                    _suppressProfileChange = true;
                     SelectedProfile = current ?? "";
+                    _suppressProfileChange = false;
                 }
 
                 OnPropertyChanged(nameof(PercentageText));

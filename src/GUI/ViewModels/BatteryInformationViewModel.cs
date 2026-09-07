@@ -34,17 +34,11 @@ namespace UtilitiesManager.ViewModels
             set => SetProperty(ref _availableProfiles, value);
         }
 
+        // Read-only in the information window — changes should be made from the main Battery window
         public string SelectedProfile
         {
             get => _selectedProfile;
-            set
-            {
-                if (SetProperty(ref _selectedProfile, value))
-                {
-                    if (!string.IsNullOrEmpty(_selectedProfile))
-                        _ = SetPowerProfileAsync(_selectedProfile);
-                }
-            }
+            private set => SetProperty(ref _selectedProfile, value);
         }
 
         public ICommand RefreshCommand { get; }
