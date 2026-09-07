@@ -60,8 +60,7 @@
         </Border>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12" Margin="0,8,0,0">
-            <Button Content="Refresh" Width="100" Command="{Binding RefreshCommand}" />
-            <Button Content="Close" Width="100" Command="{Binding CloseCommand}" />
+            <Button Classes="clickable-label" Content="Refresh" Command="{Binding RefreshCommand}" />
         </StackPanel>
     </StackPanel>
 </Window>

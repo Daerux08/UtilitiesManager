@@ -123,9 +123,9 @@
             <StackPanel Orientation="Horizontal" 
                         HorizontalAlignment="Center" 
                         Spacing="8">
-                <Button Content="Refresh" 
+                <Button Classes="clickable-label" Content="Refresh" 
                         Command="{Binding RefreshCommand}"/>
-                <Button Content="Close" 
+                <Button Classes="clickable-label" Content="Close" 
                         Command="{Binding CloseCommand}"/>
             </StackPanel>
         </StackPanel>

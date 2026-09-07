@@ -54,15 +54,10 @@
               Margin="0,4,0,8" />
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12" Margin="0,8,0,0">
-            <Button Content="Refresh"
-                Width="100"
-                Command="{Binding RefreshCommand}" />
-            <Button Content="Close"
-                Width="100"
-                Command="{Binding CloseCommand}" />
-            <Button Content="Battery information"
-                Width="140"
-                Click="OpenBatteryInformation" />
+        <Button Classes="clickable-label" Content="Refresh"
+            Command="{Binding RefreshCommand}" />
+        <Button Classes="clickable-label" Content="Battery information"
+            Click="OpenBatteryInformation" />
         </StackPanel>
     </StackPanel>
 </Window>

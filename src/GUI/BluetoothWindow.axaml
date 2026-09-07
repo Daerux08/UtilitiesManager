@@ -129,21 +129,21 @@
             <StackPanel Orientation="Horizontal" 
                         HorizontalAlignment="Center" 
                         Spacing="8">
-                <Button Name="ActiveBoolButton"
+                <Button Classes="clickable-label" Name="ActiveBoolButton"
                         Content="{Binding PoweredButtonText}"
                         Background="{Binding PoweredButtonBackground}"
                         Foreground="White"
                         Command="{Binding ActiveBoolCommand}"/>
-                <Button Name="DiscoverableButton"
+                <Button Classes="clickable-label" Name="DiscoverableButton"
                         Content="{Binding DiscoverableButtonText}"
                         Background="{Binding DiscoverableButtonBackground}"
                         Foreground="White"
                         Command="{Binding DiscoverableCommand}"/>
-                <Button Content="{Binding ScanButtonText}"
+                <Button Classes="clickable-label" Content="{Binding ScanButtonText}"
                         Command="{Binding ScanCommand}"/>
-                <Button Content="Refresh" 
+                <Button Classes="clickable-label" Content="Refresh" 
                         Command="{Binding RefreshCommand}"/>
-                <Button Content="Close" 
+                <Button Classes="clickable-label" Content="Close" 
                         Command="{Binding CloseCommand}"/>
             </StackPanel>
         </StackPanel>
