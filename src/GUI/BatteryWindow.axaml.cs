@@ -15,6 +15,19 @@ public partial class BatteryWindow : Window
         viewModel.CloseRequested += (s, e) => Close();
     }
 
+    private void OpenBatteryInformation(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        try
+        {
+            var infoWindow = new BatteryInformationWindow();
+            infoWindow.Show();
+        }
+        catch (System.Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Error opening BatteryInformationWindow: {ex.Message}");
+        }
+    }
+
     private void InitializeComponent()
     {
         AvaloniaXamlLoader.Load(this);

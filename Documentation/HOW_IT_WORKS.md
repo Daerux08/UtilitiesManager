@@ -76,7 +76,8 @@ Both GUI and CLI interfaces share:
 1. Brightness control - via brightnessctl
 2. Volume control - via pactl
 3. Battery monitoring - via upower
-4. Power profiles - via powerprofilesctl
+4. Battery detailed information - a new "Battery information" window exposes `Model`, `Vendor`, and `Capacity` (health %) parsed from `upower -i`.
+5. Power profiles - via powerprofilesctl
 5. Wi-Fi scanning - robust nmcli parsing with fallbacks
 6. Wi-Fi connection - with password support and retry logic
 7. Bluetooth device discovery - via bluetoothctl

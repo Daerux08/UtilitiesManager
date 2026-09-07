@@ -4,14 +4,12 @@ using System.Windows.Input;
 
 namespace UtilitiesManager.ViewModels
 {
-    public class BatteryWindowViewModel : BaseViewModel
+    public class BatteryInformationViewModel : BaseViewModel
     {
         private readonly CheckDependencyCommand _checker = new();
         private readonly ChangeValueCommand _changer = new();
-        
+
         private BatteryInfo _batteryInfo = new();
-        private string _currentProfile = "";
-        private bool _powerProfilesAvailable;
         private System.Collections.ObjectModel.ObservableCollection<string> _availableProfiles = new();
         private string _selectedProfile = "";
 
@@ -21,11 +19,14 @@ namespace UtilitiesManager.ViewModels
             set => SetProperty(ref _batteryInfo, value);
         }
 
-        public string CurrentProfile
-        {
-            get => _currentProfile;
-            set => SetProperty(ref _currentProfile, value);
-        }
+        public string Model => BatteryInfo?.Model ?? "";
+        public string Vendor => BatteryInfo?.Vendor ?? "";
+        public string CapacityText => BatteryInfo?.Capacity >= 0 ? $"{BatteryInfo.Capacity}%" : "N/A";
+
+        public string PercentageText => BatteryInfo.Percentage >= 0 ? $"{BatteryInfo.Percentage}%" : "N/A";
+        public string StateText => BatteryInfo.State;
+        public string TimeText => GetTimeText();
+        public string PowerText => BatteryInfo.EnergyRate >= 0 ? $"{BatteryInfo.EnergyRate:F1} W" : "N/A";
 
         public System.Collections.ObjectModel.ObservableCollection<string> AvailableProfiles
         {
@@ -41,34 +42,17 @@ namespace UtilitiesManager.ViewModels
                 if (SetProperty(ref _selectedProfile, value))
                 {
                     if (!string.IsNullOrEmpty(_selectedProfile))
-                        _ = SetPowerProfile(_selectedProfile);
+                        _ = SetPowerProfileAsync(_selectedProfile);
                 }
             }
         }
 
-        public bool PowerProfilesAvailable
-        {
-            get => _powerProfilesAvailable;
-            set => SetProperty(ref _powerProfilesAvailable, value);
-        }
-
-        public string PercentageText => BatteryInfo.Percentage >= 0 ? $"{BatteryInfo.Percentage}%" : "N/A";
-        public string StateText => BatteryInfo.State;
-        public string TimeText => GetTimeText();
-        public string PowerText => BatteryInfo.EnergyRate >= 0 ? $"{BatteryInfo.EnergyRate:F1} W" : "N/A";
-
         public ICommand RefreshCommand { get; }
-        public ICommand SetPowerSaverCommand { get; }
-        public ICommand SetBalancedCommand { get; }
-        public ICommand SetPerformanceCommand { get; }
         public ICommand CloseCommand { get; }
 
-        public BatteryWindowViewModel()
+        public BatteryInformationViewModel()
         {
             RefreshCommand = new RelayCommand(Refresh);
-            SetPowerSaverCommand = new RelayCommand(async () => await SetPowerProfile("power-saver"), () => PowerProfilesAvailable);
-            SetBalancedCommand = new RelayCommand(async () => await SetPowerProfile("balanced"), () => PowerProfilesAvailable);
-            SetPerformanceCommand = new RelayCommand(async () => await SetPowerProfile("performance"), () => PowerProfilesAvailable);
             CloseCommand = new RelayCommand(Close);
 
             _ = RefreshAsync();
@@ -80,16 +64,18 @@ namespace UtilitiesManager.ViewModels
             {
                 _checker.CheckDependencies();
                 BatteryInfo = _checker.IsUpowerAvailable ? _checker.GetBattery() : new BatteryInfo { State = "upower not found" };
-                CurrentProfile = _checker.IsPowerProfilesCtlAvailable ? await _checker.GetCurrentPowerProfileAsync() : "powerprofilesctl not found";
-                PowerProfilesAvailable = _checker.IsPowerProfilesCtlAvailable;
 
-                if (PowerProfilesAvailable)
+                // Populate profiles if available
+                if (_checker.IsPowerProfilesCtlAvailable)
                 {
                     var current = await _checker.GetCurrentPowerProfileAsync();
                     AvailableProfiles = new System.Collections.ObjectModel.ObservableCollection<string>(new[] { "power-saver", "balanced", "performance" });
                     SelectedProfile = current ?? "";
                 }
 
+                OnPropertyChanged(nameof(Model));
+                OnPropertyChanged(nameof(Vendor));
+                OnPropertyChanged(nameof(CapacityText));
                 OnPropertyChanged(nameof(PercentageText));
                 OnPropertyChanged(nameof(StateText));
                 OnPropertyChanged(nameof(TimeText));
@@ -97,7 +83,7 @@ namespace UtilitiesManager.ViewModels
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error refreshing battery data: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Error refreshing battery information: {ex.Message}");
             }
         }
 
@@ -106,11 +92,11 @@ namespace UtilitiesManager.ViewModels
             _ = RefreshAsync();
         }
 
-        private async Task SetPowerProfile(string profile)
+        private async Task SetPowerProfileAsync(string profile)
         {
             try
             {
-                if (PowerProfilesAvailable)
+                if (_checker.IsPowerProfilesCtlAvailable)
                 {
                     await _changer.SetPowerProfileAsync(profile);
                     await RefreshAsync();
@@ -118,7 +104,7 @@ namespace UtilitiesManager.ViewModels
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error setting {profile} profile: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Error setting power profile: {ex.Message}");
             }
         }
 
@@ -127,20 +113,17 @@ namespace UtilitiesManager.ViewModels
             if (string.IsNullOrEmpty(BatteryInfo.State))
                 return "N/A";
 
-            // Use the smart properties from the model.
-            // This keeps the ViewModel logic simple and readable.
             if (BatteryInfo.IsDischarging)
                 return $"~{BatteryInfo.TimeToEmpty} left";
-            
+
             if (BatteryInfo.IsCharging)
                 return $"~{BatteryInfo.TimeToFull} to full";
-            
+
             return "N/A";
         }
 
         private void Close()
         {
-            // This will be handled by the View - trigger window close
             CloseRequested?.Invoke(this, EventArgs.Empty);
         }
 

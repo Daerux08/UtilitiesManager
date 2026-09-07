@@ -64,12 +64,10 @@ The GUI interface provides an Avalonia-based desktop application with intuitive 
 5. **Energy Rate** - Current power draw in watts
 6. **Present** - Whether battery is detected
 
-### Power Profile Buttons
-- **Power Saver** - `powerprofilesctl set power-saver`
-- **Balanced** - `powerprofilesctl set balanced`
-- **Performance** - `powerprofilesctl set performance`
-- **Enabled when**: `powerprofilesctl` command is available
-- **Visual**: Highlights current profile
+### Power Profile Selector
+- **Power Profile Selector** - Replaced the three buttons with a `ComboBox` in the main Battery window. The selector is enabled only when `powerprofilesctl` is available.
+	- Setting a profile calls `powerprofilesctl set {profile}` and refreshes battery data.
+	- The detailed `Battery information` window shows the selected profile as read-only.
 
 ### How Battery Window Works
 1. Window opens → calls `RefreshBatteryDataAsync()`

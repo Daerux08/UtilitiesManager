@@ -92,6 +92,7 @@ UtilMan power get              # Get current power profile
 UtilMan power set [profile]    # Set power profile (performance/balanced/power-saver)
 ```
 
+Note: The detailed `Battery information` window (shows Model/Vendor/Capacity) is a GUI-only view; the CLI `UtilMan battery` command continues to show a concise battery summary.
 ### Bluetooth Management
 ```bash
 UtilMan bluetooth list              # List Bluetooth devices

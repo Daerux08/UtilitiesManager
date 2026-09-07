@@ -400,6 +400,14 @@ namespace UtilitiesManager
                 {
                     info.IsPresent = trimmed.Contains("yes", StringComparison.OrdinalIgnoreCase);
                 }
+                else if (trimmed.StartsWith("model:", StringComparison.OrdinalIgnoreCase))
+                {
+                    info.Model = trimmed.Split(':', 2)[1].Trim();
+                }
+                else if (trimmed.StartsWith("vendor:", StringComparison.OrdinalIgnoreCase))
+                {
+                    info.Vendor = trimmed.Split(':', 2)[1].Trim();
+                }
                 else if (trimmed.StartsWith("state:", StringComparison.OrdinalIgnoreCase))
                 {
                     info.State = trimmed.Split(':')[1].Trim();
@@ -409,6 +417,12 @@ namespace UtilitiesManager
                     var match = Regex.Match(trimmed, @"(\d+(?:\.\d+)?)%");
                     if (match.Success && double.TryParse(match.Groups[1].Value, out double pct))
                         info.Percentage = (int)Math.Round(pct);
+                }
+                else if (trimmed.StartsWith("capacity:", StringComparison.OrdinalIgnoreCase))
+                {
+                    var match = Regex.Match(trimmed, @"(\d+(?:\.\d+)?)%");
+                    if (match.Success && int.TryParse(match.Groups[1].Value, out int cap))
+                        info.Capacity = cap;
                 }
                 else if (trimmed.StartsWith("time to empty:", StringComparison.OrdinalIgnoreCase))
                 {

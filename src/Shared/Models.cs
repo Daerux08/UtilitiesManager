@@ -11,6 +11,11 @@ namespace UtilitiesManager
         public string TimeToFull { get; set; } = "N/A";
         public double EnergyRate { get; set; } = -1;
         public bool IsPresent { get; set; } = false;
+        // New fields for detailed battery information
+        public string Model { get; set; } = "";
+        public string Vendor { get; set; } = "";
+        // Capacity represents battery health as a percentage (e.g., 100)
+        public int Capacity { get; set; } = -1;
 
         // Encapsulating state logic here ensures that both the GUI and CLI 
         // interpret the "State" string consistently across the whole app.
