@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.10.0-pre-alpha10] - 2026-09-07
+
+### New Features
+- **Battery Information Window**: Added a dedicated "Battery information" window in the GUI that displays detailed battery metadata (Model, Vendor, Capacity/Health) and mirrors the data produced by `upower -i`.
+
+### UI Improvements
+- **Power Profile Selector**: Replaced the three power-profile buttons in the main Battery window with a single dropdown selector (enabled only when `powerprofilesctl` is available). The detailed `Battery information` window now displays the selected profile as read-only.
+- **Grid Layout**: Battery details are now displayed in a clearer grid with black separators between rows for improved readability.
+
+### Parsing & Data
+- **Enhanced Parsing**: `GetBattery()` now parses `model`, `vendor`, and `capacity` (battery health %) from the `upower -i` output and exposes these fields to GUI and CLI via the shared `BatteryInfo` model.
+
+### Notes
+- Changes are backward compatible with the CLI `UtilMan battery` summary output.
+
 ## [0.9.0-prealpha8] - 2026-08-25
 
 ### Major Features
@@ -101,17 +116,4 @@
 
 **Note**: This release includes major architectural improvements and enhanced stability.
 
-## [Unreleased] - 2026-09-07
 
-### New Features
-- **Battery Information Window**: Added a dedicated "Battery information" window in the GUI that displays detailed battery metadata (Model, Vendor, Capacity/Health) and mirrors the data produced by `upower -i`.
-
-### UI Improvements
-- **Power Profile Selector**: Replaced the three power-profile buttons in the main Battery window with a single dropdown selector (enabled only when `powerprofilesctl` is available). The detailed `Battery information` window now displays the selected profile as read-only.
-- **Grid Layout**: Battery details are now displayed in a clearer grid with black separators between rows for improved readability.
-
-### Parsing & Data
-- **Enhanced Parsing**: `GetBattery()` now parses `model`, `vendor`, and `capacity` (battery health %) from the `upower -i` output and exposes these fields to GUI and CLI via the shared `BatteryInfo` model.
-
-### Notes
-- Changes are backward compatible with the CLI `UtilMan battery` summary output.
