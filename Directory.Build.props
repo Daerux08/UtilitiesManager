@@ -1,0 +1,12 @@
+<Project>
+  <PropertyGroup>
+    <!-- Single source of truth for the product version.
+         Consumed by both projects, by build-deb.sh, and by `UtilMan version`. -->
+    <Version>0.10.0-pre-alpha10</Version>
+
+    <Product>UtilitiesManager</Product>
+    <Company>Alexander Kozlov</Company>
+    <Copyright>Copyright (c) 2026 Alexander Kozlov</Copyright>
+    <Description>System utility manager with GUI and CLI interfaces</Description>
+  </PropertyGroup>
+</Project>

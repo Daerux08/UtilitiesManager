@@ -2,11 +2,19 @@
 set -e
 
 APP_NAME="utilitiesmanager"
-APP_VERSION="0.9.0-prealpha5"
 ARCH="amd64"
 
 # project file
 PROJECT_PATH="./UtilitiesManager.csproj"
+
+# Version comes from Directory.Build.props; '~' makes prereleases sort below the
+# final release in dpkg, unlike '-'.
+APP_VERSION="$(dotnet msbuild "$PROJECT_PATH" -getProperty:Version -nologo | tr -d '[:space:]' | sed 's/-/~/')"
+if [ -z "$APP_VERSION" ]; then
+    echo "Could not read <Version> from Directory.Build.props" >&2
+    exit 1
+fi
+echo "==> Building version $APP_VERSION"
 
 # Output directories
 PUBLISH_DIR="./publish"

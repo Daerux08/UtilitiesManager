@@ -173,6 +173,8 @@ namespace UtilitiesManager
         {
             MenuEngine.GeneralMessage("GENERAL INFORMATION");
 
+            MenuEngine.ShowMessage("VERSION", $"[bold cyan]{AppVersion.Current}[/]     Run [bold cyan]UtilMan version[/] to print it", false);
+
             MenuEngine.ShowMessage("ABOUT", "[italic]Utilities Manager is a Linux system utility manager for controlling brightness, volume, battery, WiFi, Bluetooth, and power profiles via command line.[/]", false);
 
             MenuEngine.ShowMessage("COMPATIBILITY", "[green]•[/] Tested on: Linux Mint 22.2, Debian 13, Ubuntu 24.04\n[green]•[/] Requires: NetworkManager and standard Linux tools\n[green]•[/] Architecture: Supports x86_64, ARM64", false);
