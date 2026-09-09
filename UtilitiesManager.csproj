@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AssemblyName>UtilitiesManager</AssemblyName>
     
     <!-- AOT Configuration -->
     <PublishAot>true</PublishAot>
@@ -33,8 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="UtilitiesManagerCLI/Program_CLI.cs" />
-    <Compile Remove="Program_CLI.cs" />
+    <Compile Remove="src/CLI/Program_CLI.cs" />
     <Compile Remove="Test/**" />
   </ItemGroup>
 </Project>

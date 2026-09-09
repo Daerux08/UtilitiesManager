@@ -53,6 +53,12 @@ namespace UtilitiesManager
                     Help.ShowAllHelp();
                     break;
 
+                case "version":
+                case "--version":
+                case "-v":
+                    Console.WriteLine($"UtilitiesManager {AppVersion.Current}");
+                    break;
+
                 case "cpu":
                 case "memory":
                 case "disk":

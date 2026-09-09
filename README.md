@@ -38,7 +38,7 @@ Tested on Linux Mint 22.2, Debian 13, Debian testing, Ubuntu 24.04, and headless
 Download the latest `.deb` from [Releases](../../releases), then:
 
 ```bash
-sudo dpkg -i UtilitiesManager_0.9.0-pre-alpha-8_amd64.deb
+sudo dpkg -i utilitiesmanager_0.10.0~pre-alpha10_amd64.deb
 sudo apt-get install -f
 ```
 
@@ -96,6 +96,7 @@ UtilMan install firewall
 # Help
 UtilMan help
 UtilMan status
+UtilMan version
 ```
 
 ---
@@ -107,11 +108,14 @@ dotnet build
 ./build-deb.sh
 ```
 
+The product version lives in `Directory.Build.props` and is the single source used by both
+projects, by `build-deb.sh`, and by `UtilMan version`.
+
 ## Documentation
 
-- `HOW_IT_WORKS.md` — Technical implementation details
-- `HOW_IT_WORKS_CLI.md` — CLI features and commands
-- `HOW_IT_WORKS_GUI.md` — GUI features and components
+- `Documentation/HOW_IT_WORKS.md` — Technical implementation details
+- `Documentation/HOW_IT_WORKS_CLI.md` — CLI features and commands
+- `Documentation/HOW_IT_WORKS_GUI.md` — GUI features and components
 
 ---
 

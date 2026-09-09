@@ -3,7 +3,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AssemblyName>UtilitiesManagerCLI</AssemblyName>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     
     <!-- AOT Configuration -->
@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="Program_CLI.cs" />
+    <Compile Include="src/CLI/Program_CLI.cs" />
     <Compile Include="src/CLI/CLI_UTILMAN.cs" />
 	  <Compile Include="src/CLI/BrightnessService.cs" />
 	  <Compile Include="src/CLI/VolumeService.cs" />
@@ -36,6 +36,7 @@
 	  <Compile Include="src/CLI/PowerService.cs" />
     <Compile Include="src/CLI/Help.cs" />
     <Compile Include="src/CLI/MenuEngine.cs" />
+    <Compile Include="src/Shared/AppVersion.cs" />
     <Compile Include="src/Shared/Terminal.cs" />
     <Compile Include="src/Shared/Models.cs" />
     <Compile Include="src/DownloadScript.cs" />
