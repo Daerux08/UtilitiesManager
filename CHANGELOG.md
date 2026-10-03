@@ -1,5 +1,10 @@
 # Changelog
 
+## [Unreleased]
+
+### Added
+- **Firmware Setup (GUI)**: Added an Enter BIOS action in Settings that invokes `systemctl reboot --firmware-setup`. This requests an immediate reboot and depends on systemd and firmware support.
+
 ## [0.10.0-pre-alpha10] - 2026-09-07
 
 ### New Features

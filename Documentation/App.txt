@@ -13,11 +13,12 @@ packages used:
 12. fail2ban - Intrusion prevention
 13. bleachbit - System cleanup
 14. ncdu - Disk usage analysis
+15. systemctl - Request reboot into supported firmware setup from GUI Settings
 
 using:
 1. Visual Studio Code - IDE
 2. C# - Programming language
-3. .NET 8.0 - Framework
+3. .NET 10.0 - Framework
 4. Avalonia UI - GUI framework
 5. Git - Version control
 

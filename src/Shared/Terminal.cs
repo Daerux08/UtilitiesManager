@@ -105,6 +105,14 @@ namespace UtilitiesManager
         }
     }
 
+    public class EnterBIOSCommand
+    {
+        public async Task EnterBIOSAsync()
+        {
+            await TerminalCommands.RunCommandAsync("systemctl reboot --firmware-setup");
+        }
+    }
+
     public class ChangeValueCommand
     {
         public async Task SetBrightnessAsync(int percent)

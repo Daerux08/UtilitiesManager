@@ -36,13 +36,14 @@ The application automatically detects the appropriate mode:
 6. `BatteryWindow.axaml/.cs` - Battery status window
 7. `WiFiWindow.axaml/.cs` - WiFi management window
 8. `BluetoothWindow.axaml/.cs` - Bluetooth device management window
-9. `EnterPasswordPopup.axaml/.cs` - Generic password/PIN dialog for WiFi and Bluetooth
+9. `SettingsWindow.axaml/.cs` and `SettingsViewModel.cs` - Settings actions, including firmware setup
+10. `EnterPasswordPopup.axaml/.cs` - Generic password/PIN dialog for WiFi and Bluetooth
 
 ### CLI Components
-9. `CLI_UTILMAN.cs` - CLI interface routing and main menu coordination
-10. `MenuEngine.cs` - Modern Spectre.Console based menu system with arrow key navigation
-11. `DownloadScript.cs` - Package installation with sudo handling
-12. **Service Classes** - Refactored modular service-based architecture:
+11. `CLI_UTILMAN.cs` - CLI interface routing and main menu coordination
+12. `MenuEngine.cs` - Modern Spectre.Console based menu system with arrow key navigation
+13. `DownloadScript.cs` - Package installation with sudo handling
+14. **Service Classes** - Refactored modular service-based architecture:
     - `BrightnessService.cs` - Screen brightness control
     - `VolumeService.cs` - Audio volume management
     - `BatteryService.cs` - Battery status and power profiles
@@ -72,6 +73,8 @@ Both GUI and CLI interfaces share:
 - **Enhanced GUI** with material design cards and modern styling
 - **Modern CLI** with Spectre.Console based menus and reduced bloat
 
+The firmware-setup action is GUI-only. It runs `systemctl reboot --firmware-setup` directly; the request reboots immediately and works only when systemd and the machine's firmware support it.
+
 ## What works now
 1. Brightness control - via brightnessctl
 2. Volume control - via pactl
@@ -93,6 +96,7 @@ Both GUI and CLI interfaces share:
 17. Arrow key navigation - modern CLI menu interface with Spectre.Console (CLI only)
 18. Environment detection - automatic GUI/CLI mode selection
 19. **Enhanced Menu Engine** - streamlined CLI interface with reduced complexity
+20. Firmware setup request from the GUI Settings window - uses `systemctl reboot --firmware-setup`
 
 ## Future Enhancements
 1. ~~Bluetooth management~~ ✅ Added in v0.8.0
@@ -114,4 +118,4 @@ Both GUI and CLI interfaces share:
 1. Development: `dotnet build`
 2. Release: `dotnet publish -c Release -r linux-x64 --self-contained`
 3. Debian package: `./build-deb.sh`
-4. Includes: .NET runtime (no separate install needed)
+4. AOT release binaries do not require a separately installed .NET runtime; development builds require the .NET SDK.

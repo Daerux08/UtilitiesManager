@@ -10,9 +10,10 @@ The GUI interface provides an Avalonia-based desktop application with intuitive 
 4. `BatteryWindow.axaml/.cs` - Battery status window
 5. `WiFiWindow.axaml/.cs` - WiFi management window
 6. `BluetoothWindow.axaml/.cs` - Bluetooth device management window
-7. `EnterPasswordPopup.axaml/.cs` - Generic password/PIN dialog for WiFi and Bluetooth
-8. `Terminal.cs` - Linux command execution and parsing
-9. `Help.cs` - Help documentation
+7. `SettingsWindow.axaml/.cs` and `SettingsViewModel.cs` - Settings actions, including firmware setup
+8. `EnterPasswordPopup.axaml/.cs` - Generic password/PIN dialog for WiFi and Bluetooth
+9. `Terminal.cs` - Linux command execution and parsing
+10. `Help.cs` - Help documentation
 
 ## How GUI Mode Starts
 1. `Program.cs` checks environment variables (DISPLAY/WAYLAND_DISPLAY)
@@ -76,6 +77,10 @@ The GUI interface provides an Avalonia-based desktop application with intuitive 
 4. Runs `upower -i {device}` to get battery info
 5. Parses output for all battery statistics
 6. Updates all TextBlocks and power profile buttons
+
+## Settings Window
+
+The Settings window provides an **Enter BIOS** action. Selecting it runs `systemctl reboot --firmware-setup`, which requests an immediate reboot into firmware setup. There is no additional confirmation dialog in the app. The request requires systemd and firmware support, and may be denied if the current user is not authorized to reboot.
 
 ## WiFi Window
 
@@ -165,7 +170,6 @@ The GUI interface provides an Avalonia-based desktop application with intuitive 
 10. `bluetoothctl devices` - List Bluetooth devices
 11. `bluetoothctl info {address}` - Get device details
 12. `bluetoothctl scan on/off` - Toggle device scanning
-
 ### Control Commands
 1. `brightnessctl set {percent}%` - Set brightness
 2. `pactl set-sink-volume @DEFAULT_SINK@ {percent}%` - Set volume
@@ -176,6 +180,7 @@ The GUI interface provides an Avalonia-based desktop application with intuitive 
 7. `bluetoothctl disconnect {address}` - Disconnect from Bluetooth device
 8. `bluetoothctl pair {address}` - Pair with Bluetooth device
 9. `bluetoothctl trust {address}` - Trust Bluetooth device
+10. `systemctl reboot --firmware-setup` - Request reboot into firmware setup
 
 ## GUI Features Working
 1. **Brightness Control** - Via brightnessctl with real-time feedback
@@ -189,6 +194,7 @@ The GUI interface provides an Avalonia-based desktop application with intuitive 
 9. **Error Handling** - Graceful degradation for missing tools
 10. **Real-time Updates** - Current values shown on load
 11. **Visual Feedback** - Tooltips and status indicators
+12. **Firmware Setup** - Request reboot into supported firmware setup from Settings
 
 ## GUI Dependencies
 
@@ -199,6 +205,7 @@ The GUI interface provides an Avalonia-based desktop application with intuitive 
 - **nmcli** (NetworkManager) - WiFi management
 - **bluetoothctl** (BlueZ) - Bluetooth device management
 - **powerprofilesctl** - Power profile management
+- **systemctl** - Request firmware setup reboot from Settings
 
 ### System Requirements
 - **Display Server** - X11 or Wayland

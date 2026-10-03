@@ -93,6 +93,9 @@ UtilMan power set [profile]    # Set power profile (performance/balanced/power-s
 ```
 
 Note: The detailed `Battery information` window (shows Model/Vendor/Capacity) is a GUI-only view; the CLI `UtilMan battery` command continues to show a concise battery summary.
+
+The firmware-setup action is also GUI-only; there is no `UtilMan` subcommand for it. The Settings button runs `systemctl reboot --firmware-setup` and requests an immediate reboot when supported.
+
 ### Bluetooth Management
 ```bash
 UtilMan bluetooth list              # List Bluetooth devices

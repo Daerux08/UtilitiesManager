@@ -21,6 +21,11 @@ Tested on Linux Mint 22.2, Debian 13, Debian testing, Ubuntu 24.04, and headless
 - Volume control
 - Battery status & power profiles
 - WiFi management
+- Bluetooth device management
+
+### GUI Only
+- Settings action to reboot directly into firmware setup when supported
+- Detailed battery model, vendor, and health information
 
 ### CLI Only
 - System monitoring (CPU, memory, disk, network)
@@ -51,6 +56,8 @@ sudo apt-get install -f
 **Core:** `brightnessctl` `pactl` `upower` `nmcli` `powerprofilesctl`
 
 **Server features:** `procps` `lm-sensors` `sysstat` `systemctl` `journalctl` `ufw` `fail2ban` `bleachbit` `ncdu`
+
+The GUI's firmware-setup action uses `systemctl reboot --firmware-setup`. It requests an immediate reboot and requires systemd plus firmware that supports this request; the app does not show a separate confirmation dialog.
 
 ---
 
@@ -121,6 +128,8 @@ projects, by `build-deb.sh`, and by `UtilMan version`.
 
 ## Recent Changes
 
+- **Unreleased**: Added a Settings action to reboot into supported firmware setup.
+- **v0.10.0-pre-alpha10**: Added detailed battery metadata and a power-profile selector.
 - **v0.9.0**: Ahead-Of-Time (AOT) compilation for native binary execution
   - No .NET runtime required
   - Significantly faster startup and runtime performance
