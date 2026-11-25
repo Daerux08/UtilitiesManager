@@ -72,8 +72,69 @@
             </StackPanel>
         </Border>
 
-        <!-- Data Grid -->
-        <Border Grid.Row="1" Classes="card">
+        <!-- Device Lists -->
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Connected Devices -->
+            <Border Grid.Row="0" Classes="card"
+                    IsVisible="{Binding HasConnectedDevices}">
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Connected Devices"
+                               FontSize="13"
+                               FontWeight="SemiBold"
+                               Foreground="#1976D2"
+                               Margin="0,0,0,4"/>
+                    <DataGrid Name="ConnectedDataGrid"
+                              ItemsSource="{Binding ConnectedDevices}"
+                              SelectedItem="{Binding SelectedDevice}"
+                              MaxHeight="140"
+                              DoubleTapped="BluetoothDataGrid_DoubleTapped">
+                        <DataGrid.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Pair" Command="{Binding PairSelectedCommand}"/>
+                                <MenuItem Header="Forget" Command="{Binding ForgetSelectedCommand}"/>
+                                <MenuItem Header="Disconnect" Command="{Binding DisconnectSelectedCommand}"/>
+                                <MenuItem Header="Enable auto-pair" Command="{Binding TrustSelectedCommand}"/>
+                            </ContextMenu>
+                        </DataGrid.ContextMenu>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Name"
+                                                x:DataType="local:BluetoothInfo"
+                                                Binding="{Binding Name}"
+                                                Width="200"/>
+                            <DataGridTextColumn Header="Address"
+                                                x:DataType="local:BluetoothInfo"
+                                                Binding="{Binding Address}"
+                                                Width="150"/>
+                            <DataGridTextColumn Header="Type"
+                                                x:DataType="local:BluetoothInfo"
+                                                Binding="{Binding Type}"
+                                                Width="100"/>
+                            <DataGridTextColumn Header="Paired"
+                                                x:DataType="local:BluetoothInfo"
+                                                Binding="{Binding Paired}"
+                                                Width="80"/>
+                            <DataGridTextColumn Header="Trusted"
+                                                x:DataType="local:BluetoothInfo"
+                                                Binding="{Binding Trusted}"
+                                                Width="80"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </StackPanel>
+            </Border>
+
+            <!-- Available Devices -->
+            <Border Grid.Row="1" Classes="card">
+            <StackPanel Spacing="4">
+                <TextBlock Text="Available Devices"
+                           FontSize="13"
+                           FontWeight="SemiBold"
+                           Foreground="#1976D2"
+                           Margin="0,0,0,4"/>
             <DataGrid Name="BluetoothDataGrid"
                       ItemsSource="{Binding BluetoothDevices}"
                       SelectedItem="{Binding SelectedDevice}"
@@ -87,10 +148,6 @@
                     </ContextMenu>
                 </DataGrid.ContextMenu>
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Status" 
-                                        x:DataType="local:BluetoothInfo"
-                                        Binding="{Binding Connected, Converter={StaticResource BoolToStatusConverter}}" 
-                                        Width="100"/>
                     <DataGridTextColumn Header="Name" 
                                         x:DataType="local:BluetoothInfo"
                                         Binding="{Binding Name}" 
@@ -117,7 +174,9 @@
                                         Width="80"/>
                 </DataGrid.Columns>
             </DataGrid>
-        </Border>
+            </StackPanel>
+            </Border>
+        </Grid>
 
         <!-- Status and Buttons -->
         <StackPanel Grid.Row="2" Spacing="8" Margin="0,8,0,0">

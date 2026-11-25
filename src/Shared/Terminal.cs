@@ -774,14 +774,8 @@ namespace UtilitiesManager
             
             try
             {
-                // Get devices info using bluetoothctl
-                string output = await TerminalCommands.RunCommandAsync("bluetoothctl devices Paired");
-                
-                if (string.IsNullOrWhiteSpace(output))
-                {
-                    // Try to get all devices if no paired devices
-                    output = await TerminalCommands.RunCommandAsync("bluetoothctl devices");
-                }
+                // Get all known devices using bluetoothctl
+                string output = await TerminalCommands.RunCommandAsync("bluetoothctl devices");
                 
                 if (string.IsNullOrWhiteSpace(output))
                 {

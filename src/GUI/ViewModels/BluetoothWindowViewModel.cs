@@ -14,6 +14,7 @@ namespace UtilitiesManager.ViewModels
         private readonly ChangeValueCommand _changer = new();
 
         private ObservableCollection<BluetoothInfo> _bluetoothDevices = new ObservableCollection<BluetoothInfo>();
+        private ObservableCollection<BluetoothInfo> _connectedDevices = new ObservableCollection<BluetoothInfo>();
         private string _statusText = "Loading Bluetooth devices...";
         private BluetoothInfo? _selectedDevice;
         private bool _isScanning = false;
@@ -25,6 +26,14 @@ namespace UtilitiesManager.ViewModels
             get => _bluetoothDevices;
             set => SetProperty(ref _bluetoothDevices, value);
         }
+
+        public ObservableCollection<BluetoothInfo> ConnectedDevices
+        {
+            get => _connectedDevices;
+            set => SetProperty(ref _connectedDevices, value);
+        }
+
+        public bool HasConnectedDevices => ConnectedDevices.Count > 0;
 
         public string StatusText
         {
@@ -106,6 +115,8 @@ namespace UtilitiesManager.ViewModels
             DisconnectSelectedCommand = new RelayCommand(DisconnectSelected, () => SelectedDevice != null);
             TrustSelectedCommand = new RelayCommand(TrustSelected, () => SelectedDevice != null);
 
+            ConnectedDevices.CollectionChanged += (s, e) => OnPropertyChanged(nameof(HasConnectedDevices));
+
             _ = RefreshAsync();
         }
 
@@ -126,9 +137,17 @@ namespace UtilitiesManager.ViewModels
                     await Dispatcher.UIThread.InvokeAsync(() =>
                     {
                         BluetoothDevices.Clear();
+                        ConnectedDevices.Clear();
                         foreach (var device in newDevices)
                         {
-                            BluetoothDevices.Add(device);
+                            if (device.Connected)
+                            {
+                                ConnectedDevices.Add(device);
+                            }
+                            else
+                            {
+                                BluetoothDevices.Add(device);
+                            }
                         }
                     });
 
@@ -137,12 +156,14 @@ namespace UtilitiesManager.ViewModels
                 else
                 {
                     BluetoothDevices.Clear();
+                    ConnectedDevices.Clear();
                     StatusText = "bluetoothctl is not available. Bluetooth functionality requires BlueZ.";
                 }
             }
             catch (Exception ex)
             {
                 BluetoothDevices.Clear();
+                ConnectedDevices.Clear();
                 StatusText = $"Error loading Bluetooth devices: {ex.Message}";
             }
         }
@@ -252,6 +273,16 @@ namespace UtilitiesManager.ViewModels
 
                     foreach (var device in updates.Devices)
                     {
+                        var connected = ConnectedDevices.FirstOrDefault(item =>
+                            string.Equals(item.Address, device.Address, StringComparison.OrdinalIgnoreCase));
+
+                        if (connected != null)
+                        {
+                            connected.Name = device.Name;
+                            connected.Alias = device.Alias;
+                            continue;
+                        }
+
                         var existing = BluetoothDevices.FirstOrDefault(item =>
                             string.Equals(item.Address, device.Address, StringComparison.OrdinalIgnoreCase));
 
